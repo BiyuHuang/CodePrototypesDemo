@@ -2,13 +2,18 @@ import sbt._
 
 object Dependencies {
   val testDependencies: Seq[ModuleID] = Seq(
-    "org.scalatest" %% "scalatest" % "2.1.0" % "test",
+    "org.scalatest" % "scalatest_2.11" % "2.2.4",
     "mysql" % "mysql-connector-java" % "5.1.31" % "test",
-    "org.apache.kafka" % "kafka-clients" % "0.8.2.1" ,
-    "org.apache.spark" % "spark-streaming-kafka_2.10" % "1.4.1"
+    "org.apache.kafka" % "kafka-clients" % "0.8.2.1",
+    "org.apache.spark" % "spark-streaming-kafka_2.11" % "1.6.2"
   )
 
-  val sparkDependencies: Seq[ModuleID] = Seq()
+  val sparkDependencies: Seq[ModuleID] = Seq(
+  "org.apache.spark" % "spark-core_2.11" % "2.0.0",
+  "org.apache.spark" % "spark-sql_2.11" % "2.0.0",
+  "org.apache.spark" % "spark-streaming_2.11" % "2.0.0",
+  "org.apache.spark" % "spark-mllib_2.11" % "2.0.0"
+  )
 
   val sparkAppDependencies: Seq[ModuleID] = testDependencies ++ sparkDependencies
 }
