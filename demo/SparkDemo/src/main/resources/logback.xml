@@ -44,7 +44,7 @@
         </encoder>
     </appender>
 
-    <root level="ERROR">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE_DEBUG"/>
         <appender-ref ref="FILE_ERROR"/>

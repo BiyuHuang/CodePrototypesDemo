@@ -1,14 +1,18 @@
 package com.wallace.spark.MllibDemo
 
 import com.wallace.spark.common.LogSupport
+import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}
+import org.apache.spark.{SparkConf, SparkContext}
 
-import org.glassfish.jersey.internal.util.Tokenizer
 
 /**
   * Created by Wallace on 2016/10/17.
   */
 object MllibDemo extends App with LogSupport {
-  val conf = new SparkConf().setMaster("local[*]").setAppName("RddConvertToDataFrame")
+
+  val conf = new SparkConf()
+//    .setMaster("local")
+    .setAppName("RddConvertToDataFrame")
   val sc = new SparkContext(conf)
   val sqlContext = new org.apache.spark.sql.SQLContext(sc)
   val sentenceData = sqlContext.createDataFrame(Seq(

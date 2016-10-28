@@ -2,6 +2,7 @@ import sbt._
 
 object Dependencies {
   val testDependencies: Seq[ModuleID] = Seq(
+    "com.typesafe" % "config" % "1.2.1",
     "org.scalatest" % "scalatest_2.11" % "2.2.4",
     "mysql" % "mysql-connector-java" % "5.1.31" % "test",
     "org.apache.kafka" % "kafka-clients" % "0.8.2.1",

@@ -21,7 +21,7 @@ object MessageProducer {
            |<Usage>: MessageProducer messagesPerSec[Int]
            |         MessageProducer 1000
            |""".stripMargin)
-      exit(0)
+      System.exit(0)
     }
     val timer = new Timer
     val task = new MsgSender(args(0).toInt)
