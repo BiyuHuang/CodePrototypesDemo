@@ -1,0 +1,27 @@
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=1,shelf=1,board=1|5|RX   -ANT0; 1,N|20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=1,shelf=1,board=1|3|b9:fd:ce:c2|20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=1,shelf=1,board=1|3|b8:c9:bd:d3:b5:e3:ba:c5:3a:20:36:35:35:33:36:30:30:3b:20:31:2c:33:3b:20:54:44:53:3a:20:d0:a1:c7:f8:49:44:3d:33:26:43:50:3d:31:2c:20:d0:a1:c7:f8:49:44:3d:34:26:43:50:3d:32|20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=51,shelf=1,board=1|5|b9:e2:bf:da:31:b6:d4:d3:a6:b5:c4:c9:cf:c1:aa:b9:e2:bf:da:3a:b9:e2:bf:da:33:b6:d4:d3:a6:b5:c4:c9:cf:c1:aa:b9:e2:bf:da:3a:b9:e2:bf:da:35:b6:d4:d3:a6:b5:c4:c9:cf:c1:aa:b9:e2:bf:da:3a:b9:e2:bf:da:37:b6:d4:d3:a6:b5:c4:c9:cf:c1:aa:b9:e2:bf:da:3a:b9:e2:bf:da:39:b6:d4:d3:a6:b5:c4:c9:cf:c1:aa:b9:e2:bf:da:3a:b9:e2:bf:da:31:31:b6:d4:d3:a6:b5:c4:c9:cf:c1:aa:b9:e2:bf:da:3a:4d:43:55:c6:f4:b6:af:c2:b7:be:b6:b5:c4:d7:ee:ba:f3:c8:fd:b2:bd:a3:ba:31:33:2c:20:31:34:2c:20:31:35|20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=1,shelf=1,board=1|4||20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=1,shelf=1,board=1|2|ce:b4:bd:d3:ca:d5:b5:bd:b9:e2:d0:c5:ba:c5:2c:20:b9:e2:bf:da:33:b6:d4:d3:a6:b5:c4:c9:cf:c1:aa:b9:e2:bf:da|20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=1,shelf=1,board=1|5|ca:e4:c8:eb:b8:c9:bd:d3:b5:e3:30|20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=1,shelf=1,board=1|3|b8:c9:bd:d3:b5:e3:ba:c5:3a:20:30|20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=1,shelf=1,board=1|5|d2:ec:b3:a3:c1:b4:c2:b7:ba:c5:3a:20:31|20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0,Equipment=1,rack=51,shelf=1,board=1|5|TX-ANT1|20420
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=357197|1|49:50:3a:20:31:30:30:2e:39:32:2e:31:33:34:2e:31:38:30:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:54:44:4c:20:65:4e:42:49:64:3a:33:35:37:31:39:37|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=817172|1|49:50:3a:20:31:30:30:2e:39:32:2e:31:34:37:2e:32:39:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:54:44:4c:20:65:4e:42:49:64:3a:38:31:37:31:37:32|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=793819|1|49:50:3a:20:31:30:30:2e:39:32:2e:31:34:30:2e:35:34:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:54:44:4c:20:65:4e:42:49:64:3a:37:39:33:38:31:39|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=356941|1|49:50:3a:20:31:30:2e:39:2e:32:2e:31:31:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:54:44:4c:20:65:4e:42:49:64:3a:33:35:36:39:34:31|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=1|1|49:50:3a:20:31:30:2e:39:2e:31:39:33:2e:31:35:35:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=357503|1|49:50:3a:20:31:30:30:2e:39:32:2e:31:33:38:2e:31:38:34:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:54:44:4c:20:65:4e:42:49:64:3a:33:35:37:35:30:33|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=0@NodeMe=0|1|49:50:3a:20:31:30:2e:39:2e:31:39:30:2e:31:34:31:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:4c:20:65:4e:42:49:64:3a:30|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=0@NodeMe=2|1|49:50:3a:20:31:30:2e:39:2e:39:33:2e:31:34:33:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=357525|1|49:50:3a:20:31:30:30:2e:39:32:2e:31:33:32:2e:34:34:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:54:44:4c:20:65:4e:42:49:64:3a:33:35:37:35:32:35|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=0@NodeMe=1|1|49:50:3a:20:31:2e:31:2e:31:2e:31:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=357662|1|49:50:3a:20:31:30:30:2e:39:32:2e:31:33:36:2e:32:37:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:54:44:4c:20:65:4e:42:49:64:3a:33:35:37:36:36:32|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=356964|1|49:50:3a:20:31:30:30:2e:39:32:2e:31:33:39:2e:37:33:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:54:44:4c:20:65:4e:42:49:64:3a:33:35:36:39:36:34|20402
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=817069|1|49:50:3a:20:31:30:30:2e:39:32:2e:31:34:37:2e:32:34:30:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3:3b:20:54:44:4c:20:65:4e:42:49:64:3a:38:31:37:30:36:39|20402
+OMMOID=irpx8xyj-2|11|d3:a6:d3:c3:b7:fe:ce:f1:c6:f7:20:73:75:73:65:28:31:30:2e:39:2e:31:37:37:2e:32:34:33:29:a3:ac:d3:b2:c5:cc:a3:ba:2f:64:65:76:2f:6d:61:70:70:65:72:2f:73:79:73:74:65:6d:5f:36:35:36:34:2d:4c:6f:67:56:6f:6c:48:6f:6d:65:ca:b9:d3:c3:b3:ac:b9:fd:bc:e0:bf:d8:e3:d0:d6:b5:a3:a1:28:20:20:ca:b9:d3:c3:a3:ba:37:34:2e:35:33:25:a3:ac:e3:d0:d6:b5:ce:aa:a3:ba:5b:d1:cf:d6:d8:a3:ba:39:30:25:5d:5b:d6:d8:d2:aa:a3:ba:38:35:25:5d:5b:c6:d5:cd:a8:a3:ba:38:30:25:5d:5b:c7:e1:ce:a2:a3:ba:37:30:25:5d:20:29|6
+sdrmgr:OMMOID=irpx8xyj-2@sbn=110@NodeMe=0|1|49:50:3a:20:31:30:2e:35:2e:31:32:38:2e:31:31:31:2c:20:4f:4d:43:cd:a8:b5:c0:d2:ec:b3:a3|20402
+COMM:EMS=502463710549|11|d6:b4:d0:d0:ca:fd:be:dd:bf:e2:c3:fc:c1:ee:ca:a7:b0:dc:a1:a3|6
+COMM:EMS=502463710549|11|d6:b4:d0:d0:ca:fd:be:dd:bf:e2:c3:fc:c1:ee:ca:a7:b0:dc:a1:a3|6

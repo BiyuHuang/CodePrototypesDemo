@@ -1,0 +1,10 @@
+# Created by .ignore support plugin (hsz.mobi)
+.gitignore
+.idea/
+.idea_modules/
+demo/SparkDemo/target/
+demo/src/
+project/project/
+project/target/
+projectFilesBackup/
+target/
