@@ -1,8 +1,8 @@
-package com.wallace.spark.SparkDemo
+package com.wallace.spark.SparkDemo.RddDemo
 
 import java.text.{DecimalFormat, SimpleDateFormat}
 
-import com.wallace.spark.common.LogSupport
+import com.wallace.common.LogSupport
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable.ArrayBuffer
@@ -17,7 +17,7 @@ object RddActionDemo extends LogSupport {
     val conf = new SparkConf().setMaster("local[*]").setAppName("ActionDemo")
     val sc = new SparkContext(conf)
 
-    val file = Source.fromFile("./data/DateProducer_2016-05-09_Test.csv", "UTF-8")
+    val file = Source.fromFile("demo/SparkDemo/data/DateProducer_2016-05-09_Test.csv", "UTF-8")
     val line = file.getLines().toArray
     val dateStyle = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
     val msgBuffer: ArrayBuffer[List[String]] = ArrayBuffer(List(null))

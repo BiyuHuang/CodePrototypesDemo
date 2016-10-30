@@ -1,10 +1,9 @@
 package com.wallace.spark.DataProcess
 
 import java.io.PrintWriter
-import java.text.SimpleDateFormat
-import java.util.Date
 
-import com.wallace.spark.common.LogSupport
+import com.wallace.common.LogSupport
+import com.wallace.common.TimeFormat.TimePara
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
@@ -17,7 +16,6 @@ import scala.util.Random
 object DataProducer extends LogSupport {
   def dataProducer(num: Int): Array[String] = {
     val random = new Random
-    val sdf = new SimpleDateFormat("yyyy-MM-dd hh:MM:ss.SSS")
     val ueId = Array("10001", "10002", "10003", "10004", "10005", "10006", "10007", "10008", "10009", "10010", "10011", "10012", "10013", "10014")
     val text = Array("aaaaaaaaaaa", "bbbbbbbbb", "cccccccccccc", "dddddddddddd", "fffffffffffffff", "gggggggggggg", "hhhhhhhhhhhhh")
     val (region_id_c, x_offset_c, y_offset_c) = (4841, 0, 0)
@@ -26,7 +24,7 @@ object DataProducer extends LogSupport {
     (0 until num).foreach {
       x =>
         val factor = if (x == 0) 0 else random.nextInt(x)
-        val record = s"""${sdf.format(new Date(System.currentTimeMillis()))},${ueId(factor % ueId.length)},${text(factor % text.length)},${region_id_c + factor},${x_offset_c + factor + x},${y_offset_c + factor + x}\n"""
+        val record = s"""${TimePara.getCurrentTime},${ueId(factor % ueId.length)},${text(factor % text.length)},${region_id_c + factor},${x_offset_c + factor + x},${y_offset_c + factor + x}\n"""
         resBuffer.append(record)
     }
     resBuffer.result().toArray
@@ -68,7 +66,7 @@ object DataProducer extends LogSupport {
       * val endTime = System.currentTimeMillis()
       * val costTime = endTime - startTime
       *log.error(s"[Costing Time]: $costTime ms")
-      * val outputFile = new File(s"./data/AvgValue_${new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis))}_TestSpendTime.csv")
+      * val outputFile = new File(s"./data/AvgValue_${TimePara.getDatePartition}_TestSpendTime.csv")
       * val out = new FileWriter(outputFile, true)
       *out.write(costTime.toInt + "\n")
       *out.close()
@@ -83,7 +81,7 @@ object DataProducer extends LogSupport {
     //    webFile.foreach(print)
     //    webFile.close()
 
-    val printWriter = new PrintWriter(s"./data/Testing_Data_${new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis))}.csv", "utf-8")
+    val printWriter = new PrintWriter(s"./demo/SparkDemo/data/Testing_Data_${TimePara.getDatePartition}.csv", "utf-8")
     val resData = dataProducer(10000)
     resData.indices.foreach {
       x =>

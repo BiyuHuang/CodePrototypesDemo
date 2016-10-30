@@ -1,4 +1,4 @@
-package com.wallace.spark.common.TimeFormat
+package com.wallace.common.TimeFormat
 
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
@@ -45,7 +45,14 @@ object TimePara {
   }
 
   def getCurrentDate: String = {
-    val now: Date = new Date()
+    val now: Date = new Date(System.currentTimeMillis())
+    val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val time = dateFormat.format(now)
+    time
+  }
+
+  def getCurrentTime: String = {
+    val now: Date = new Date(System.currentTimeMillis())
     val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
     val time = dateFormat.format(now)
     time

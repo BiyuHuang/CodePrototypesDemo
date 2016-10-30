@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * Created by Wallace on 2016/8/20.
  */
-public class EncodingParser {
+public final class EncodingParser {
     public static String getEncoding(String str) {
         String encode = "GB2312";
         try {
@@ -95,7 +95,7 @@ public class EncodingParser {
     public static void main(String args[]) {
         String ge = EncodingParser.getEncoding("4c455a303131373030535fc0f6ccecb4f3cfc33230c2a52de3fcd1c5bfb5c0d6b3c72833353731393729");
         System.out.println(ge);
-        String res = EncodingParser.toStringHex("b9fdcec2","GB2312");
+        String res = EncodingParser.toStringHex("b9fdcec2", "GB2312");
         System.out.println(res);
     }
 }

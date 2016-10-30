@@ -3,8 +3,8 @@ package com.wallace.spark.KafkaDemo
 import java.util
 import java.util.{Timer, TimerTask}
 
-import com.wallace.spark.common.LogSupport
-import com.wallace.spark.common.TimeFormat.TimePara
+import com.wallace.common.LogSupport
+import com.wallace.common.TimeFormat.TimePara
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 
 import scala.io.Source
@@ -39,7 +39,7 @@ class senderTIme(brokers: String, topic: String, messagesPerSec: Int) extends Ti
 
 
   override def run(): Unit = {
-    val file = Source.fromFile("./data/DateProducer_2016-05-14_Test.csv", "UTF-8")
+    val file = Source.fromFile("demo/SparkDemo/data/DateProducer_2016-05-14_Test.csv", "UTF-8")
     val lines = file.getLines.toArray
     log.error(s"========== Start to send ${messagesPerSec * 5} message to Topic: [$topic] ==========")
     (1 to messagesPerSec * 5).foreach {

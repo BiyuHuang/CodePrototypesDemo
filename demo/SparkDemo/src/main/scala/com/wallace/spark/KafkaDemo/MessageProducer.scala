@@ -1,10 +1,10 @@
-package com.wallace.spark.SparkSteaming
+package com.wallace.spark.KafkaDemo
 
 import java.text.SimpleDateFormat
 import java.util
 import java.util.{Date, Timer, TimerTask}
 
-import com.wallace.spark.common.LogSupport
+import com.wallace.common.LogSupport
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 
 import scala.io.Source
@@ -54,7 +54,7 @@ class MsgSender(numPerSec: Int) extends TimerTask with LogSupport {
 
     val producer = new KafkaProducer[String, String](props)
 
-    val srcFile = "data/Testing_Data_2016-10-03.csv"
+    val srcFile = "demo/SparkDemo/data/Testing_Data_2016-10-07.csv"
     val data = Source.fromFile(srcFile, "UTF-8")
     val lines = data.getLines().toArray
     if (lines.nonEmpty) {

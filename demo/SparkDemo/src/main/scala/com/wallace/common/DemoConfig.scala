@@ -1,4 +1,4 @@
-package com.wallace.spark.common
+package com.wallace.common
 
 import scala.collection.JavaConversions._
 

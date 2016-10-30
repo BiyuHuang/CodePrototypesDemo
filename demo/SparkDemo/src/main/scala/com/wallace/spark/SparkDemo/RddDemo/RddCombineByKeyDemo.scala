@@ -1,6 +1,6 @@
-package com.wallace.spark.SparkDemo
+package com.wallace.spark.SparkDemo.RddDemo
 
-import com.wallace.spark.common.LogSupport
+import com.wallace.common.LogSupport
 import org.apache.spark.{SparkConf, SparkContext}
 
 

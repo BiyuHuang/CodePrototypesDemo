@@ -1,8 +1,8 @@
 package com.wallace.spark.MllibDemo
 
-import com.wallace.spark.common.LogSupport
+import com.wallace.common.LogSupport
 import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SparkSession
 
 
 /**
@@ -10,12 +10,19 @@ import org.apache.spark.{SparkConf, SparkContext}
   */
 object MllibDemo extends App with LogSupport {
 
-  val conf = new SparkConf()
-//    .setMaster("local")
-    .setAppName("RddConvertToDataFrame")
-  val sc = new SparkContext(conf)
-  val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-  val sentenceData = sqlContext.createDataFrame(Seq(
+  //  val conf = new SparkConf()
+  //    .setMaster("local")
+  //    .setAppName("RddConvertToDataFrame")
+  val warehouseLocation = System.getProperty("user.dir") + "/" + "spark-warehouse"
+  val spark = SparkSession
+    .builder()
+    .master("local[*]")
+    .appName("RddConvertToDataFrame")
+    .config("spark.sql.warehouse.dir", warehouseLocation)
+    .getOrCreate()
+  val sc = spark.sparkContext
+
+  val sentenceData = spark.createDataFrame(Seq(
     (0, "Hi I heard about Spark"),
     (0, "I wish Java could use case classes"),
     (1, "Logistic regression models are neat")
@@ -31,5 +38,5 @@ object MllibDemo extends App with LogSupport {
   val rescaledData = idfModel.transform(featurizedData)
   rescaledData.select("features", "label").take(3).foreach(println)
 
-  sc.stop()
+  spark.stop()
 }

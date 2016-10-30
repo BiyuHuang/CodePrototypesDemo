@@ -3,7 +3,7 @@ package com.wallace.snmp
 import java.io.PrintWriter
 
 import com.walace.demo.EncodingParser
-import com.wallace.spark.common.LogSupport
+import com.wallace.common.LogSupport
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -12,9 +12,11 @@ import scala.util.Try
 /**
   * Created by Wallace on 2016/8/19.
   */
-class SnmpPDUAnalysis extends LogSupport {
+class SnmpPDUAnalysis(path: String) extends LogSupport {
+  protected val _path = path.replaceAll("\\\\", "/")
+
   def process() = {
-    val fileReader = Source.fromFile("data/currentAlarmTable.csv", "UTF-8")
+    val fileReader = Source.fromFile(this._path, "UTF-8")
     val fileLines = fileReader.getLines().toArray
 
     var alarmId_Size = 0
@@ -74,7 +76,6 @@ class SnmpPDUAnalysis extends LogSupport {
         throw e
     }
 
-
     val fileWrite = new PrintWriter("AlarmTable.csv", "UTF-8")
     val alarmTableList = new ListBuffer[String]
 
@@ -86,10 +87,10 @@ class SnmpPDUAnalysis extends LogSupport {
           var col_2 = ""
           var col_3 = ""
           var col_4 = ""
-          col_1 = Try(alarmId(i).apply(keyIterator(i))).getOrElse("")
-          col_2 = Try(alarmCode(i).apply(keyIterator(i))).getOrElse("")
-          col_3 = Try(alarmText(i).apply(keyIterator(i))).getOrElse("")
-          col_4 = Try(alarmInfo(i).apply(keyIterator(i))).getOrElse("")
+          col_1 = alarmId(i).getOrElse(keyIterator(i), "")
+          col_2 = alarmCode(i).getOrElse(keyIterator(i), "")
+          col_3 = alarmText(i).getOrElse(keyIterator(i), "")
+          col_4 = alarmInfo(i).getOrElse(keyIterator(i), "")
           val record = s"$col_1|$col_2|$col_3|$col_4"
           alarmTableList.append(record)
           fileWrite.write(record + "\n")
@@ -109,10 +110,10 @@ class SnmpPDUAnalysis extends LogSupport {
   }
 }
 
-object SnmpPDUAnalysis extends App with LogSupport {
-  val startTime = System.currentTimeMillis()
-  log.error(s"Start time: $startTime")
-  println(new SnmpPDUAnalysis().process())
-  val endTime = System.currentTimeMillis()
-  log.error(s"End time: $endTime, and cost time : ${(endTime - startTime) * 1.0 / 1000} s.")
-}
+//object SnmpPDUAnalysis extends App with LogSupport {
+//  val startTime = System.currentTimeMillis()
+//  log.error(s"Start time: $startTime")
+//  println(new SnmpPDUAnalysis("demo/SparkDemo/data/currentAlarmTable.csv").process())
+//  val endTime = System.currentTimeMillis()
+//  log.error(s"End time: $endTime, and cost time : ${(endTime - startTime) * 1.0 / 1000} s.")
+//}
