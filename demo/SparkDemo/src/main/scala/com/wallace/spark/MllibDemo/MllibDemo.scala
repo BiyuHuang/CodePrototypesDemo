@@ -9,10 +9,6 @@ import org.apache.spark.sql.SparkSession
   * Created by Wallace on 2016/10/17.
   */
 object MllibDemo extends App with LogSupport {
-
-  //  val conf = new SparkConf()
-  //    .setMaster("local")
-  //    .setAppName("RddConvertToDataFrame")
   val warehouseLocation = System.getProperty("user.dir") + "/" + "spark-warehouse"
   val spark = SparkSession
     .builder()
