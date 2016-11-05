@@ -2,8 +2,8 @@ package com.wallace.snmp
 
 import java.io.PrintWriter
 
-import com.walace.demo.EncodingParser
 import com.wallace.common.LogSupport
+import com.wallace.demo.EncodingParser
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source

@@ -1,4 +1,4 @@
-package com.walace.demo;
+package com.wallace.demo;
 
 import java.io.UnsupportedEncodingException;
 
