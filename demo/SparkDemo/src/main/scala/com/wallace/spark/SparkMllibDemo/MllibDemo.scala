@@ -1,4 +1,4 @@
-package com.wallace.spark.MllibDemo
+package com.wallace.spark.SparkMllibDemo
 
 import com.wallace.common.LogSupport
 import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}

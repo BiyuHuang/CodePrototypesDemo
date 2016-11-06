@@ -1,4 +1,4 @@
-package com.wallace.spark.MllibDemo
+package com.wallace.spark.SparkMllibDemo
 
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.linalg.{Vector, Vectors}

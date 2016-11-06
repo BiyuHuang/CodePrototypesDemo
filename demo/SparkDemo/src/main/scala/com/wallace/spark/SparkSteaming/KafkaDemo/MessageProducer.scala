@@ -1,4 +1,4 @@
-package com.wallace.spark.KafkaDemo
+package com.wallace.spark.SparkSteaming.KafkaDemo
 
 import java.text.SimpleDateFormat
 import java.util

@@ -1,4 +1,4 @@
-package com.wallace.spark.KafkaDemo
+package com.wallace.spark.SparkSteaming.KafkaDemo
 
 import kafka.serializer.StringDecoder
 import org.apache.spark.SparkConf

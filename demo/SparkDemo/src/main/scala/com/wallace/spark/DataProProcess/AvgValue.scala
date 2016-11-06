@@ -1,4 +1,4 @@
-package com.wallace.spark.DataProcess
+package com.wallace.spark.DataProProcess
 
 import com.wallace.common.LogSupport
 import com.wallace.common.TimeFormat.TimePara
