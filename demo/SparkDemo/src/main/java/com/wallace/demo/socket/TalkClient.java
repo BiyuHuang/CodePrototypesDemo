@@ -22,6 +22,7 @@ public class TalkClient {
     public static void main(String args[]) {
         try {
             Socket server = new Socket(InetAddress.getLocalHost(), 9999);
+            server.setSoTimeout(60000);
             BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
             PrintWriter out = new PrintWriter(server.getOutputStream());
             BufferedReader wt = new BufferedReader(new InputStreamReader(System.in));
