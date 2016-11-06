@@ -1,4 +1,4 @@
-package com.wallace.demo.socket;
+package com.wallace.demo.socket.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +14,7 @@ import java.util.Objects;
 
 /**
  * Created by Wallace on 2016/11/4.
+ * Server-Client模型之客户端
  */
 public class TalkClient {
 

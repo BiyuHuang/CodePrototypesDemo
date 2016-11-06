@@ -1,4 +1,4 @@
-package com.wallace.demo.socket;
+package com.wallace.demo.socket.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +12,10 @@ import java.util.Objects;
 
 /**
  * Created by Wallace on 2016/11/4.
+ * 一对一：Server-Client模型
  */
-public class TalkServer {
-    private static Logger log = LoggerFactory.getLogger(TalkServer.class);
+public class SingleServer {
+    private static Logger log = LoggerFactory.getLogger(SingleServer.class);
 
     public static void main(String args[]) {
         try {

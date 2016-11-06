@@ -1,4 +1,4 @@
-package com.wallace.demo.socket;
+package com.wallace.demo.socket.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.net.Socket;
 
 /**
  * Created by Wallace on 2016/11/6.
+ * 响应多个客户端的连接请求
  */
 public class MultiServer extends Thread {
     private Socket m_Server;
