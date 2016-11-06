@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 
 /**
  * Created by Wallace on 2016/11/4.
@@ -30,7 +31,7 @@ public class TalkServer {
             if (response != null) {
                 response = sin.readLine();
             }
-            while (client_msg != null || client_msg == "end") {
+            while (client_msg != null && !Objects.equals(client_msg, "end")) {
                 System.out.println("[Server] Message from Client: " + client_msg);
                 String response_msg;
                 if (response == null) {
