@@ -1,6 +1,9 @@
 package com.wallace.spark.SparkMllibDemo
 
+import com.wallace.common.FuncRuntimeDur
+import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.LogisticRegression
+import org.apache.spark.ml.feature.{HashingTF, Tokenizer}
 import org.apache.spark.ml.linalg.{Vector, Vectors}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.sql.{Row, SparkSession}
@@ -8,10 +11,18 @@ import org.apache.spark.sql.{Row, SparkSession}
 /**
   * Created by Wallace on 2016/11/1.
   */
-object PipelinesDemo {
+object PipelinesDemo extends FuncRuntimeDur {
+  /** Create a LogisticRegression instance. This instance is an Estimator.
+    * 逻辑回归函数实例
+    * We may set parameters using setter methods.
+    * MaxIter: 最大迭代次数. RegParam: 规范化系数
+    * */
+  protected val lr: LogisticRegression = new LogisticRegression().setMaxIter(10)
+    .setRegParam(0.01)
+
   def main(args: Array[String]): Unit = {
     val warehouseLocation = System.getProperty("user.dir") + "/" + "spark-warehouse"
-    val spark = SparkSession
+    val spark: SparkSession = SparkSession
       .builder()
       .master("local[*]")
       .appName("RddConvertToDataFrame")
@@ -19,6 +30,16 @@ object PipelinesDemo {
       .getOrCreate()
     val sc = spark.sparkContext
 
+    MLDemo1(spark, lr)
+
+    PipeLineFunc(spark, lr)
+  }
+
+  /**
+    * Demo
+    **/
+
+  def MLDemo1(spark: SparkSession, lr: LogisticRegression) = {
     // Prepare training data from a list of (label, features) tuples.
     val training = spark.createDataFrame(Seq(
       (1.0, Vectors.dense(0.0, 1.1, 0.1)),
@@ -29,17 +50,10 @@ object PipelinesDemo {
 
     training.show()
 
-    // Create a LogisticRegression instance. This instance is an Estimator.
-    // 逻辑回归函数实例
-    val lr = new LogisticRegression()
 
     // Print out the parameters, documentation, and any default values.
     println("[###PipelinesDemo###] LogisticRegression parameters:\n" + lr.explainParams() + "\n")
 
-    // We may set parameters using setter methods.
-    // MaxIter: 最大迭代次数. RegParam: 规范化系数
-    lr.setMaxIter(10)
-      .setRegParam(0.01)
 
     // Learn a LogisticRegression model. This uses the parameters stored in lr.
     val model1 = lr.fit(training)
@@ -80,6 +94,47 @@ object PipelinesDemo {
       .foreach { case Row(features: Vector, label: Double, prob: Vector, prediction: Double) =>
         println(s"[###PipelinesDemo###] ($features, $label) -> prob=$prob, prediction=$prediction")
       }
+  }
 
+  /** PipeLineFunc
+    *
+    * @param spark SparkSession
+    * @param lr    LogisticRegression
+    * @return Unit
+    * */
+  def PipeLineFunc(spark: SparkSession, lr: LogisticRegression): Unit = {
+    val training = spark.createDataFrame(Seq(
+      (0L, "a b c d e spark", 1.0),
+      (1L, "b d", 0.0),
+      (2L, "spark f g h", 1.0),
+      (3L, "hadoop mapreduce", 0.0))).toDF("id", "text", "label")
+
+    training.show()
+
+    val tokenizer = new Tokenizer().setInputCol("text").setOutputCol("words")
+    val hashingTF = new HashingTF().setNumFeatures(1000).setInputCol(tokenizer.getOutputCol).setOutputCol("features")
+    val pipeline = new Pipeline().setStages(Array(tokenizer, hashingTF, lr))
+
+    val model = pipeline.fit(training)
+    //    model.write.overwrite().save("./demo/SparkDemo/data/spark-logistic-regression-model")
+    //
+    //    pipeline.write.overwrite().save("./demo/SparkDemo/data/unfit-lr-model")
+    //
+    //    val sameModel = PipelineModel.load("./demo/SparkDemo/data/spark-logistic-regression-model")
+
+    val test = spark.createDataFrame(Seq(
+      (4L, "spark i j k"),
+      (5L, "l m n"),
+      (6L, "spark f g h spark f g h spark f g h"),
+      (7L, "hadoop apache"),
+      (8L, "a b c d e F spark"),
+      (9L," spark")
+    )).toDF("id", "text")
+
+    model.transform(test).select("id", "text", "probability", "prediction")
+      .collect().foreach {
+      case Row(id: Long, text: String, prob: Vector, prediction: Double) =>
+        println(s"($id,$text) --> prob=$prob,prediction=$prediction")
+    }
   }
 }
