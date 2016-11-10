@@ -123,4 +123,6 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
     val ngramDataFrame = ngram.transform(wordDataFrame)
     ngramDataFrame.take(3).map(_.getAs[Stream[String]]("ngrams").toList).foreach(println)
   }
+
+  /** Binarizer */
 }
