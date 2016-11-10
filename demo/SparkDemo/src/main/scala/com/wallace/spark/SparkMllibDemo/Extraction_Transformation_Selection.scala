@@ -95,4 +95,32 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
     val regexTokenized = regexTokenizer.transform(sentenceDataFrame)
     regexTokenized.select("words", "label").take(3).foreach(log.error(_))
   }
+
+  def stopWordRemover(spark: SparkSession): Unit = {
+    import org.apache.spark.ml.feature.StopWordsRemover
+    val remover = new StopWordsRemover()
+      .setInputCol("raw")
+      .setOutputCol("filtered")
+
+    val dataSet = spark.createDataFrame(Seq(
+      (0, Seq("I", "saw", "the", "red", "baloon")),
+      (1, Seq("Mary", "had", "a", "little", "lamb"))
+    )).toDF("id", "raw")
+
+    remover.transform(dataSet).show()
+  }
+
+  def nGram(spark: SparkSession): Unit = {
+    import org.apache.spark.ml.feature.NGram
+
+    val wordDataFrame = spark.createDataFrame(Seq(
+      (0, Array("Hi", "I", "heard", "about", "Spark")),
+      (1, Array("I", "wish", "Java", "could", "use", "case", "classes")),
+      (2, Array("Logistic", "regression", "models", "are", "neat"))
+    )).toDF("label", "words")
+
+    val ngram = new NGram().setInputCol("words").setOutputCol("ngrams")
+    val ngramDataFrame = ngram.transform(wordDataFrame)
+    ngramDataFrame.take(3).map(_.getAs[Stream[String]]("ngrams").toList).foreach(println)
+  }
 }
