@@ -1,9 +1,8 @@
 package com.wallace.spark.SparkMllibDemo
 
 import com.wallace.spark.CreateSparkSession
-import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}
+import org.apache.spark.ml.feature._
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.ml.feature.Word2Vec
 
 /**
   * Created by Wallace on 2016/11/10.
@@ -11,8 +10,10 @@ import org.apache.spark.ml.feature.Word2Vec
 object Extraction_Transformation_Selection extends CreateSparkSession {
   def main(args: Array[String]): Unit = {
     val spark = createSparkSession()
-    hashingTF(spark)
-    word2Vec(spark)
+    //    hashingTF(spark)
+    //    word2Vec(spark)
+    //    countVectorizer(spark)
+    tokenizer(spark)
   }
 
   def hashingTF(spark: SparkSession): Unit = {
@@ -54,4 +55,44 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
     result.select("result").take(3).foreach(println)
   }
 
+  def countVectorizer(spark: SparkSession) = {
+    val df = spark.createDataFrame(Seq(
+      (0, Array("a", "b", "c")),
+      (1, Array("a", "b", "b", "c", "a"))
+    )).toDF("id", "words")
+
+    // fit a CountVectorizerModel from the corpus
+    val cvModel: CountVectorizerModel = new CountVectorizer()
+      .setInputCol("words")
+      .setOutputCol("features")
+      .setVocabSize(3)
+      .setMinDF(2)
+      .fit(df)
+
+    // alternatively, define CountVectorizerModel with a-priori vocabulary
+    val cvm = new CountVectorizerModel(Array("a", "b", "c"))
+      .setInputCol("words")
+      .setOutputCol("features")
+
+    cvModel.transform(df).select("features").show()
+  }
+
+  def tokenizer(spark: SparkSession): Unit = {
+    val sentenceDataFrame = spark.createDataFrame(Seq(
+      (0, "Hi I heard about Spark"),
+      (1, "I wish Java could use case classes"),
+      (2, "Logistic,regression,models,are,neat")
+    )).toDF("label", "sentence")
+
+    val tokenizer = new Tokenizer().setInputCol("sentence").setOutputCol("words")
+    val regexTokenizer = new RegexTokenizer()
+      .setInputCol("sentence")
+      .setOutputCol("words")
+      .setPattern("\\W") // alternatively .setPattern("\\w+").setGaps(false)
+
+    val tokenized = tokenizer.transform(sentenceDataFrame)
+    tokenized.select("words", "label").take(3).foreach(println)
+    val regexTokenized = regexTokenizer.transform(sentenceDataFrame)
+    regexTokenized.select("words", "label").take(3).foreach(log.error(_))
+  }
 }
