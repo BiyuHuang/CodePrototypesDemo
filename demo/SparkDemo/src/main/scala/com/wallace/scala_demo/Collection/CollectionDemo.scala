@@ -3,7 +3,7 @@ package com.wallace.scala_demo.Collection
 /**
   * Created by Wallace on 2016/12/3.
   */
-object FlatMapDemo extends App {
+object CollectionDemo extends App {
   util.Properties.setProp("scala.time", "true")
 
   /**
