@@ -1,7 +1,6 @@
 package org.apache.spark.streaming.kafka
 
 import kafka.common.TopicAndPartition
-import kafka.message.MessageAndMetadata
 import kafka.serializer.Decoder
 import org.apache.spark.SparkException
 import org.apache.spark.rdd.RDD
@@ -67,7 +66,7 @@ class KafkaManager(val kafkaParams: Map[String, String]) extends Serializable {
     val consumerOffsetsE = kc.getConsumerOffsets(groupId, partitions)
     if (consumerOffsetsE.isLeft) throw new SparkException("Get kafka consumer offsets failed: ")
     val consumerOffsets = consumerOffsetsE.right.get
-    UdfKafkaUtils.createDirectStream[K, V, KD, VD, (K, V)](ssc, kafkaParams, consumerOffsets, (mmd: MessageAndMetadata[K, V]) => (mmd.key(), mmd.message()))
+  //  UdfKafkaUtils.createDirectStream[K, V, KD, VD, (K, V)](ssc, kafkaParams, consumerOffsets, (mmd: MessageAndMetadata[K, V]) => (mmd.key(), mmd.message()))
   }
 
   /**
