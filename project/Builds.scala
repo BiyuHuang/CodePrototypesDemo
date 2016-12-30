@@ -11,8 +11,8 @@ object Builds extends Build {
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.sparkAppDependencies).
     settings(assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)).
-    settings(assemblyJarName in assembly := s"${NamePrefix}SparkDemo_0.0.1.jar").
-    settings(mainClass in assembly := Some("com.demo.wallace.Test"))
+    settings(assemblyJarName in assembly := s"${NamePrefix}SparkDemo_0.0.1.jar")
+//    .settings(mainClass in assembly := Some("com.demo.wallace.Test"))
 
   // lazy val testConsumer = project.in(file("rdd/test")).settings(name := NamePrefix + "test").
   //   settings(Common.settings: _*).

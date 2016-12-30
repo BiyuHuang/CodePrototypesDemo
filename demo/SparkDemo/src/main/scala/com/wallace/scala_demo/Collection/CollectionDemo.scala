@@ -9,7 +9,8 @@ object CollectionDemo extends App {
   /**
     * flatMap
     **/
-  val arr: Array[String] = Array("a", "b", "cl$ass")
+  val arr: Array[String] = Array("cl$ass", "a", "b").sortBy(_.length)
+  for (elem <- arr) println(elem)
   //Array("zzzzz", "eeeee$ffffff$gggggggg", "aaaaaaa$bbbbbbbbb$ccccccccc")
   val arrRes: Array[String] = arr.flatMap {
     x =>
@@ -17,6 +18,7 @@ object CollectionDemo extends App {
         val temp = x.split("\\$", -1)
         temp.map(x => "@" + x + "_" + x.reverse + "@")
       } else {
+
         Array(s"@${x}_${x.reverse}@")
       }
   }
