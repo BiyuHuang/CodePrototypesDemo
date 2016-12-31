@@ -11,7 +11,7 @@ import org.apache.spark.streaming.{Duration, StreamingContext}
   */
 object KafkaSparkDemoMain {
   def main(args: Array[String]) {
-    val sparkConf = new SparkConf().setMaster("local[*]").setAppName("kafka-spark-demo")
+    val sparkConf: SparkConf = new SparkConf().setMaster("local[*]").setAppName("kafka-spark-demo")
     val scc = new StreamingContext(sparkConf, Duration(5000))
     scc.checkpoint(".") // 因为使用到了updateStateByKey,所以必须要设置checkpoint
     val topics = Set("kafka-spark-demo") //我们需要消费的kafka数据的topic

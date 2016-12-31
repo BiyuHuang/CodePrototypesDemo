@@ -103,14 +103,14 @@ object UdfKafkaUtils {
                 messageHandler: MessageAndMetadata[K, V] => R
               ): InputDStream[R] = {
     val cleanedHandler = ssc.sc.clean(messageHandler)
-    new MyDirectKafkaInputDStream[K, V, KD, VD, R](
+    new UdfDirectKafkaInputDStream[K, V, KD, VD, R](
       ssc, kafkaParams, fromOffsets, cleanedHandler)
   }
 }
 
 
 private[streaming]
-class MyDirectKafkaInputDStream[K: ClassTag,
+class UdfDirectKafkaInputDStream[K: ClassTag,
 V: ClassTag,
 U <: Decoder[K] : ClassTag,
 T <: Decoder[V] : ClassTag,
