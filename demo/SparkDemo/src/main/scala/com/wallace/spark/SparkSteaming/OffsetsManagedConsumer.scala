@@ -24,9 +24,10 @@ object OffsetsManagedConsumer extends CreateSparkSession {
 
   val kafkaManager = new KafkaManager(kafkaParam)
   //val streamData = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](scc, kafkaParam, topics)
-  val streamData = kafkaManager.createDirectStream[String, String, StringDecoder, StringDecoder](scc, kafkaParam, topics)
+  /** User Defined Function API */
+  val streamData = kafkaManager.createDirectStream[String, String, StringDecoder, StringDecoder](scc, topics)
 
-  streamData.foreachRDD {
+  streamData.transform(rdd => rdd.coalesce(25)).foreachRDD {
     rdd =>
       var actionResult: Boolean = true
       try {
@@ -41,10 +42,9 @@ object OffsetsManagedConsumer extends CreateSparkSession {
           actionResult = false
           throw e
       } finally {
-        if (actionResult) {
-          kafkaManager.updateZKOffsets(rdd)
-        } else {
-          log.error("Failed to update offsets to Zookeeper.")
+        actionResult match {
+          case true => kafkaManager.updateZKOffsets(rdd)
+          case false => log.error("Failed to update offsets to Zookeeper.")
         }
       }
   }
