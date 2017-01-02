@@ -16,6 +16,6 @@ trait CreateSparkSession extends FuncRuntimeDur with LogSupport {
       .config("spark.sql.warehouse.dir", warehouseLocation)
       .getOrCreate()
 
-    spark
-  }
+spark
+}
 }
