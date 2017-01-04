@@ -30,6 +30,7 @@ object DataFrameDemo extends LogSupport {
       .master("local[*]")
       .appName("RddConvertToDataFrame")
       .config("spark.sql.warehouse.dir", warehouseLocation)
+      .config("spark.driver.memory", "2g")
       //.enableHiveSupport()
       .getOrCreate()
 
@@ -78,5 +79,9 @@ object DataFrameDemo extends LogSupport {
 
     val res4: DataFrame = res3.filter(res3.col("Time") >= "2016-05-23 09:00:00")
     res4.show(3)
+
+    /** select */
+    val res5 = res4.select("NAME", "Id", "Time", "Spending")
+    res5.show(3)
   }
 }

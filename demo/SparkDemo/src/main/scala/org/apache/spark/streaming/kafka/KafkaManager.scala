@@ -131,7 +131,7 @@ R: ClassTag](ssc_ : StreamingContext,
 
   val maxRateLimitPerPartition = 100
 
-  override protected val maxMessagesPerPartition: Option[Long] = {
+  protected val maxMessagesPerPartition: Option[Long] = {
     //    val estimatedRateLimit = rateController.map(_.getLatestRate().toInt)
     val estimatedRateLimit = Some(10000)
     val numPartitions = currentOffsets.keys.size

@@ -7,7 +7,7 @@ object Dependencies {
     "mysql" % "mysql-connector-java" % "5.1.31" % "test",
     "ch.ethz.ganymed" % "ganymed-ssh2" % "build210",
     "org.apache.kafka" % "kafka-clients" % "0.8.2.1",
-    "org.apache.spark" % "spark-streaming-kafka_2.11" % "1.6.3"
+    "org.apache.spark" % "spark-streaming-kafka-0-8_2.11" % "2.0.0"
   )
 
   val sparkDependencies: Seq[ModuleID] = Seq(

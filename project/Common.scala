@@ -30,16 +30,18 @@ object Common {
     assemblyJarName in assembly := s"${name.value}_${version.value}.jar",
     test in assembly := {},
     assemblyMergeStrategy in assembly := {
-//      case PathList(ps@_*) if ps.last endsWith ".xml" => MergeStrategy.first
-//      case PathList(ps@_*) if ps.last endsWith ".properties" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".xml" => MergeStrategy.first
+      //      case PathList(ps@_*) if ps.last endsWith ".properties" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".thrift" => MergeStrategy.first
       case PathList(ps@_*) if ps.last endsWith ".class" => MergeStrategy.first
-//      case PathList(ps@_*) if ps.last endsWith ".xsd" => MergeStrategy.first
-//      case PathList(ps@_*) if ps.last endsWith ".dtd" => MergeStrategy.first
-//      case PathList(ps@_*) if ps.last endsWith ".html" => MergeStrategy.first
-//      case PathList(ps@_*) if ps.last endsWith ".txt" => MergeStrategy.first
-//      case PathList(ps@_*) if ps.last endsWith ".jar" => MergeStrategy.first
-//      case PathList(ps@_*) if ps.last endsWith ".providers" => MergeStrategy.first
-//      case PathList(ps@_*) if ps.last endsWith "mailcap" => MergeStrategy.first
+      //      case PathList(ps@_*) if ps.last endsWith ".xsd" => MergeStrategy.first
+      //      case PathList(ps@_*) if ps.last endsWith ".dtd" => MergeStrategy.first
+      //      case PathList(ps@_*) if ps.last endsWith ".html" => MergeStrategy.first
+      //      case PathList(ps@_*) if ps.last endsWith ".txt" => MergeStrategy.first
+
+      //      case PathList(ps@_*) if ps.last endsWith ".jar" => MergeStrategy.first
+      //      case PathList(ps@_*) if ps.last endsWith ".providers" => MergeStrategy.first
+      //      case PathList(ps@_*) if ps.last endsWith "mailcap" => MergeStrategy.first
       case x =>
         val oldStrategy = (mergeStrategy in assembly).value
         oldStrategy(x)
