@@ -30,7 +30,7 @@ object DataFrameDemo extends LogSupport {
       .master("local[*]")
       .appName("RddConvertToDataFrame")
       .config("spark.sql.warehouse.dir", warehouseLocation)
-      .config("spark.driver.memory", "2g")
+      .config("spark.driver.memory", "3g")
       //.enableHiveSupport()
       .getOrCreate()
 
