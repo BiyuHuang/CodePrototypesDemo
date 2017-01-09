@@ -13,7 +13,9 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
     //    hashingTF(spark)
     //    word2Vec(spark)
     //    countVectorizer(spark)
-    tokenizer(spark)
+    //    tokenizer(spark)
+    //    binarizer(spark)
+    pca(spark)
   }
 
   def hashingTF(spark: SparkSession): Unit = {
@@ -125,4 +127,35 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
   }
 
   /** Binarizer */
+  def binarizer(spark: SparkSession) = {
+    val data = Array((0, 0.1), (1, 0.8), (2, 0.2))
+    val dataFrame = spark.createDataFrame(data).toDF("id", "feature")
+    val binarizer = new Binarizer()
+      .setInputCol("feature")
+      .setOutputCol("binarized_feature")
+      .setThreshold(0.5)
+    val binarizedDataFrame = binarizer.transform(dataFrame)
+
+    println(s"Binarizer output with Threshold = ${binarizer.getThreshold}")
+    binarizedDataFrame.show()
+  }
+
+  def pca(spark: SparkSession): Unit = {
+    import org.apache.spark.ml.linalg.Vectors
+    val data = Array(Vectors.sparse(5, Seq((1, 1.0), (3, 7.0))),
+      Vectors.dense(2.0, 0.0, 3.0, 4.0, 5.0),
+      Vectors.dense(4.0, 0.0, 0.0, 6.0, 7.0))
+    val df = spark.createDataFrame(data.map(Tuple1.apply)).toDF("features")
+    df.show()
+    val pca = new PCA()
+      .setInputCol("features")
+      .setOutputCol("pcaFeatures")
+      .setK(4)
+      .fit(df)
+
+    val result = pca.transform(df).select("pcaFeatures")
+    result.show(false)
+  }
+
+  //  PolynomialExpansion
 }
