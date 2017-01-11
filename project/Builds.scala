@@ -14,7 +14,7 @@ object Builds extends Build {
     settings(assemblyJarName in assembly := s"${NamePrefix}SparkDemo_0.0.1.jar")
     .settings(mainClass in assembly := Some("com.wallace.spark.SparkDemo.DataFrameDemo.DataFrameDemo"))
 
-   lazy val scalaDemo = project.in(file("rdd/ScalaDemo")).settings(name := NamePrefix + "ScalaDemo").
+   lazy val scalaDemo = project.in(file("demo/ScalaDemo")).settings(name := NamePrefix + "ScalaDemo").
      settings(Common.settings: _*).
      settings(libraryDependencies ++= Dependencies.commonDependencies).
      settings(assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)).
