@@ -5,7 +5,9 @@ object Dependencies {
     "com.typesafe" % "config" % "1.2.1",
     "org.scalatest" % "scalatest_2.11" % "2.2.4",
     "mysql" % "mysql-connector-java" % "5.1.31" % "test",
-    "ch.ethz.ganymed" % "ganymed-ssh2" % "build210"
+    "ch.ethz.ganymed" % "ganymed-ssh2" % "build210",
+    "org.slf4j" % "slf4j-api" % "1.7.7",
+    "org.slf4j" % "slf4j-log4j12" % "1.7.16"
   )
 
   val sparkDependencies: Seq[ModuleID] = Seq(
