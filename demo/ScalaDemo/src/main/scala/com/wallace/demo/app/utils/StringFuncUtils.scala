@@ -1,4 +1,4 @@
-package com.wallace.demo.app
+package com.wallace.demo.app.utils
 
 import com.wallace.demo.app.common.LogSupport
 

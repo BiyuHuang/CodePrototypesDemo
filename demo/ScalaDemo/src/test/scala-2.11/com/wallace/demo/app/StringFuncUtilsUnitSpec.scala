@@ -1,6 +1,7 @@
 package com.wallace.demo.app
 
 import com.wallace.demo.app.common.LogSupport
+import com.wallace.demo.app.utils.StringFuncUtils
 import org.scalatest.{FlatSpec, ShouldMatchers}
 
 /**
