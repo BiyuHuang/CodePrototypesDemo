@@ -14,8 +14,9 @@ trait CreateSparkSession extends FuncRuntimeDur with LogSupport {
       .master("local[*]")
       .appName("RddConvertToDataFrame")
       .config("spark.sql.warehouse.dir", warehouseLocation)
+      .enableHiveSupport()
       .getOrCreate()
 
-spark
-}
+    spark
+  }
 }

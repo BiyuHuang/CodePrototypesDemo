@@ -13,13 +13,13 @@ object StringFuncUtils extends LogSupport {
     val str = """1,2,3,4,"a=1,b=2,c=3","e=1.2,f=32.1,g=1.3",7,8,9"""
 
     log.info(str)
-    val result: Array[String] = SplitString(str, ",", "\"")
+    val result: Array[String] = splitString(str, ",", "\"")
     for (elem <- result) {
       log.info("@@@@@ " + elem)
     }
   }
 
-  def SplitString(str: String, fieldSeparator: String, specialChar: String): Array[String] = {
+  def splitString(str: String, fieldSeparator: String, specialChar: String): Array[String] = {
     val resultArr = new ArrayBuffer[String]()
     var temp = str
     str match {
