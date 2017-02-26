@@ -1,13 +1,13 @@
-package com.wallace.common
-
+package com.wallace.demo.app.common
 
 import java.io.File
+
 import com.typesafe.config.{Config, ConfigFactory}
 
 /**
-  * Created by huangbiyu on 16-6-4.
+  * Created by Wallace on 2017/2/24.
   */
-trait ProjConfig extends LogSupport {
+trait ProjectConfig extends LogSupport {
   var config: Config = _
 
   /**
