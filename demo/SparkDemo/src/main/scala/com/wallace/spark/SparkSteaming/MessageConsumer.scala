@@ -13,6 +13,38 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
   */
 
 object MessageConsumer {
+  val updateFunc = (currentValues: Seq[Int], preValue: Option[Int]) => {
+    val curr = currentValues.sum
+    val pre = preValue.getOrElse(0)
+    Some(curr + pre)
+  }
+  val updateValueFunc = (curValue: Seq[String], preValue: Option[String]) => {
+    val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+    val srcTime: Long = curValue.map {
+      x =>
+        val temp = x.split(",", -1)
+        sdf.parse(temp(MessageDetail.TIMESTAMP.id)).getTime
+    }.max
+
+    val targetTime = preValue.map {
+      x =>
+        val temp = x.split(",", -1)
+        sdf.parse(temp(MessageDetail.TIMESTAMP.id)).getTime
+    }.getOrElse(0L)
+
+    val res: String = if (targetTime == 0 || srcTime >= targetTime) {
+      curValue.maxBy {
+        x =>
+          val temp = x.split(",", -1)
+          sdf.parse(temp(MessageDetail.TIMESTAMP.id)).getTime
+      }
+    } else {
+      preValue.getOrElse("")
+    }
+
+    Some(res)
+  }
+
   def main(args: Array[String]) {
     val sparkConf = new SparkConf()
     sparkConf.setMaster("local[*]")
@@ -48,41 +80,6 @@ object MessageConsumer {
 
     scc.start() // 真正启动程序
     scc.awaitTermination() //阻塞等待
-
-
-  }
-
-  val updateFunc = (currentValues: Seq[Int], preValue: Option[Int]) => {
-    val curr = currentValues.sum
-    val pre = preValue.getOrElse(0)
-    Some(curr + pre)
-  }
-
-  val updateValueFunc = (curValue: Seq[String], preValue: Option[String]) => {
-    val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-    val srcTime: Long = curValue.map {
-      x =>
-        val temp = x.split(",", -1)
-        sdf.parse(temp(MessageDetail.TIMESTAMP.id)).getTime
-    }.max
-
-    val targetTime = preValue.map {
-      x =>
-        val temp = x.split(",", -1)
-        sdf.parse(temp(MessageDetail.TIMESTAMP.id)).getTime
-    }.getOrElse(0L)
-
-    val res: String = if (targetTime == 0 || srcTime >= targetTime) {
-      curValue.maxBy {
-        x =>
-          val temp = x.split(",", -1)
-          sdf.parse(temp(MessageDetail.TIMESTAMP.id)).getTime
-      }
-    } else {
-      preValue.getOrElse("")
-    }
-
-    Some(res)
   }
 
   /**
@@ -93,7 +90,7 @@ object MessageConsumer {
     * @param topics     需要消费的topic集合
     * @return
     */
-  def createStream(scc: StreamingContext, kafkaParam: Map[String, String], topics: Set[String]) = {
+  def createStream(scc: StreamingContext, kafkaParam: Map[String, String], topics: Set[String]): InputDStream[(String, String)] = {
     KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](scc, kafkaParam, topics)
   }
 }
