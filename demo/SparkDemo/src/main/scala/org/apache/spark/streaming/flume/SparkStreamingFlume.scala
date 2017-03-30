@@ -1,5 +1,6 @@
 package org.apache.spark.streaming.flume
 
+import com.wallace.common.LogSupport
 import org.apache.spark.SparkContext
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -7,11 +8,11 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 /**
   * Created by Wallace on 2017/3/30.
   */
-object SparkStreamingFlume {
+object SparkStreamingFlume extends LogSupport {
   def main(args: Array[String]): Unit = {
 
     if (args.length < 2) {
-      print("please enter host and port")
+      log.warn("please enter host and port")
       System.exit(1)
     }
 
