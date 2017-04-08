@@ -40,7 +40,7 @@ object SparkStreamingFlume extends LogSupport {
     try {
       ssc.awaitTermination()
     } catch {
-      case e: Exception =>
+      case _: Exception =>
         ssc.stop(stopSparkContext = true, stopGracefully = true)
     } finally {
       sc.stop()
