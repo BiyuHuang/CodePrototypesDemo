@@ -1,4 +1,4 @@
-package com.wallace.demo.app.common
+package com.wallace.demo.app.utils
 
 /**
   * Created by Wallace on 2017/1/14.
