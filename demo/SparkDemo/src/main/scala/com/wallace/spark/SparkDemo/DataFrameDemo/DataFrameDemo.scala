@@ -71,7 +71,7 @@ object DataFrameDemo extends LogSupport {
     /**
       * 两表联合查询
       */
-    val res3: DataFrame = res1.join(res2, res1.col("NAME").equalTo(res2.col("Id"))).orderBy("Time").where("Spending != 0 ")
+    val res3: DataFrame = res1.join(res2, res1.col("NAME") === res2.col("Id")).orderBy("Time").where("Spending <> 0 ")
     res3.show(3)
     //    res3.printSchema()
 
@@ -79,10 +79,12 @@ object DataFrameDemo extends LogSupport {
     res4.show(3)
 
     /** select */
-    val res5 = res4.select("NAME", "Id", "Time", "Spending")
+    val res5: DataFrame = res4.select("NAME", "Id", "Time", "Spending")
     res5.show(3)
+    //    res5.write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite).save("./temp/")
+    //    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
 
-    //val temp= res1
+    //val temp= res1k
   }
 
   def padto(ls: Array[String], columnNum: Int = 5): Array[String] = if (ls.length > columnNum) ls.dropRight(ls.length - columnNum) else ls.padTo(columnNum, "")
