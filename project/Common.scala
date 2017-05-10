@@ -31,7 +31,7 @@ object Common {
     test in assembly := {},
     assemblyMergeStrategy in assembly := {
       case PathList(ps@_*) if ps.last endsWith ".xml" => MergeStrategy.first
-      //      case PathList(ps@_*) if ps.last endsWith ".properties" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".properties" => MergeStrategy.first
       case PathList(ps@_*) if ps.last endsWith ".thrift" => MergeStrategy.first
       case PathList(ps@_*) if ps.last endsWith ".class" => MergeStrategy.first
       //      case PathList(ps@_*) if ps.last endsWith ".xsd" => MergeStrategy.first
