@@ -9,9 +9,9 @@ import com.wallace.common.Using
   * Created by Wallace on 2016/11/3.
   */
 class SSHClient(pSSHClient: SSHClientUserInfo) extends Using {
-  val clientIP = pSSHClient.sshHost
-  val clientUser = pSSHClient.sshUser
-  val clientPwd = pSSHClient.sshPwd
+  val clientIP: String = pSSHClient.sshHost
+  val clientUser: String = pSSHClient.sshUser
+  val clientPwd: String = pSSHClient.sshPwd
 
   def execute(cmd: String): Boolean = {
     using(getConnection) {
@@ -24,7 +24,7 @@ class SSHClient(pSSHClient: SSHClientUserInfo) extends Using {
           case e: IllegalStateException =>
             log.error("Cannot open session, connection is not authenticated.", e)
             false
-          case e: Exception =>
+          case _: Exception =>
             log.error(s"Execute cmd:[$cmd] Failed.")
             false
         } finally {
@@ -34,7 +34,7 @@ class SSHClient(pSSHClient: SSHClientUserInfo) extends Using {
             if (conn != null)
               conn.close()
           } catch {
-            case e: Exception =>
+            case _: Exception =>
               log.error(s"Failed to close ssh session.")
           }
         }

@@ -13,6 +13,7 @@ class SSHClientUnitSpec extends UnitSpec {
     val res = sshClient.execute("cd /home/Wallace/ | touch /home/Wallace/test_ssh_exec")
 
     sshClient.execute("echo \"Test ssh exec\" >> /home/Wallace/test_ssh_exec ")
+    sshClient.execute("date -R")
     val expect = true
     res shouldBe expect
   }
