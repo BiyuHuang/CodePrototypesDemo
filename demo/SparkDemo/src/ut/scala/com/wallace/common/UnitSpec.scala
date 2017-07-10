@@ -1,5 +1,6 @@
-package com.wallace.common
+package scala.com.wallace.common
 
+import com.wallace.common.LogSupport
 import org.scalatest.{FlatSpec, _}
 
 /**

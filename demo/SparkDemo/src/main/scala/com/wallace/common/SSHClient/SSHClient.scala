@@ -1,4 +1,4 @@
-package com.wallace.common.sshClient
+package com.wallace.common.SSHClient
 
 import java.io._
 import java.nio.charset.Charset
