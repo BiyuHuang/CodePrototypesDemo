@@ -6,6 +6,8 @@ import java.nio.charset.Charset
 import ch.ethz.ssh2.{ChannelCondition, Connection, Session, StreamGobbler}
 import com.wallace.common.Using
 
+import scala.util.control.Breaks._
+
 /**
   * Created by Wallace on 2016/11/3.
   */
@@ -31,26 +33,16 @@ class SSHClient(pSSHClient: SSHClientUserInfo) extends Using {
             out.println(cmd)
             out.flush()
             session.waitForCondition(ChannelCondition.CLOSED | ChannelCondition.EOF | ChannelCondition.EXIT_STATUS, 1000)
-            var line = stdoutReader.readLine()
-            line match {
-              case v if v.contains("@") || v.isEmpty =>
-                line = stdoutReader.readLine()
-                log.debug(s"[SSHClient] execute cmd: $cmd, return result:$line.")
-              case _ =>
-                log.debug(s"[SSHClient] execute cmd: $cmd, return result:$line.")
+            breakable {
+              while (true) {
+                val line: String = stdoutReader.readLine()
+                if (line == null)
+                  break
+                println(s"#### $line")
+              }
             }
           }
           out.close()
-          //          val resArr = new ArrayBuffer[String]()
-          //          breakable {
-          //            while (true) {
-          //              val line: String = stdoutReader.readLine()
-          //              if (line == null)
-          //                break
-          //              resArr.append(line)
-          //              log.debug(s"[SSHClient] executed cmd sets ,got results: ${resArr.result().toArray.mkString("\n")}")
-          //            }
-          //          }
 
           log.debug(s"[SSHClient] ${session.getExitStatus}")
         }
