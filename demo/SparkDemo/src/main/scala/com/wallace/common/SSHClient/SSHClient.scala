@@ -43,9 +43,10 @@ class SSHClient(pSSHClient: SSHClientUserInfo) extends Using {
 
   private def getSession(conn: Connection): Session = {
     conn.connect()
+    val os = System.getProperty("os.name")
     val userHomePath = System.getProperty("user.home")
     val rsaFile = new File(userHomePath + "/.ssh/id_rsa")
-    if (rsaFile.exists()) {
+    if (rsaFile.exists() && !os.toLowerCase.contains("windows")) {
       val connResult = conn.authenticateWithPublicKey(clientUser, rsaFile, null)
       if (connResult) {
         log.info("SSH AuthenticateWithPublicKey Successfully.")
