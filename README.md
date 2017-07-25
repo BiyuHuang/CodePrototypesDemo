@@ -4,3 +4,8 @@
 [![Build Status](https://travis-ci.org/BiyuHuang/CodePrototypesDemo.svg?branch=master)](https://travis-ci.org/BiyuHuang/)
 
 All of this are my private coding prototypes demo. Including _scala demo_/_spark demo_.
+
+
+
+* Author : ![Wallace Huang](https://github.com/BiyuHuang) [![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.com/h417652303)
+* Email  : h417652303@gmail.com
