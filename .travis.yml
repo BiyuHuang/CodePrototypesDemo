@@ -1,0 +1,5 @@
+language: scala
+dist: precise
+sudo: false
+script: sbt update compile assembly
+
