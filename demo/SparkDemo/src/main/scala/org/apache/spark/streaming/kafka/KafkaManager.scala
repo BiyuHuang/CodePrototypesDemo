@@ -1,5 +1,6 @@
 package org.apache.spark.streaming.kafka
 
+import com.wallace.common.LogSupport
 import kafka.common.TopicAndPartition
 import kafka.message.MessageAndMetadata
 import kafka.serializer.Decoder
@@ -14,7 +15,7 @@ import scala.reflect.ClassTag
 /**
   * Created by Wallace on 2016/11/23.
   */
-class KafkaManager(val kafkaParams: Map[String, String]) extends Serializable {
+class KafkaManager(val kafkaParams: Map[String, String]) extends LogSupport {
   private def kc = new KafkaCluster(kafkaParams)
 
   private def setOrUpdateOffsets(topics: Set[String], groupId: String) = {
@@ -34,7 +35,7 @@ class KafkaManager(val kafkaParams: Map[String, String]) extends Serializable {
             case (tp, n) =>
               val earliestLeaderOffset = earliestLeaderOffsets(tp).offset
               if (n < earliestLeaderOffset) {
-                println("Consumer group: " + groupId + ",Topic: " + tp.topic + ",Partition: " + tp.partition + " offsets已经过时，更新为 " + earliestLeaderOffset)
+                log.info("[KafkaManager] GroupID: %s,Topic: %s, Partition: %d offsets已经过时,更新为 %d".format(groupId, tp.topic, tp.partition, earliestLeaderOffset))
                 offsets += (tp -> earliestLeaderOffset)
               }
           })
@@ -43,7 +44,7 @@ class KafkaManager(val kafkaParams: Map[String, String]) extends Serializable {
           }
         } else {
           val reset = kafkaParams.get("auto.offfset.reset").map(_.toLowerCase)
-          var leaderOffsets: Map[TopicAndPartition, LeaderOffset] = null
+          var leaderOffsets: Map[TopicAndPartition, LeaderOffset] = Map.empty
           if (reset.contains("smallest")) {
             leaderOffsets = kc.getEarliestLeaderOffsets(partitions).right.get
           } else {

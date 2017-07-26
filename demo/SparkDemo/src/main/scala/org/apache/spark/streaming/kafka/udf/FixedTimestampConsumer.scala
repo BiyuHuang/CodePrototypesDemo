@@ -1,8 +1,10 @@
 package org.apache.spark.streaming.kafka.udf
 
 import com.wallace.spark.CreateSparkSession
+import kafka.common.TopicAndPartition
 import kafka.message.MessageAndMetadata
 import kafka.serializer.StringDecoder
+import org.apache.spark.streaming.kafka.KafkaCluster.Err
 import org.apache.spark.streaming.kafka.{KafkaCluster, KafkaUtils}
 import org.apache.spark.streaming.{Duration, StreamingContext}
 
@@ -22,7 +24,7 @@ object FixedTimestampConsumer extends CreateSparkSession {
   )
   //val streamData = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParam, topics)
   val kc = new KafkaCluster(kafkaParam)
-  val topicPartsInfo = kc.getPartitions(topics)
+  val topicPartsInfo: Either[Err, Set[TopicAndPartition]] = kc.getPartitions(topics)
 
   /** 指定时间戳消费 */
   if (topicPartsInfo.isRight) {
@@ -38,9 +40,9 @@ object FixedTimestampConsumer extends CreateSparkSession {
       }
     } else {
       /** 在本函数内部处理错误，如果有错误抛出异常 */
-      throw new RuntimeException(s"### Exception when MTKafkaUtils#getLeaderOffsets ${leaderOffsets.left.get} ###")
+      throw new RuntimeException(s"[FixedTimestampConsumer] Exception when MTKafkaUtils #getLeaderOffsets# ${leaderOffsets.left.get}.")
     }
   } else {
-    log.error(s"Failed to get Partitions information for $topics. ### ${topicPartsInfo.left.get} ###")
+    log.error(s"[FixedTimestampConsumer] Failed to get Partitions information for $topics. ### ${topicPartsInfo.left.get} ###")
   }
 }

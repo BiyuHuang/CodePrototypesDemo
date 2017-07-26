@@ -5,7 +5,7 @@ import org.apache.log4j.Logger
 /**
   * Created by Wallace on 2016/5/2.
   */
-trait LogSupport {
+trait LogSupport extends Serializable {
 
   //1.log4j.properties配置
   //  val rootPath = new File("").getAbsolutePath.replaceAll("\\\\", "/")
@@ -21,5 +21,5 @@ trait LogSupport {
   //    protected val log = lc.getLogger(this.getClass)
 
   //3.默认日志配置
-  protected val log = Logger.getLogger(this.getClass)
+  protected val log: Logger = Logger.getLogger(this.getClass)
 }
