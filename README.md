@@ -10,5 +10,5 @@
 
 
 
-* Author : ![Wallace Huang](https://github.com/BiyuHuang) [![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.com/h417652303)
+* Author : [Wallace Huang](https://github.com/BiyuHuang) [![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.com/h417652303)
 * Email  : h417652303@gmail.com
