@@ -12,7 +12,7 @@ trait FuncRuntimeDur {
     **/
   def runtimeDuration[T <: Any](code: => T, times: Int = 1): Double = {
     val startTime = System.nanoTime() * 0.000001
-    for (i <- 1 to times) {
+    for (_ <- 1 to times) {
       code
     }
     val endTime = System.nanoTime() * 0.000001

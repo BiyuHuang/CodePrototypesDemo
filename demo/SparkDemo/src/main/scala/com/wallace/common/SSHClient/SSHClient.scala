@@ -36,9 +36,13 @@ class SSHClient(pSSHClient: SSHClientUserInfo) extends Using {
             breakable {
               while (true) {
                 val line: String = stdoutReader.readLine()
-                if (line == null)
+                if (line.nonEmpty) {
+                  println(s"#### $line")
+                }
+                else {
                   break
-                println(s"#### $line")
+                }
+
               }
             }
           }
@@ -65,6 +69,35 @@ class SSHClient(pSSHClient: SSHClientUserInfo) extends Using {
           }
         }
     }
+  }
+
+  private def getSession(conn: Connection): Session = {
+    conn.connect()
+    val os = System.getProperty("os.name")
+    val userHomePath = System.getProperty("user.home")
+    val rsaFile = new File(userHomePath + "/.ssh/id_rsa")
+    if (rsaFile.exists() && !os.toLowerCase.contains("windows")) {
+      val connResult = conn.authenticateWithPublicKey(clientUser, rsaFile, null)
+      if (connResult) {
+        log.info("[SSHClient] SSH AuthenticateWithPublicKey Successfully.")
+      } else {
+        log.error("[SSHClient] SSH AuthenticateWithPublicKey Failed.")
+      }
+    } else {
+      val connResult = conn.authenticateWithPassword(clientUser, clientPwd)
+      if (connResult) {
+        log.info("[SSHClient] SSH AuthenticateWithPublicKey Successfully.")
+      } else {
+        log.error("[SSHClient] SSH AuthenticateWithPublicKey Failed.")
+      }
+    }
+    val session: Session = conn.openSession()
+    session
+  }
+
+  private def getConnection: Connection = {
+    val conn = new Connection(clientIP)
+    conn
   }
 
   def execute(cmd: String): Boolean = {
@@ -107,35 +140,6 @@ class SSHClient(pSSHClient: SSHClientUserInfo) extends Using {
       sb.append(new String(buf, charset))
     }
     sb.toString
-  }
-
-  private def getSession(conn: Connection): Session = {
-    conn.connect()
-    val os = System.getProperty("os.name")
-    val userHomePath = System.getProperty("user.home")
-    val rsaFile = new File(userHomePath + "/.ssh/id_rsa")
-    if (rsaFile.exists() && !os.toLowerCase.contains("windows")) {
-      val connResult = conn.authenticateWithPublicKey(clientUser, rsaFile, null)
-      if (connResult) {
-        log.info("[SSHClient] SSH AuthenticateWithPublicKey Successfully.")
-      } else {
-        log.error("[SSHClient] SSH AuthenticateWithPublicKey Failed.")
-      }
-    } else {
-      val connResult = conn.authenticateWithPassword(clientUser, clientPwd)
-      if (connResult) {
-        log.info("[SSHClient] SSH AuthenticateWithPublicKey Successfully.")
-      } else {
-        log.error("[SSHClient] SSH AuthenticateWithPublicKey Failed.")
-      }
-    }
-    val session: Session = conn.openSession()
-    session
-  }
-
-  private def getConnection: Connection = {
-    val conn = new Connection(clientIP)
-    conn
   }
 
 }

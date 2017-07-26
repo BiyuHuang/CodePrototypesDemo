@@ -14,22 +14,6 @@ import scala.util.Random
   * Produce Data And Save File on Local Path
   */
 object DataProducer extends LogSupport {
-  def dataProducer(num: Int): Array[String] = {
-    val random = new Random
-    val ueId = Array("10001", "10002", "10003", "10004", "10005", "10006", "10007", "10008", "10009", "10010", "10011", "10012", "10013", "10014")
-    val text = Array("aaaaaaaaaaa", "bbbbbbbbb", "cccccccccccc", "dddddddddddd", "fffffffffffffff", "gggggggggggg", "hhhhhhhhhhhhh")
-    val (region_id_c, x_offset_c, y_offset_c) = (4841, 0, 0)
-
-    val resBuffer = new ArrayBuffer[String]()
-    (0 until num).foreach {
-      x =>
-        val factor = if (x == 0) 0 else random.nextInt(x)
-        val record = s"""${TimePara.getCurrentTime},${ueId(factor % ueId.length)},${text(factor % text.length)},${region_id_c + factor},${x_offset_c + factor + x},${y_offset_c + factor + x}\n"""
-        resBuffer.append(record)
-    }
-    resBuffer.result().toArray
-  }
-
   def main(args: Array[String]) {
     /** val eNodeBID = List("614255,49", "614234,40", "615234,1", "625121,32", "623001,33")
       * val random = new Random
@@ -89,5 +73,21 @@ object DataProducer extends LogSupport {
     }
     printWriter.flush()
     printWriter.close()
+  }
+
+  def dataProducer(num: Int): Array[String] = {
+    val random = new Random
+    val ueId = Array("10001", "10002", "10003", "10004", "10005", "10006", "10007", "10008", "10009", "10010", "10011", "10012", "10013", "10014")
+    val text = Array("aaaaaaaaaaa", "bbbbbbbbb", "cccccccccccc", "dddddddddddd", "fffffffffffffff", "gggggggggggg", "hhhhhhhhhhhhh")
+    val (region_id_c, x_offset_c, y_offset_c) = (4841, 0, 0)
+
+    val resBuffer = new ArrayBuffer[String]()
+    (0 until num).foreach {
+      x =>
+        val factor = if (x == 0) 0 else random.nextInt(x)
+        val record = s"""${TimePara.getCurrentTime},${ueId(factor % ueId.length)},${text(factor % text.length)},${region_id_c + factor},${x_offset_c + factor + x},${y_offset_c + factor + x}\n"""
+        resBuffer.append(record)
+    }
+    resBuffer.result().toArray
   }
 }

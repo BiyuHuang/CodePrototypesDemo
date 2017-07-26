@@ -7,7 +7,7 @@ demo/SparkDemo/target/
 demo/src/
 project/project/
 project/target/
-projectFilesBackup/
+projectFilesBackup*/
 target/
 
 *.log
