@@ -11,6 +11,7 @@ language: scala
 script: 
   - sbt ++$TRAVIS_SCALA_VERSION compile test:compile
   - sbt ++$TRAVIS_SCALA_VERSION -Dakka.test.timefactor=1.5 'set concurrentRestrictions in Global += Tags.limit(Tags.Test, 1)' test
+  - sbt ++$TRAVIS_SCALA_VERSION assembly
   # Trick to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
 
