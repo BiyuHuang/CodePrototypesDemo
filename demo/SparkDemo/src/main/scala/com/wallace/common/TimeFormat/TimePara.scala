@@ -1,7 +1,7 @@
 package com.wallace.common.TimeFormat
 
 import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
+import java.util.{Calendar, Date, TimeZone}
 
 /**
   * Created by Wallace on 2016/5/6.
@@ -80,16 +80,6 @@ object TimePara {
     tempTime
   }
 
-  //  def getTimeMillis: Long = {
-  //    //val now: Date = new Date()
-  //    val loc = new Locale("en")
-  //    val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", loc)
-  //    //val time = dateFormat.format(now)
-  //    val time = getCurrentDate
-  //    val curTime = dateFormat.parse(time)
-  //    curTime.getTime
-  //  }
-
 
   def getYesterday: String = {
     val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
@@ -115,38 +105,39 @@ object TimePara {
     val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
     cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY) //这种输出的是上个星期周日的日期，因为国外把周日当成第一天
     cal.add(Calendar.WEEK_OF_YEAR, 1) // 增加一个星期，才是我们中国人的本周日的日期
-    period = df.format(cal.getTime())
+    period = df.format(cal.getTime)
     period
   }
 
   def getFirstDayOfMonth: String = {
     var period: String = ""
-    val cal: Calendar = Calendar.getInstance();
-    val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    val cal: Calendar = Calendar.getInstance()
+    val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
     cal.set(Calendar.DATE, 1)
-    period = df.format(cal.getTime()) //本月第一天
+    period = df.format(cal.getTime) //本月第一天
     period
   }
 
   def getEndDayOfMonth: String = {
     var period: String = ""
-    val cal: Calendar = Calendar.getInstance();
-    val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    val cal: Calendar = Calendar.getInstance()
+    val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
     cal.set(Calendar.DATE, 1)
     cal.roll(Calendar.DATE, -1)
-    period = df.format(cal.getTime()) //本月最后一天
+    period = df.format(cal.getTime) //本月最后一天
     period
   }
 
-  def dateFormat(time: String): String = {
-    val sdf: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
-    val date: String = sdf.format(new Date(time.toLong * 1000l))
+  def dateFormat(seconds: String, timeZoneID: String = "GMT"): String = {
+    Calendar.getInstance().setTimeZone(TimeZone.getTimeZone(timeZoneID))
+    val sdf: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+    val date: String = sdf.format(new Date(seconds.toLong * 1000 + new Date().getTimezoneOffset * 60 * 1000))
     date
   }
 
   def timeFormat(time: String): String = {
     val sdf: SimpleDateFormat = new SimpleDateFormat("HH:mm:ss")
-    val date: String = sdf.format(new Date(time.toLong * 1000l))
+    val date: String = sdf.format(new Date(time.toLong * 1000))
     date
   }
 

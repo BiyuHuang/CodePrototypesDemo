@@ -6,17 +6,17 @@ import com.wallace.common.LogSupport
 import com.wallace.demo.EncodingParser
 
 import scala.collection.mutable.ListBuffer
-import scala.io.Source
+import scala.io.Source.fromFile
 import scala.util.Try
 
 /**
   * Created by Wallace on 2016/8/19.
   */
 class SnmpPDUAnalysis(path: String) extends LogSupport {
-  protected val _path = path.replaceAll("\\\\", "/")
+  protected val _path: String = path.replaceAll("\\\\", "/")
 
-  def process() = {
-    val fileReader = Source.fromFile(this._path, "UTF-8")
+  def process(): List[String] = {
+    val fileReader = fromFile(this._path, "UTF-8")
     val fileLines = fileReader.getLines().toArray
 
     var alarmId_Size = 0
@@ -109,11 +109,3 @@ class SnmpPDUAnalysis(path: String) extends LogSupport {
     alarmTableData
   }
 }
-
-//object SnmpPDUAnalysis extends App with LogSupport {
-//  val startTime = System.currentTimeMillis()
-//  log.error(s"Start time: $startTime")
-//  println(new SnmpPDUAnalysis("demo/SparkDemo/data/currentAlarmTable.csv").process())
-//  val endTime = System.currentTimeMillis()
-//  log.error(s"End time: $endTime, and cost time : ${(endTime - startTime) * 1.0 / 1000} s.")
-//}
