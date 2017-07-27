@@ -3,56 +3,55 @@ package com.wallace.common.timeformat
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, TimeZone}
 
+import scala.concurrent.duration._
+
 /**
   * Created by Wallace on 2016/5/6.
   * 时间函数
   */
 object TimePara {
-  def getYear: Int = {
-    val now: Date = new Date()
-    val year = now.getYear + 1900
-    year
+
+  def getYear: Int = func[String, Int, Int]("GMT")(Calendar.YEAR)(get)
+
+  def getMonth: Int = func[String, Int, Int]("GMT")(Calendar.MONTH)(get) + 1
+
+  def getDate: Int = func[String, Int, Int]("GMT")(Calendar.DAY_OF_MONTH)(get)
+
+  def getHour: Int = func[String, Int, Int]("GMT")(Calendar.HOUR_OF_DAY)(get)
+
+  def getMinute: Int = func[String, Int, Int]("GMT")(Calendar.MINUTE)(get)
+
+  def getSecond: Int = func[String, Int, Int]("GMT")(Calendar.SECOND)(get)
+
+  private def get(timeZoneID: String = "GMT", timeUnit: Int): Int = {
+    Calendar.getInstance(TimeZone.getTimeZone(timeZoneID)).get(timeUnit)
   }
 
-  def getMonth: Int = {
-    val now: Date = new Date()
-    val month = now.getMonth + 1
-    month
-  }
+  private def func[A, B, C](x: A)(y: B)(f: (A, B) => C): C = f(x, y)
 
-  def getDate: Int = {
-    val now: Date = new Date()
-    val date = now.getDate
-    date
-  }
+  // TODO Got some problems,to be handled....
+  def getYear(timeZoneID: String): Int = Calendar.getInstance(TimeZone.getTimeZone(timeZoneID.toUpperCase)).get(Calendar.YEAR)
 
-  def getHour: Int = {
-    val now: Date = new Date()
-    val hour = now.getHours
-    hour
-  }
+  def getMonth(timeZoneID: String): Int = Calendar.getInstance(TimeZone.getTimeZone(timeZoneID.toUpperCase)).get(Calendar.MONTH) + 1
 
-  def getMinute: Int = {
-    val now: Date = new Date()
-    val minute = now.getMinutes
-    minute
-  }
+  def getDate(timeZoneID: String): Int = Calendar.getInstance(TimeZone.getTimeZone(timeZoneID.toUpperCase)).get(Calendar.DAY_OF_MONTH)
 
-  def getSecond: Int = {
-    val now: Date = new Date()
-    val second = now.getSeconds
-    second
+  def getHour(timeZoneID: String): Int = Calendar.getInstance(TimeZone.getTimeZone(timeZoneID.toUpperCase)).get(Calendar.HOUR_OF_DAY)
+
+  def getMinute(timeZoneID: String): Int = Calendar.getInstance(TimeZone.getTimeZone(timeZoneID.toUpperCase)).get(Calendar.MINUTE)
+
+  def getSecond(timeZoneID: String): Int = {
+    Calendar.getInstance(TimeZone.getTimeZone(timeZoneID.toUpperCase)).get(Calendar.SECOND)
   }
 
   def getCurrentDate: String = {
-    val now: Date = new Date(System.currentTimeMillis())
+    val now: Date = new Date(System.nanoTime().nanos.toMillis)
     val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-    val time = dateFormat.format(now)
-    time
+    dateFormat.format(now)
   }
 
   def getCurrentTime: String = {
-    val now: Date = new Date(System.currentTimeMillis())
+    val now: Date = new Date(System.nanoTime().nanos.toMillis)
     val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
     val time = dateFormat.format(now)
     time
@@ -100,39 +99,43 @@ object TimePara {
   }
 
   def getCurrentWeekEnd: String = {
-    var period: String = ""
     val cal: Calendar = Calendar.getInstance()
     val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
     cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY) //这种输出的是上个星期周日的日期，因为国外把周日当成第一天
     cal.add(Calendar.WEEK_OF_YEAR, 1) // 增加一个星期，才是我们中国人的本周日的日期
-    period = df.format(cal.getTime)
-    period
+    df.format(cal.getTime)
   }
 
   def getFirstDayOfMonth: String = {
-    var period: String = ""
     val cal: Calendar = Calendar.getInstance()
     val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
     cal.set(Calendar.DATE, 1)
-    period = df.format(cal.getTime) //本月第一天
-    period
+    df.format(cal.getTime) //本月第一天
+
   }
 
   def getEndDayOfMonth: String = {
-    var period: String = ""
     val cal: Calendar = Calendar.getInstance()
     val df: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
     cal.set(Calendar.DATE, 1)
     cal.roll(Calendar.DATE, -1)
-    period = df.format(cal.getTime) //本月最后一天
-    period
+    df.format(cal.getTime) //本月最后一天
   }
 
-  def dateFormat(seconds: String, timeZoneID: String = "GMT"): String = {
+  def dateFormat(seconds: Any, timeZoneID: String = "GMT"): String = {
     Calendar.getInstance().setTimeZone(TimeZone.getTimeZone(timeZoneID))
     val sdf: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-    val date: String = sdf.format(new Date(seconds.toLong * 1000 + new Date().getTimezoneOffset * 60 * 1000))
-    date
+    val s: Option[Long] = seconds match {
+      case v: String => Option(v.toLong)
+      case v: Long => Option(v)
+      case _ => None
+    }
+
+    if (s.isDefined) {
+      sdf.format(new Date(s.get * 1000 + new Date().getTimezoneOffset * 60 * 1000))
+    } else {
+      ""
+    }
   }
 
   def timeFormat(time: String): String = {
