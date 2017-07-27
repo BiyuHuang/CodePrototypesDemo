@@ -11,12 +11,11 @@ object DemoConfig extends App with ProjConfig {
   /**
     * Kafka Settings
     */
-
-  val brokers = config.getStringList("brokers.list").toList.map(_.split(",")).map(x=> (x(0),x(1).toInt)).toMap
+  val brokers = config.getStringList("brokers.list").toList.map(_.split(",")).map(x => (x(0), x(1).toInt)).toMap
   val topics = config.getString("topics")
   val messagePerSec = config.getString("messagePerSec")
 
-  log.error(
+  log.info(
     s"""
        |$brokers
        |$topics

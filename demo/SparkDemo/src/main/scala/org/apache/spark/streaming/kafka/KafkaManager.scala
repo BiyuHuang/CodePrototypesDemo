@@ -16,6 +16,23 @@ import scala.reflect.ClassTag
   * Created by Wallace on 2016/11/23.
   */
 class KafkaManager(val kafkaParams: Map[String, String]) extends LogSupport {
+  /**
+    **/
+  def createDirectStream[K: ClassTag, V: ClassTag, KD <: Decoder[K] : ClassTag, VD <: Decoder[V] : ClassTag](
+                                                                                                              ssc: StreamingContext,
+                                                                                                              topics: Set[String]
+                                                                                                            ): InputDStream[(K, V)] = {
+    val groupId = kafkaParams("group.id")
+    setOrUpdateOffsets(topics, groupId)
+    val partitionsE = kc.getPartitions(topics)
+    if (partitionsE.isLeft) throw new SparkException("Get kafka partition failed: ")
+    val partitions = partitionsE.right.get
+    val consumerOffsetsE = kc.getConsumerOffsets(groupId, partitions)
+    if (consumerOffsetsE.isLeft) throw new SparkException("Get kafka consumer offsets failed: ")
+    val consumerOffsets = consumerOffsetsE.right.get
+    UdfKafkaUtils.createDirectStream[K, V, KD, VD, (K, V)](ssc, kafkaParams, consumerOffsets, (mmd: MessageAndMetadata[K, V]) => (mmd.key(), mmd.message()))
+  }
+
   private def kc = new KafkaCluster(kafkaParams)
 
   private def setOrUpdateOffsets(topics: Set[String], groupId: String) = {
@@ -59,20 +76,6 @@ class KafkaManager(val kafkaParams: Map[String, String]) extends LogSupport {
   }
 
   /**
-    **/
-  def createDirectStream[K: ClassTag, V: ClassTag, KD <: Decoder[K] : ClassTag, VD <: Decoder[V] : ClassTag](ssc: StreamingContext, topics: Set[String]) = {
-    val groupId = kafkaParams("group.id")
-    setOrUpdateOffsets(topics, groupId)
-    val partitionsE = kc.getPartitions(topics)
-    if (partitionsE.isLeft) throw new SparkException("Get kafka partition failed: ")
-    val partitions = partitionsE.right.get
-    val consumerOffsetsE = kc.getConsumerOffsets(groupId, partitions)
-    if (consumerOffsetsE.isLeft) throw new SparkException("Get kafka consumer offsets failed: ")
-    val consumerOffsets = consumerOffsetsE.right.get
-    UdfKafkaUtils.createDirectStream[K, V, KD, VD, (K, V)](ssc, kafkaParams, consumerOffsets, (mmd: MessageAndMetadata[K, V]) => (mmd.key(), mmd.message()))
-  }
-
-  /**
     * 更新zookeeper上的消费offsets
     *
     * @param rdd
@@ -85,24 +88,19 @@ class KafkaManager(val kafkaParams: Map[String, String]) extends LogSupport {
       val topicAndPartition = TopicAndPartition(offsets.topic, offsets.partition)
       val o = kc.setConsumerOffsets(groupId, Map((topicAndPartition, offsets.untilOffset)))
       if (o.isLeft) {
-        println(s"Error updating the offset to Kafka cluster: ${o.left.get}")
+        log.info(s"Error updating the offset to Kafka cluster: ${o.left.get}")
       }
     }
   }
 }
 
 object UdfKafkaUtils {
-  def createDirectStream[
-  K: ClassTag,
-  V: ClassTag,
-  KD <: Decoder[K] : ClassTag,
-  VD <: Decoder[V] : ClassTag,
-  R: ClassTag](
-                ssc: StreamingContext,
-                kafkaParams: Map[String, String],
-                fromOffsets: Map[TopicAndPartition, Long],
-                messageHandler: MessageAndMetadata[K, V] => R
-              ): InputDStream[R] = {
+  def createDirectStream[K: ClassTag, V: ClassTag, KD <: Decoder[K] : ClassTag, VD <: Decoder[V] : ClassTag, R: ClassTag](
+                                                                                                                           ssc: StreamingContext,
+                                                                                                                           kafkaParams: Map[String, String],
+                                                                                                                           fromOffsets: Map[TopicAndPartition, Long],
+                                                                                                                           messageHandler: MessageAndMetadata[K, V] => R
+                                                                                                                         ): UdfDirectKafkaInputDStream[K, V, KD, VD, R] = {
     val cleanedHandler = ssc.sc.clean(messageHandler)
     new UdfDirectKafkaInputDStream[K, V, KD, VD, R](
       ssc, kafkaParams, fromOffsets, cleanedHandler)
@@ -120,18 +118,7 @@ R: ClassTag](ssc_ : StreamingContext,
              override val fromOffsets: Map[TopicAndPartition, Long],
              messageHandler: MessageAndMetadata[K, V] => R)
   extends DirectKafkaInputDStream[K, V, U, T, R](ssc_, kafkaParams, fromOffsets, messageHandler) {
-  override protected def clamp(leaderOffsets: Map[TopicAndPartition, LeaderOffset]): Map[TopicAndPartition, LeaderOffset] = {
-    maxMessagesPerPartition.map {
-      mmp =>
-        leaderOffsets.map {
-          case (tp, lo) =>
-            tp -> lo.copy(offset = Math.min(currentOffsets(tp) + mmp, lo.offset))
-        }
-    }.getOrElse(leaderOffsets)
-  }
-
   val maxRateLimitPerPartition = 100
-
   protected val maxMessagesPerPartition: Option[Long] = {
     //    val estimatedRateLimit = rateController.map(_.getLatestRate().toInt)
     val estimatedRateLimit = Some(10000)
@@ -154,5 +141,15 @@ R: ClassTag](ssc_ : StreamingContext,
     } else {
       None
     }
+  }
+
+  override protected def clamp(leaderOffsets: Map[TopicAndPartition, LeaderOffset]): Map[TopicAndPartition, LeaderOffset] = {
+    maxMessagesPerPartition.map {
+      mmp =>
+        leaderOffsets.map {
+          case (tp, lo) =>
+            tp -> lo.copy(offset = Math.min(currentOffsets(tp) + mmp, lo.offset))
+        }
+    }.getOrElse(leaderOffsets)
   }
 }

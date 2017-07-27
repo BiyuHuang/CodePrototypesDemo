@@ -15,10 +15,9 @@ import java.util.List;
  */
 public class ReloadThread extends Thread {
     private static final Logger log = LoggerFactory.getLogger(ReloadThread.class);
-
+    private final List<String> selectedFields;
     private long lastSuccessfulReload;
     private File configureFile;
-    public List<String> selectedFields;
 
     public ReloadThread(File configureFile) {
         this.configureFile = configureFile;
@@ -39,7 +38,7 @@ public class ReloadThread extends Thread {
 
     @Override
     public void run() {
-        while (true) {
+        do {
             long time = System.currentTimeMillis();
             long lastModified = configureFile.lastModified();
             if (lastModified > lastSuccessfulReload
@@ -56,7 +55,7 @@ public class ReloadThread extends Thread {
                             ex);
                 }
             }
-        }
+        } while (true);
     }
 
     public void reloadConfigureFile(File configureFile) {
