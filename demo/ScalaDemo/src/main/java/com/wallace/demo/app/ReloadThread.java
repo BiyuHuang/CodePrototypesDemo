@@ -59,19 +59,22 @@ public class ReloadThread extends Thread {
     }
 
     private void reloadConfigureFile(File configureFile) {
+        InputStreamReader read;
+        BufferedReader bufferedReader;
+        String line;
         try {
             /* 判断文件是否存在 */
             if (configureFile.isFile() && configureFile.exists()) {
                 FileInputStream inStream = new FileInputStream(configureFile);
-                InputStreamReader read = new InputStreamReader(inStream);
-                BufferedReader bufferedReader = new BufferedReader(read);
-                String line;
+                read = new InputStreamReader(inStream);
+                bufferedReader = new BufferedReader(read);
                 while ((line = bufferedReader.readLine()) != null) {
                     if (!selectedFields.contains(line)) {
                         selectedFields.add(line);
                     }
                 }
                 read.close();
+                bufferedReader.close();
             } else {
                 log.error("Failed to find file:" + configureFile.getAbsolutePath());
             }
