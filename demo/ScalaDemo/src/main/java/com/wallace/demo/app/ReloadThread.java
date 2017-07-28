@@ -24,7 +24,7 @@ public class ReloadThread extends Thread {
         selectedFields = new ArrayList<String>();
     }
 
-    public String getSelectedFields() {
+    private String getSelectedFields() {
         StringBuilder sb = new StringBuilder();
         for (String item : selectedFields) {
             sb.append(item).append(",");
@@ -58,12 +58,12 @@ public class ReloadThread extends Thread {
         } while (true);
     }
 
-    public void reloadConfigureFile(File configureFile) {
+    private void reloadConfigureFile(File configureFile) {
         try {
             /** 判断文件是否存在 */
             if (configureFile.isFile() && configureFile.exists()) {
-                InputStreamReader read = new InputStreamReader(
-                        new FileInputStream(configureFile));
+                FileInputStream inStream = new FileInputStream(configureFile);
+                InputStreamReader read = new InputStreamReader(inStream);
                 BufferedReader bufferedReader = new BufferedReader(read);
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
