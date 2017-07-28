@@ -10,6 +10,6 @@ object FactoryDemoRunTest extends LogSupport {
     val a = 1.0
     val b = 2.0
     val operate = scala.io.StdIn.readLine("Please enter operation: ")
-    log.info(s"${OperationFactory.createOperate(operate, a, b).get}")
+    log.info(s"${OperationFactory.createOperate(operate, a, b).getOrElse(0)}")
   }
 }

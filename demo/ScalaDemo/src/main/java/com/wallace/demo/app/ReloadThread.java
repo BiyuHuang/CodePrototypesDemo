@@ -21,7 +21,7 @@ public class ReloadThread extends Thread {
 
     public ReloadThread(File configureFile) {
         this.configureFile = configureFile;
-        selectedFields = new ArrayList<String>();
+        selectedFields = new ArrayList<>();
     }
 
     private String getSelectedFields() {
@@ -60,7 +60,7 @@ public class ReloadThread extends Thread {
 
     private void reloadConfigureFile(File configureFile) {
         try {
-            /** 判断文件是否存在 */
+            /* 判断文件是否存在 */
             if (configureFile.isFile() && configureFile.exists()) {
                 FileInputStream inStream = new FileInputStream(configureFile);
                 InputStreamReader read = new InputStreamReader(inStream);
