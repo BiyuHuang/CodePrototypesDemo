@@ -15,17 +15,16 @@ import java.util.List;
  */
 public class ReloadThread extends Thread {
     private static final Logger log = LoggerFactory.getLogger(ReloadThread.class);
-
+    private final List<String> selectedFields;
     private long lastSuccessfulReload;
     private File configureFile;
-    public List<String> selectedFields;
 
     public ReloadThread(File configureFile) {
         this.configureFile = configureFile;
-        selectedFields = new ArrayList<String>();
+        selectedFields = new ArrayList<>();
     }
 
-    public String getSelectedFields() {
+    private String getSelectedFields() {
         StringBuilder sb = new StringBuilder();
         for (String item : selectedFields) {
             sb.append(item).append(",");
@@ -39,7 +38,7 @@ public class ReloadThread extends Thread {
 
     @Override
     public void run() {
-        while (true) {
+        do {
             long time = System.currentTimeMillis();
             long lastModified = configureFile.lastModified();
             if (lastModified > lastSuccessfulReload
@@ -56,23 +55,26 @@ public class ReloadThread extends Thread {
                             ex);
                 }
             }
-        }
+        } while (true);
     }
 
-    public void reloadConfigureFile(File configureFile) {
+    private void reloadConfigureFile(File configureFile) {
+        InputStreamReader read;
+        BufferedReader bufferedReader;
+        String line;
         try {
-            /** 判断文件是否存在 */
+            /* 判断文件是否存在 */
             if (configureFile.isFile() && configureFile.exists()) {
-                InputStreamReader read = new InputStreamReader(
-                        new FileInputStream(configureFile));
-                BufferedReader bufferedReader = new BufferedReader(read);
-                String line;
+                FileInputStream inStream = new FileInputStream(configureFile);
+                read = new InputStreamReader(inStream);
+                bufferedReader = new BufferedReader(read);
                 while ((line = bufferedReader.readLine()) != null) {
                     if (!selectedFields.contains(line)) {
                         selectedFields.add(line);
                     }
                 }
                 read.close();
+                bufferedReader.close();
             } else {
                 log.error("Failed to find file:" + configureFile.getAbsolutePath());
             }
