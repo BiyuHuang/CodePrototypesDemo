@@ -17,7 +17,7 @@ object StrategyDemoRunTest extends LogSupport {
         new StrategyContext(new CashRebate("0.8"))
     }
     val money: Double = scala.io.StdIn.readLine("Please input total money: ").toDouble
-    cashStrategy.getAlgTest
+    cashStrategy.getAcceptCashResult(money)
     log.info(s"Total money: ${cashStrategy.getAcceptCashResult(money)} RMB")
   }
 }
