@@ -9,14 +9,15 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, Produce
 
 import scala.io.Source
 import scala.util.Random
+import scala.util.control.NonFatal
 
 /**
   * Created by huangbiyu on 16-6-4.
   */
-object MessageProducer {
-  def main(args: Array[String]) {
+object MessageProducer extends LogSupport {
+  def main(args: Array[String]): Unit = {
     if (args.length < 1) {
-      println(
+      log.error(
         s"""
            |<Usage>: MessageProducer messagesPerSec[Int]
            |         MessageProducer 1000
@@ -60,12 +61,19 @@ class MsgSender(numPerSec: Int) extends TimerTask with LogSupport {
     if (lines.nonEmpty) {
       val startTIme = System.currentTimeMillis()
       (1 to messagesPerSec).foreach {
-        i => val line = lines(Random.nextInt(lines.length))
-          .replaceFirst("([0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2} [0-9]{2,2}:[0-9]{2,2}:[0-9]{2,2}.[0-9]{3,3})", s"${df.format(new Date(System.currentTimeMillis))}")
+        i =>
+          val line = lines(Random.nextInt(lines.length))
+            .replaceFirst("([0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2} [0-9]{2,2}:[0-9]{2,2}:[0-9]{2,2}.[0-9]{3,3})", s"${df.format(new Date(System.currentTimeMillis))}")
           //val line = s"${df.format(new Date(System.currentTimeMillis))}" + lines(Random.nextInt(lines.length)).split(",", -1).drop(1).mkString(",")
           //println("###################" + line)
-          val message = new ProducerRecord[String, String](topic, null, line)
-          producer.send(message)
+          try {
+            val key: Option[String] = None
+            val message: ProducerRecord[String, String] = new ProducerRecord[String, String](topic, key.get, line)
+            producer.send(message)
+          } catch {
+            case NonFatal(e) =>
+              log.error(s"[MsgSender]Catch NonFatal Exception: ${e.getMessage}.")
+          }
       }
       val endTime = System.currentTimeMillis()
       log.error(s"[Sended $messagesPerSec Messages to Kafka Topics: $topic, Cost ${endTime - startTIme} ms.]")
@@ -74,6 +82,5 @@ class MsgSender(numPerSec: Int) extends TimerTask with LogSupport {
       log.warn(s"Source Files is Empty!Please Check!")
       data.close()
     }
-
   }
 }

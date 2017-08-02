@@ -13,19 +13,19 @@ import scala.io.Source
   * Created by Wallace on 2016/5/5.
   */
 object KafkaWordCountProducer extends LogSupport {
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     //    if (args.length < 3) {
-    //      System.err.println("Usage: KafkaWordCountProducer <metadataBrokerList> <topic> <messagesPerSec>")
+    //      log.error("Usage: KafkaWordCountProducer <metadataBrokerList> <topic> <messagesPerSec>")
     //      System.exit(1)
     //    }
-
-    val (brokers, topic, messagesPerSec) = ("localhost:9092", "kafka-spark-demo", "1000")
+    val (brokers, topic, messagesPerSec) = ("10.9.234.32:9092,10.9.234.35:9092", "test_hby", "1000")
     val timer = new Timer
     timer.schedule(new senderTIme(brokers, topic, messagesPerSec.toInt), 1000, 5000)
   }
 }
 
 class senderTIme(brokers: String, topic: String, messagesPerSec: Int) extends TimerTask with LogSupport {
+  private val DEFAULT_KEY = null
   // Zookeeper connection properties
   val props = new util.HashMap[String, Object]()
   props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers)
@@ -43,11 +43,11 @@ class senderTIme(brokers: String, topic: String, messagesPerSec: Int) extends Ti
     val lines = file.getLines.toArray
     log.error(s"========== Start to send ${messagesPerSec * 5} message to Topic: [$topic] ==========")
     (1 to messagesPerSec * 5).foreach {
-      messageNum =>
+      _ =>
         val str: Array[String] = lines(scala.util.Random.nextInt(lines.length)).split(",", -1)
         try {
-          val msg = s"""${TimePara.getCurrentDate},${str.drop(1).mkString(",")}"""
-          val message = new ProducerRecord[String, String](topic, null, msg)
+          val msg: String = s"""${TimePara.getCurrentDate},${str.drop(1).mkString(",")}"""
+          val message: ProducerRecord[String, String] = new ProducerRecord[String, String](topic, DEFAULT_KEY, msg)
           producer.send(message)
         } catch {
           case e: Exception =>

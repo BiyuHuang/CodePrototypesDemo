@@ -2,10 +2,13 @@ package com.wallace.spark.sparkstreaming
 
 import java.text.SimpleDateFormat
 
-import kafka.serializer.StringDecoder
+import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.InputDStream
-import org.apache.spark.streaming.kafka.KafkaUtils
+import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
+import org.apache.spark.streaming.kafka010.{ConsumerStrategy, KafkaUtils, LocationStrategy}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 /**
@@ -45,7 +48,7 @@ object MessageConsumer {
     Some(res)
   }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf()
     sparkConf.setMaster("local[*]")
       .setAppName("Kafka-spark-demo")
@@ -54,14 +57,19 @@ object MessageConsumer {
     val scc = new StreamingContext(sparkConf, Seconds(5))
     scc.checkpoint("./")
     val topics = Set("kafka-spark-demo")
-    val kafkaParam = Map(
-      "metadata.broker.list" -> "localhost:9092", // kafka的broker list地址
+    val kafkaParams = Map[String, Object](
+      "bootstrap.servers" -> "localhost:9092,anotherhost:9092",
+      "key.deserializer" -> classOf[StringDeserializer],
+      "value.deserializer" -> classOf[StringDeserializer],
       "group.id" -> "wallace_temp",
-      "zookeeper.connect" -> "localhost:2181")
+      "auto.offset.reset" -> "latest", //earliest消费历史数据, latest消费最新数据
+      "enable.auto.commit" -> (false: java.lang.Boolean)
+    )
 
+    val subScribe = Subscribe[String, String](topics, kafkaParams)
     // 2016-09-30 10:30:00.000,UEID,TEXT,REGION_ID,X_OFFSET,Y_OFFSET
-    val stream: InputDStream[(String, String)] = createStream(scc, kafkaParam, topics)
-    stream.map(_._2).map {
+    val stream: InputDStream[ConsumerRecord[String, String]] = createStream(scc, PreferConsistent, subScribe)
+    stream.map(record => (record.key(), record.value())).map(_._2).map {
       x =>
         val tempContext: Array[String] = x.split(",", -1)
         val key = tempContext(MessageDetail.UE_ID.id)
@@ -85,12 +93,15 @@ object MessageConsumer {
   /**
     * 创建一个从kafka获取数据的流.
     *
-    * @param scc        spark streaming上下文
-    * @param kafkaParam kafka相关配置
-    * @param topics     需要消费的topic集合
+    * @param scc       spark streaming上下文
+    * @param strategy  kafka consumer调度分区的位置策略
+    * @param subScribe consumer的消费策略
     * @return
     */
-  def createStream(scc: StreamingContext, kafkaParam: Map[String, String], topics: Set[String]): InputDStream[(String, String)] = {
-    KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](scc, kafkaParam, topics)
+  def createStream(
+                    scc: StreamingContext,
+                    strategy: LocationStrategy,
+                    subScribe: ConsumerStrategy[String, String]): InputDStream[ConsumerRecord[String, String]] = {
+    KafkaUtils.createDirectStream[String, String](scc, strategy, subScribe)
   }
 }
