@@ -64,14 +64,19 @@ object KafkaSparkDemoMain extends LogSupport {
                """.stripMargin)
         }
     }
-    //    stream.map(record => (record.key(), record.value(), record.partition(), record.offset())).foreachRDD {
-    //      rdd =>
-    //        rdd.foreach {
-    //          x =>
-    //            log.error(s"####: Partition: ${x._3}, Offset: ${x._4}.")
-    //        }
-    //      // rdd.persist()
-    //    }
+    stream.map(record => (record.key(), record.value(), record.timestamp())).foreachRDD {
+      rdd =>
+        rdd.foreach {
+          x =>
+            log.error(
+              s"""
+                 |Key => ${x._1}
+                 |Value: ${x._2}
+                 |TimeStamp: ${x._3}
+               """.stripMargin)
+        }
+      // rdd.persist()
+    }
     scc.start() // 真正启动程序
     scc.awaitTermination() //阻塞等待
   }
