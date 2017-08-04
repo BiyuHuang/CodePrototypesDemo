@@ -16,12 +16,12 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
   */
 
 object MessageConsumer {
-  val updateFunc = (currentValues: Seq[Int], preValue: Option[Int]) => {
+  val updateFunc: (Seq[Int], Option[Int]) => Some[Int] = (currentValues: Seq[Int], preValue: Option[Int]) => {
     val curr = currentValues.sum
     val pre = preValue.getOrElse(0)
     Some(curr + pre)
   }
-  val updateValueFunc = (curValue: Seq[String], preValue: Option[String]) => {
+  val updateValueFunc: (Seq[String], Option[String]) => Some[String] = (curValue: Seq[String], preValue: Option[String]) => {
     val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
     val srcTime: Long = curValue.map {
       x =>
@@ -77,8 +77,6 @@ object MessageConsumer {
     }.updateStateByKey[String](updateValueFunc)
 
     //.updateStateByKey[String](updateValueFunc)
-
-
     //    val tempDStream = stream.map(_._2) // 取出value
     //      .flatMap(_.split("\n")) // 将字符串使用空格分隔
     //      .map(r => (r.mkString, 1)) // 每个单词映射成一个pair

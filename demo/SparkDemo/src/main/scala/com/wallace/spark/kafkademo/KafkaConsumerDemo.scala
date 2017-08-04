@@ -1,4 +1,4 @@
-package com.wallace.spark.sparkstreaming.kafkademo
+package com.wallace.spark.kafkademo
 
 import java.util
 import java.util.Properties

@@ -2,8 +2,6 @@ package com.wallace.spark.SparkDemo.dataframedemo
 
 import com.wallace.common.LogSupport
 import com.wallace.common.timeformat.TimePara
-import com.wallace.spark.SparkDemo.dataframedemo.PersonInfo._
-import com.wallace.spark.SparkDemo.dataframedemo.SpendingInfo._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
