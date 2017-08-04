@@ -12,7 +12,7 @@ import scala.io.Source
 /**
   * Created by Wallace on 2016/5/5.
   */
-object KafkaWordCountProducer extends LogSupport {
+object KafkaProducerDemo extends LogSupport {
   def main(args: Array[String]): Unit = {
     //    if (args.length < 3) {
     //      log.error("Usage: KafkaWordCountProducer <metadataBrokerList> <topic> <messagesPerSec>")
