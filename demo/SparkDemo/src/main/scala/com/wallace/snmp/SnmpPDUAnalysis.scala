@@ -19,16 +19,16 @@ class SnmpPDUAnalysis(path: String) extends LogSupport {
     val fileReader = fromFile(this._path, "UTF-8")
     val fileLines = fileReader.getLines().toArray
 
-    var alarmId_Size = 0
-    var alarmCode_Size = 0
-    var alarmText_Size = 0
-    var alarmInfo_Size = 0
+    var alarmId_Size: Int = 0
+    var alarmCode_Size: Int = 0
+    var alarmText_Size: Int = 0
+    var alarmInfo_Size: Int = 0
 
-    val alarmId = new ListBuffer[Map[Int, String]]
-    val alarmCode = new ListBuffer[Map[Int, String]]
-    val alarmText = new ListBuffer[Map[Int, String]]
-    val alarmInfo = new ListBuffer[Map[Int, String]]
-    val alarmIterator = new ListBuffer[Int]
+    val alarmId: ListBuffer[Map[Int, String]] = new ListBuffer[Map[Int, String]]
+    val alarmCode: ListBuffer[Map[Int, String]] = new ListBuffer[Map[Int, String]]
+    val alarmText: ListBuffer[Map[Int, String]] = new ListBuffer[Map[Int, String]]
+    val alarmInfo: ListBuffer[Map[Int, String]] = new ListBuffer[Map[Int, String]]
+    val alarmIterator: ListBuffer[Int] = new ListBuffer[Int]()
     try {
       fileLines.indices.foreach {
         x =>

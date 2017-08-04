@@ -1,8 +1,9 @@
-package org.apache.spark.streaming.flume
+package org.apache.spark.streaming.flumedemo
 
 import com.wallace.common.LogSupport
 import org.apache.spark.SparkContext
 import org.apache.spark.storage.StorageLevel
+import org.apache.spark.streaming.flume.FlumeUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 import scala.util.control.NonFatal
@@ -10,7 +11,7 @@ import scala.util.control.NonFatal
 /**
   * Created by Wallace on 2017/3/30.
   */
-object SparkStreamingFlume extends LogSupport {
+object SparkStreamingFlumeDemo extends LogSupport {
   private val DEFAULT_BATCH_DURATION: Int = 20
 
   private val DEFAULT_PART_NUM: Int = 30
