@@ -11,8 +11,8 @@ object Dependencies {
   )
 
   val sparkDependencies: Seq[ModuleID] = Seq(
-    "org.apache.kafka" % "kafka-clients" % "0.8.2.1",
-    "org.apache.spark" % "spark-streaming-kafka-0-8_2.11" % "2.0.0",
+    "org.apache.kafka" % "kafka-clients" % "0.10.0.1",
+    "org.apache.spark" % "spark-streaming-kafka-0-10_2.11" % "2.0.2",
     "org.apache.spark" % "spark-streaming-flume_2.11" % "2.0.0",
     "org.apache.spark" % "spark-core_2.11" % "2.0.0",
     "org.apache.spark" % "spark-sql_2.11" % "2.0.0",

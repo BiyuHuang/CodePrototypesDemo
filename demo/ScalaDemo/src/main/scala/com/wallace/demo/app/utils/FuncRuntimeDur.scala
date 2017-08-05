@@ -5,17 +5,19 @@ package com.wallace.demo.app.utils
   */
 
 trait FuncRuntimeDur {
+  private val DEFAULT_PRECISION: Double = 0.000001
+
   /**
     * @param code  Code block/ Methods
     * @param times Execute code times
     * @return res: Execute code cost time, unit <ms>
     **/
   def runtimeDuration[T <: Any](code: => T, times: Int = 1): Double = {
-    val startTime = System.nanoTime() * 0.000001
-    for (i <- 1 to times) {
+    val startTime = System.nanoTime() * DEFAULT_PRECISION
+    for (_ <- 1 to times) {
       code
     }
-    val endTime = System.nanoTime() * 0.000001
+    val endTime = System.nanoTime() * DEFAULT_PRECISION
     val res = endTime - startTime
     res
   }
