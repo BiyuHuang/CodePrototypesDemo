@@ -31,6 +31,7 @@ object KafkaConsumerDemo extends LogSupport {
   def main(args: Array[String]): Unit = {
     val consumer: KafkaConsumer[String, String] = createConsumer
     consumer.assign(List(p0, p1))
+
     val partitions: util.List[PartitionInfo] = consumer.partitionsFor(topics.head)
     partitions.map(x => x.toString).foreach(p => log.error("[KafkaConsumerDemo] %s".format(p)))
     val record: ConsumerRecords[String, String] = consumer.poll(2048L)
