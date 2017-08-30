@@ -5,6 +5,7 @@ import java.lang.management.ManagementFactory
 
 import com.wallace.demo.app.common.LogSupport
 
+import scala.concurrent.duration.TimeUnit
 import scala.util.control.Breaks._
 import scala.util.control.NonFatal
 
@@ -12,10 +13,13 @@ import scala.util.control.NonFatal
   * Created by Wallace on 2017/2/24.
   */
 object Boot extends LogSupport {
+
+  def convert(time: Long, unit: TimeUnit): Long = unit.convert(time, unit)
+
   def main(args: Array[String]): Unit = {
     var file: Option[File] = None
     try {
-      file = Option(new File("./test.csv"))
+      file = Some(new File("./test.csv"))
       log.info(file.get.getPath)
     } catch {
       case NonFatal(e) =>
