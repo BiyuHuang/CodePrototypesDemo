@@ -17,7 +17,7 @@ public class RegexDemo {
         String regEx = "\"[a-zA-Z0-9,=$@]+\"";
         Pattern pattern = Pattern.compile(regEx);
         Matcher m = pattern.matcher(str);
-        while(m.find()){
+        while (m.find()) {
             System.out.println("@@@@@@@@@ " + m.group());
         }
     }

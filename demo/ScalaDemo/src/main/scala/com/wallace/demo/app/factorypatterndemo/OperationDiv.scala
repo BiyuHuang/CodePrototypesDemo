@@ -7,9 +7,9 @@ import scala.util.Try
 /**
   * Created by Wallace on 2017/4/15.
   */
-class OperationDiv(A: Double, B: Double) extends Operation[Double] with LogSupport {
-  override val numberA: Double = A
-  override val numberB: Double = B
+class OperationDiv(numA: Double, numB: Double) extends Operation[Double] with LogSupport {
+  override val numberA: Double = numA
+  override val numberB: Double = numB
 
   override def calcResult: Option[Double] = {
     if (numberA == 0 && numberB == 0) {
@@ -21,5 +21,5 @@ class OperationDiv(A: Double, B: Double) extends Operation[Double] with LogSuppo
 }
 
 object OperationDiv {
-  def apply(A: Double, B: Double): OperationDiv = new OperationDiv(A, B)
+  def apply(numA: Double, numB: Double): OperationDiv = new OperationDiv(numA, numB)
 }

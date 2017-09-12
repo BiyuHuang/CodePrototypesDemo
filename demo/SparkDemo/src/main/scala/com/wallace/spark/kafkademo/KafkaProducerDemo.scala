@@ -20,12 +20,11 @@ object KafkaProducerDemo extends LogSupport {
     //    }
     val (brokers, topic, messagesPerSec) = ("10.9.234.32:9092,10.9.234.35:9092", "test_hby", "1000")
     val timer = new Timer
-    timer.schedule(new senderTIme(brokers, topic, messagesPerSec.toInt), 1000, 5000)
+    timer.schedule(new senderTimer(brokers, topic, messagesPerSec.toInt), 1000, 5000)
   }
 }
 
-class senderTIme(brokers: String, topic: String, messagesPerSec: Int) extends TimerTask with LogSupport {
-  private val DEFAULT_KEY = null
+class senderTimer(brokers: String, topic: String, messagesPerSec: Int) extends TimerTask with LogSupport {
   // Zookeeper connection properties
   val props = new util.HashMap[String, Object]()
   props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers)
@@ -41,13 +40,13 @@ class senderTIme(brokers: String, topic: String, messagesPerSec: Int) extends Ti
   override def run(): Unit = {
     val file = Source.fromFile("demo/SparkDemo/data/DateProducer_2016-05-14_Test.csv", "UTF-8")
     val lines = file.getLines.toArray
-    log.error(s"========== Start to send ${messagesPerSec * 5} message to Topic: [$topic] ==========")
+    log.info(s"========== Start to send ${messagesPerSec * 5} message to Topic: [$topic] ==========")
     (1 to messagesPerSec * 5).foreach {
       _ =>
         val str: Array[String] = lines(scala.util.Random.nextInt(lines.length)).split(",", -1)
         try {
           val msg: String = s"""${TimePara.getCurrentDate},${str.drop(1).mkString(",")}"""
-          val message: ProducerRecord[String, String] = new ProducerRecord[String, String](topic, DEFAULT_KEY, msg)
+          val message: ProducerRecord[String, String] = new ProducerRecord[String, String](topic, msg)
           producer.send(message)
         } catch {
           case e: Exception =>
@@ -55,7 +54,6 @@ class senderTIme(brokers: String, topic: String, messagesPerSec: Int) extends Ti
             log.error(e.getMessage)
         }
     }
-    log.error(s"========== Send message to Topic : [$topic] has done ==========")
+    log.info(s"========== Succeed to Send message to Topic : [$topic] ==========")
   }
-
 }

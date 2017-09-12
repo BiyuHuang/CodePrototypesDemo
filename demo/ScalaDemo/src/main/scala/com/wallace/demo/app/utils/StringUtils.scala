@@ -59,26 +59,26 @@ object StringUtils extends LogSupport {
 
     val nData = data.drop(index + 1).slice(0, nNum * nLength)
 
-    val n1_Data = new ArrayBuffer[String]()
-    val n2_Data = new ArrayBuffer[String]()
-    val n3_Data = new ArrayBuffer[String]()
-    val n4_Data = new ArrayBuffer[String]()
+    val n1Data = new ArrayBuffer[String]()
+    val n2Data = new ArrayBuffer[String]()
+    val n3Data = new ArrayBuffer[String]()
+    val n4Data = new ArrayBuffer[String]()
 
     nData.indices.foreach {
-      case i if i % nLength == 0 => n1_Data.append(nData(i))
-      case i if i % nLength == 1 => n2_Data.append(nData(i))
-      case i if i % nLength == 2 => n3_Data.append(nData(i))
-      case i if i % nLength == 3 => n4_Data.append(nData(i))
+      case i if i % nLength == 0 => n1Data.append(nData(i))
+      case i if i % nLength == 1 => n2Data.append(nData(i))
+      case i if i % nLength == 2 => n3Data.append(nData(i))
+      case i if i % nLength == 3 => n4Data.append(nData(i))
     }
-    val n1_Res = n1_Data.result.mkString("$")
-    val n2_Res = n2_Data.result.mkString("$")
-    val n3_Res = n3_Data.result.mkString("$")
-    val n4_Res = n4_Data.result().mkString("$")
+    val n1Res = n1Data.result.mkString("$")
+    val n2Res = n2Data.result.mkString("$")
+    val n3Res = n3Data.result.mkString("$")
+    val n4Res = n4Data.result().mkString("$")
 
-    tempResultData.append(n1_Res)
-    tempResultData.append(n2_Res)
-    tempResultData.append(n3_Res)
-    tempResultData.append(n4_Res)
+    tempResultData.append(n1Res)
+    tempResultData.append(n2Res)
+    tempResultData.append(n3Res)
+    tempResultData.append(n4Res)
 
     tempResultData.result().toArray ++ tailData
   }

@@ -5,9 +5,9 @@ import scala.util.Try
 /**
   * Created by Wallace on 2017/4/15.
   */
-class OperationAdd(A: Double, B: Double) extends Operation[Double] {
-  override val numberA: Double = A
-  override val numberB: Double = B
+class OperationAdd(numA: Double, numB: Double) extends Operation[Double] {
+  override val numberA: Double = numA
+  override val numberB: Double = numB
 
   override def calcResult: Option[Double] = {
     Try(numberA + numberB).toOption
@@ -15,5 +15,5 @@ class OperationAdd(A: Double, B: Double) extends Operation[Double] {
 }
 
 object OperationAdd {
-  def apply(A: Double, B: Double): OperationAdd = new OperationAdd(A, B)
+  def apply(numA: Double, numB: Double): OperationAdd = new OperationAdd(numA, numB)
 }
