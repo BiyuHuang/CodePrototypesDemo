@@ -30,8 +30,11 @@ object Boot extends LogSupport {
         log.info("delete file.")
       }
     }
+    log.info(s"${func2(4)}")
+    log.info("End.")
+  }
 
-
+  def func1(): Unit = {
     log.info(s"${ManagementFactory.getRuntimeMXBean.getName}")
     try {
       util.Properties.setProp("scala.time", "true")
@@ -58,5 +61,12 @@ object Boot extends LogSupport {
       case NonFatal(e) =>
         log.error(s"Catch Non-Fatal Exception: ${e.getMessage}.")
     }
+  }
+
+  def func2(in: Int): AnyVal = in match {
+    case 1 => 10
+    case 2 => 20
+    case 3 => 30
+    case _ =>
   }
 }

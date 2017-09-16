@@ -4,14 +4,14 @@ import java.io._
 import java.nio.charset.Charset
 
 import ch.ethz.ssh2.{ChannelCondition, Connection, Session, StreamGobbler}
-import com.wallace.common.Using
+import com.wallace.common.{LogSupport, Using}
 
 import scala.util.control.Breaks._
 
 /**
   * Created by Wallace on 2016/11/3.
   */
-class SshClient(pSSHClient: SshClientUserInfo) extends Using {
+class SshClient(pSSHClient: SshClientUserInfo) extends Using with LogSupport {
 
   private val clientIP = pSSHClient.sshHost
   private val clientUser = pSSHClient.sshUser
@@ -30,43 +30,30 @@ class SshClient(pSSHClient: SshClientUserInfo) extends Using {
           session.startShell()
           val out = new PrintWriter(session.getStdin)
           for (cmd <- cmdSet) {
-            out.println(cmd)
+            out.write(cmd + "\n")
             out.flush()
             session.waitForCondition(ChannelCondition.CLOSED | ChannelCondition.EOF | ChannelCondition.EXIT_STATUS, 1000)
             breakable {
               while (true) {
                 val line: String = stdoutReader.readLine()
                 if (line.nonEmpty) {
-                  println(s"#### $line")
-                }
-                else {
+                  log.info(s"#### $line")
+                } else {
                   break
                 }
-
               }
             }
           }
           out.close()
-
           log.debug(s"[SSHClient] ${session.getExitStatus}")
-        }
-        catch {
+        } catch {
           case e: IllegalStateException =>
             log.error("[SSHClient] Cannot open session, connection is not authenticated.", e)
           case e: Exception =>
             log.error(s"[SSHClient] Failed to execute command.Exception Message: ${e.getMessage}")
-        }
-        finally {
-          try {
-            if (session != null) {
-              session.close()
-            }
-            if (conn != null)
-              conn.close()
-          } catch {
-            case e: Exception =>
-              log.error(s"[SSHClient] Failed to close ssh session.Exception Message: ${e.getMessage}")
-          }
+        } finally {
+          session.close()
+          conn.close()
         }
     }
   }
@@ -90,15 +77,8 @@ class SshClient(pSSHClient: SshClientUserInfo) extends Using {
             log.error(s"[SSHClient] Failed to execute command: $cmd.Exception Message: ${e.getMessage}")
             false
         } finally {
-          try {
-            if (session != null)
-              session.close()
-            if (conn != null)
-              conn.close()
-          } catch {
-            case e: Exception =>
-              log.error(s"[SSHClient] Failed to close ssh session.Exception Message: ${e.getMessage}")
-          }
+          session.close()
+          conn.close()
         }
     }
   }
@@ -109,7 +89,7 @@ class SshClient(pSSHClient: SshClientUserInfo) extends Using {
     val userHomePath = System.getProperty("user.home")
     val rsaFile = new File(userHomePath + "/.ssh/id_rsa")
     if (rsaFile.exists() && !os.toLowerCase.contains("windows")) {
-      val connResult = conn.authenticateWithPublicKey(clientUser, rsaFile, null)
+      val connResult = conn.authenticateWithPublicKey(clientUser, rsaFile, "")
       if (connResult) {
         log.info("[SSHClient] SSH AuthenticateWithPublicKey Successfully.")
       } else {
@@ -141,5 +121,4 @@ class SshClient(pSSHClient: SshClientUserInfo) extends Using {
     }
     sb.toString
   }
-
 }

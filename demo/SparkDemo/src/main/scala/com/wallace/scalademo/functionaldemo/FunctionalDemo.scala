@@ -6,7 +6,7 @@ import com.wallace.common.{LogSupport, UserDefineFunc}
   * Created by Wallace on 2016/11/6.
   */
 object FunctionalDemo extends UserDefineFunc with LogSupport {
-  val p0: (Int, Int, Int) => Int = sum _
+  val p0: (Int, Int, Int) => Int = sum
   val p2: (Int) => Int = sum(10, _: Int, 20)
   val p3: (Int, Int) => Int = sum(_: Int, 100, _: Int)
 
@@ -54,9 +54,6 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
     * Lambda表达式, 匿名函数
     **/
   def m1: (Int) => Int = (x: Int) => x * x
-
-
-  // 111
 
   /**
     * 偏应用函数

@@ -11,3 +11,6 @@ projectFilesBackup*/
 target/
 
 *.log
+.checkpoint-*
+checkpoint*
+receivedBlockMetadata/

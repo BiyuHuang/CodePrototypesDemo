@@ -65,7 +65,7 @@ object DataProducer extends LogSupport {
     //    webFile.foreach(print)
     //    webFile.close()
 
-    val printWriter = new PrintWriter(s"./demo/SparkDemo/data/Testing_Data_${TimePara.getDatePartition}.csv", "utf-8")
+    val printWriter: PrintWriter = new PrintWriter(s"./demo/SparkDemo/data/Testing_Data_${TimePara.getDatePartition}.csv", "utf-8")
     val resData = dataProducer(10000)
     resData.indices.foreach {
       x =>

@@ -5,9 +5,9 @@ import scala.util.Try
 /**
   * Created by Wallace on 2017/4/15.
   */
-class OperationSub(A: Double, B: Double) extends Operation[Double] {
-  override val numberA: Double = A
-  override val numberB: Double = B
+class OperationSub(numA: Double, numB: Double) extends Operation[Double] {
+  override val numberA: Double = numA
+  override val numberB: Double = numB
 
   override def calcResult: Option[Double] = {
     if (numberA > numberB) {
@@ -19,5 +19,5 @@ class OperationSub(A: Double, B: Double) extends Operation[Double] {
 }
 
 object OperationSub {
-  def apply(A: Double, B: Double): OperationSub = new OperationSub(A, B)
+  def apply(numA: Double, numB: Double): OperationSub = new OperationSub(numA, numB)
 }

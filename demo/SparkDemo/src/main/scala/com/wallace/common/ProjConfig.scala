@@ -2,6 +2,7 @@ package com.wallace.common
 
 
 import java.io.File
+
 import com.typesafe.config.{Config, ConfigFactory}
 
 /**
@@ -34,7 +35,10 @@ trait ProjConfig extends LogSupport {
 
   protected def makePath(filename: String): String = {
     val newDir = configHome.trim.replaceAll("""\\""", "/")
-    if (newDir.endsWith("/")) configHome + filename
-    else configHome + "/" + filename
+    if (newDir.endsWith("/")) {
+      configHome + filename
+    } else {
+      configHome + "/" + filename
+    }
   }
 }
