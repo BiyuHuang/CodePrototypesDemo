@@ -1,11 +1,12 @@
 package com.wallace.spark.kafkademo
 
 import java.util
+import java.util.concurrent.Future
 import java.util.{Timer, TimerTask}
 
 import com.wallace.common.LogSupport
 import com.wallace.common.timeformat.TimePara
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord, RecordMetadata}
 
 import scala.io.Source
 
@@ -47,7 +48,7 @@ class senderTimer(brokers: String, topic: String, messagesPerSec: Int) extends T
         try {
           val msg: String = s"""${TimePara.getCurrentDate},${str.drop(1).mkString(",")}"""
           val message: ProducerRecord[String, String] = new ProducerRecord[String, String](topic, msg)
-          producer.send(message)
+          val result: Future[RecordMetadata] = producer.send(message)
         } catch {
           case e: Exception =>
             throw e

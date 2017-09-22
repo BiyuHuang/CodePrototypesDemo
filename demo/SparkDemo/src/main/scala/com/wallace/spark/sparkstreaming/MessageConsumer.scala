@@ -66,7 +66,7 @@ object MessageConsumer {
       "enable.auto.commit" -> (false: java.lang.Boolean)
     )
 
-    val subScribe = Subscribe[String, String](topics, kafkaParams)
+    val subScribe: ConsumerStrategy[String, String] = Subscribe[String, String](topics, kafkaParams)
     // 2016-09-30 10:30:00.000,UEID,TEXT,REGION_ID,X_OFFSET,Y_OFFSET
     val stream: InputDStream[ConsumerRecord[String, String]] = createStream(scc, PreferConsistent, subScribe)
     stream.map(record => (record.key(), record.value())).map(_._2).map {
