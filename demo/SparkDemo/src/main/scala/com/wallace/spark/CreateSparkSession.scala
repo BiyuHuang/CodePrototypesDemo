@@ -9,7 +9,7 @@ import org.apache.spark.sql.SparkSession
 trait CreateSparkSession extends FuncRuntimeDur with LogSupport {
   def createSparkSession(): SparkSession = {
     val warehouseLocation = System.getProperty("user.dir") + "/" + "spark-warehouse"
-    val spark = SparkSession
+    val spark: SparkSession = SparkSession
       .builder()
       .master("local[*]")
       .appName("RddConvertToDataFrame")
