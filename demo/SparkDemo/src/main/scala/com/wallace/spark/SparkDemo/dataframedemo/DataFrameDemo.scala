@@ -23,7 +23,7 @@ object DataFrameDemo extends LogSupport {
 
   def main(args: Array[String]): Unit = {
     val warehouseLocation = System.getProperty("user.dir").replaceAll("\\\\", "/") + "/" + "spark-warehouse"
-    val spark = SparkSession
+    val spark: SparkSession = SparkSession
       .builder().master("local[*]").appName("RddConvertToDataFrame").config("spark.sql.warehouse.dir", warehouseLocation)
       .config("spark.driver.memory", "3g")
       //.enableHiveSupport()
@@ -44,6 +44,8 @@ object DataFrameDemo extends LogSupport {
 
     personDS.createOrReplaceTempView("person_info")
     val res1: DataFrame = spark.sql(s"SELECT * FROM person_info")
+
+    res1.map(x => x.getString(1)).rdd.take(1)
     res1.show(3)
     /**
       * Purchase Something
@@ -71,5 +73,10 @@ object DataFrameDemo extends LogSupport {
     //    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
   }
 
-  def padto(ls: Array[String], columnNum: Int = 5): Array[String] = if (ls.length > columnNum) ls.dropRight(ls.length - columnNum) else ls.padTo(columnNum, "")
+  protected def padto(ls: Array[String], columnNum: Int = 5): Array[String] = if (ls.length > columnNum) ls.dropRight(ls.length - columnNum) else ls.padTo(columnNum, "")
+
+  protected def getSparkTableLocation(spark: SparkSession, tableName: String): String = {
+    val resDF: DataFrame = spark.sql(s"DESC FORMATTED $tableName")
+    resDF.filter(resDF.col("col_name") === "Location:").map(x => x.getString(1)).rdd.take(1).head
+  }
 }
