@@ -77,6 +77,6 @@ object DataFrameDemo extends LogSupport {
 
   protected def getSparkTableLocation(spark: SparkSession, tableName: String): String = {
     val resDF: DataFrame = spark.sql(s"DESC FORMATTED $tableName")
-    resDF.filter(resDF.col("col_name") === "Location:").map(x => x.getString(1)).rdd.take(1).head
+    resDF.filter(resDF.col("col_name") === "Location:").rdd.map(x => x.getString(1)).take(1).head
   }
 }
