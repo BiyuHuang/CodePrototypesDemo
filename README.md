@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/BiyuHuang/CodePrototypesDemo.svg?branch=master)](https://travis-ci.org/BiyuHuang/)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/BiyuHuang/CodePrototypesDemo/blob/master/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/BiyuHuang/CodePrototypesDemo/badge.svg?branch=master)](https://coveralls.io/github/BiyuHuang/CodePrototypesDemo?branch=master)
+
     All of this are my private coding prototypes demo. Including scala demo/spark demo.
 
 
