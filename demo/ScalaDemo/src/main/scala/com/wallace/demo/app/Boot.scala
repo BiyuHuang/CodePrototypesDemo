@@ -17,6 +17,7 @@ object Boot extends LogSupport {
   def convert(time: Long, unit: TimeUnit): Long = unit.convert(time, unit)
 
   def main(args: Array[String]): Unit = {
+    util.Properties.setProp("scala.time", "true")
     var file: Option[File] = None
     try {
       file = Some(new File("./test.csv"))

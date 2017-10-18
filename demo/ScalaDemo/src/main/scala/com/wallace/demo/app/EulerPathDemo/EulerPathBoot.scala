@@ -1,4 +1,4 @@
-package com.wallace.demo.app.EulerPathDemo
+package com.wallace.demo.app.eulerpathdemo
 
 import java.util.Scanner
 
