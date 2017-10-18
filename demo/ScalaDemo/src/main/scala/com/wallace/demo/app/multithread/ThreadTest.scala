@@ -1,7 +1,7 @@
-package com.wallace.scalademo.multithread
+package com.wallace.demo.app.multithread
 
 import akka.actor.{Actor, ActorRef}
-import com.wallace.common.LogSupport
+import com.wallace.demo.app.common.LogSupport
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Wallace on 2016/10/12.
   * synchronized的用法
   */
-class Thread_Test(actor: ActorRef) extends Runnable with LogSupport {
+class ThreadTest(actor: ActorRef) extends Runnable with LogSupport {
   var exit = false
   val metaData = new ArrayBuffer[String]()
   var metaDataInfo: String = _

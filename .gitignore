@@ -14,3 +14,4 @@ target/
 .checkpoint-*
 checkpoint*
 receivedBlockMetadata/
+sh.exe.stackdump

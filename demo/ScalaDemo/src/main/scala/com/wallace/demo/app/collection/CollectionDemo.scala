@@ -1,6 +1,6 @@
-package com.wallace.scalademo.collection
+package com.wallace.demo.app.collection
 
-import com.wallace.common.LogSupport
+import com.wallace.demo.app.common.LogSupport
 
 /**
   * Created by Wallace on 2016/12/3.

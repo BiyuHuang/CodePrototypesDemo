@@ -1,6 +1,6 @@
-package com.wallace.scalademo.functionaldemo
+package com.wallace.demo.app.functionaldemo
 
-import com.wallace.common.{LogSupport, UserDefineFunc}
+import com.wallace.demo.app.common.{LogSupport, UserDefineFunc}
 
 /**
   * Created by Wallace on 2016/11/6.
@@ -14,10 +14,10 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
   def main(args: Array[String]): Unit = {
     val a: Int = 3
     val b: BigInt = toBigInt(a)
-    log.info(Int.MaxValue, Int.MinValue, b.pow(a))
-    log.info(p0(1, 2, 3)) // 6
-    log.info(p2(100)) // 130
-    log.info(p3(10, 1))
+    log.info(s"${Int.MaxValue}, ${Int.MinValue}, ${b.pow(a)}")
+    log.info(s"${p0(1, 2, 3)}") // 6
+    log.info(s"${p2(100)}") // 130
+    log.info(s"${p3(10, 1)}")
     log.info("[Partial Functions] " + divide(10))
     log.info("[Partial Functions] " + divide1(10))
     log.info("[Partial Functions] " + direction(180))
@@ -47,7 +47,7 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
     case v if math.abs(v / 90) == 1 => "North"
     case v if math.abs(v / 90) == 2 => "West"
     case v if math.abs(v / 90) == 3 => "South"
-    case v if math.abs(v / 90) == 4 => "East"
+    case _ => "East"
   }
 
   /**

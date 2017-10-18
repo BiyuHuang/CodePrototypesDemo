@@ -1,10 +1,10 @@
-package com.wallace.scalademo.multithread
+package com.wallace.demo.app.multithread
 
 import java.io._
 
 import akka.actor._
 import akka.util.Timeout
-import com.wallace.common.LogSupport
+import com.wallace.demo.app.common.LogSupport
 
 import scala.concurrent.duration._
 
@@ -22,8 +22,8 @@ object MultiThreadDemo extends LogSupport {
   def main(args: Array[String]): Unit = {
     //    val m1 = new ArrayBuffer[String]()
     //    val m2 = new ArrayBuffer[String]()
-    val t1: Thread_Test = new Thread_Test(actor)
-    val t2: Thread_Test = new Thread_Test(actor)
+    val t1: ThreadTest = new ThreadTest(actor)
+    val t2: ThreadTest = new ThreadTest(actor)
     val ta = new Thread(t1, "A")
     val tb = new Thread(t2, "B")
     ta.start()

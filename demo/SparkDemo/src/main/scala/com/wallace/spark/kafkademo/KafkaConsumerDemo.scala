@@ -21,14 +21,16 @@ object KafkaConsumerDemo extends LogSupport {
   //    "--disable-rack-aware",
   //    "--topic", "foo"))
   //
-  //  val zkConnect: (ZkClient, ZkConnection) = ZkUtils.createZkClientAndConnection("localhost:2181", 6 * 1000, 10 * 1000)
+  //  val zkConnect: (ZkClient, ZkConnection) = ZkUtils.createZkClientAndConnection("10.9.234.34:2181,10.9.234.35:2181,10.9.234.32:2181/kafka", 6 * 1000, 10 * 1000)
   //  val zkUtil = new ZkUtils(zkConnect._1, zkConnect._2, true)
-  // TopicCommand.createTopic(zkUtil, tpParam)
+
   private val topics = Set("test_hby") // 消费的kafka数据的topic
   private val p0 = new TopicPartition(topics.head, 0)
   private val p1 = new TopicPartition(topics.head, 1)
 
   def main(args: Array[String]): Unit = {
+    //    TopicCommand.createTopic(zkUtil, tpParam)
+
     val consumer: KafkaConsumer[String, String] = createConsumer
     consumer.assign(List(p0, p1))
 
