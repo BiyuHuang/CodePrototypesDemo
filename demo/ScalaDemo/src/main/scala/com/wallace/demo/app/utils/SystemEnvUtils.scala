@@ -18,11 +18,11 @@ object SystemEnvUtils {
   private val _env: util.Map[String, String] = System.getenv()
   private val _props: Properties = System.getProperties
 
-  def getUserDir: String = _props.getOrDefault("user.dir", "").toString
+  def getUserDir: String = _props.getProperty("user.dir")
 
-  def getFileSeparator: String = _props.getOrDefault("file.separator", "/").toString
+  def getFileSeparator: String = _props.getProperty("file.separator")
 
   def getEnvByKey(key: String): String = _env.getOrDefault(key, "")
 
-  def getPropsByKey(key: String): String = _props.getOrDefault(key, "").toString
+  def getPropsByKey(key: String): String = _props.getProperty(key)
 }

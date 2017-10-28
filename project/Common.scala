@@ -1,15 +1,15 @@
 import sbt.Keys._
-import sbt._
+import sbt.{Def, _}
 import sbtassembly.AssemblyKeys._
 import sbtassembly.{MergeStrategy, PathList}
 
 object Common {
   val appVersion = "0.0.1"
 
-  lazy val copyDependencies = TaskKey[Unit]("copy-dependencies")
+  lazy val copyDependencies: TaskKey[Unit] = TaskKey[Unit]("copy-dependencies")
   version := target.toString
 
-  def copyDepTask = copyDependencies <<= (update, crossTarget, scalaVersion, target) map {
+  def copyDepTask: Def.Setting[Task[Unit]] = copyDependencies <<= (update, crossTarget, scalaVersion, target) map {
     (updateReport, out, scalaVer, tar) => {
       updateReport.allFiles foreach {
         srcPath =>
