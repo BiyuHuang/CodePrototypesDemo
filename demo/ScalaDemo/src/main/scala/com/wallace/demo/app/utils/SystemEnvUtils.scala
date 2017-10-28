@@ -22,7 +22,7 @@ object SystemEnvUtils {
 
   def getFileSeparator: String = _props.getProperty("file.separator")
 
-  def getEnvByKey(key: String): String = _env.getOrDefault(key, "")
+  def getEnvByKey(key: String): String = _env.get(key)
 
   def getPropsByKey(key: String): String = _props.getProperty(key)
 }
