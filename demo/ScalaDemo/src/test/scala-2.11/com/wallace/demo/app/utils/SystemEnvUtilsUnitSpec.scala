@@ -17,6 +17,7 @@ class SystemEnvUtilsUnitSpec extends UnitSpec {
   teamID should "do unit test for getUserDir" in {
     val res = SystemEnvUtils.getUserDir
     val expect = "CodePrototypesDemo"
+    log.info(s"UserDir: $res.")
     res.contains(expect) shouldBe true
   }
 
