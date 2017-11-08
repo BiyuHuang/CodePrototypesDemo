@@ -9,10 +9,11 @@
 package com.wallace.spark.sparkmllibdemo
 
 import com.wallace.spark.CreateSparkSession
-import org.apache.spark.mllib.classification.SVMWithSGD
-import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
+import org.apache.spark.mllib.classification.{LogisticRegressionWithLBFGS, NaiveBayes, SVMWithSGD}
+import org.apache.spark.mllib.evaluation.{BinaryClassificationMetrics, MulticlassMetrics}
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.regression.LabeledPoint
+import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
+import org.apache.spark.mllib.tree.RandomForest
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -45,7 +46,12 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
     )).cache()
     val splitRdds: Array[RDD[LabeledPoint]] = inputRDD.randomSplit(Array(0.7, 0.3), seed = 1L) //Split data into training (70%) and test(30%)
     svmWithSGDModel(splitRdds, 200, 0.6, 0.0005)
-    svmWithSGDModel(splitRdds, 100)
+    //    linearRegressionWithSGD(splitRdds)
+    logisticRegressionWithLBFGSModel(splitRdds)
+    //    naiveBayes(splitRdds)
+
+    randomForestModel(splitRdds)
+
   }
 
   /**
@@ -69,7 +75,7 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
     // Clear the default threshold
     model.clearThreshold()
     //Compute raw scores on the testData
-    val scoreAndLabels: RDD[(Double, Double)] = testData.map {
+    val predictionAndLabels: RDD[(Double, Double)] = testData.map {
       point =>
         val score = model.predict(point.features)
         (score, point.label)
@@ -84,9 +90,97 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
       * 从几何的角度讲，RoC曲线下方的面积越大越大，则模型越优。
       * 所以有时候我们用RoC曲线下的面积，即AUC（Area Under Curve）值来作为算法和模型好坏的标准
       **/
-    val metrics = new BinaryClassificationMetrics(scoreAndLabels)
+    val metrics = new BinaryClassificationMetrics(predictionAndLabels)
     val auROC = metrics.areaUnderROC()
-    log.error(s"[Area under ROC = $auROC, numIterations = $numIterations, stepSize = $stepSize, regParam = $regParam, miniBatchFraction = $miniBatchFraction]")
+    log.warn(s"[Model = SVMWithSGDModel, Area under ROC = $auROC, numIterations = $numIterations, stepSize = $stepSize, regParam = $regParam, miniBatchFraction = $miniBatchFraction]")
+  }
+
+  protected def logisticRegressionWithLBFGSModel(data: Array[RDD[LabeledPoint]]): Unit = {
+    val trainingData = data.head
+    val testData = data.last
+
+    val model = new LogisticRegressionWithLBFGS()
+      .setNumClasses(20)
+      .run(trainingData)
+
+    val predictionAndLabels = testData.map {
+      point =>
+        val prediction = model.predict(point.features)
+        (prediction, point.label)
+    }
+
+    // Get evaluation metrics.获取评估指标
+    val metrics = new MulticlassMetrics(predictionAndLabels)
+    val precision: Double = metrics.accuracy
+
+    log.warn(s"[Model = LogisticRegressionWithLBFGSModel, Precision = $precision]")
+  }
+
+  /**
+    * RandomForest
+    **/
+  protected def randomForestModel(data: Array[RDD[LabeledPoint]]): Unit = {
+    val trainingData = data.head
+    val testData = data.last
+    // Train a RandomForest model.
+    // Empty categoricalFeaturesInfo indicates all features are continuous.
+    val numClasses = 2
+    val categoricalFeaturesInfo = Map[Int, Int]()
+    val numTrees = 3 // Use more in practice.
+    val featureSubsetStrategy = "auto" // Let the algorithm choose.
+    val impurity = "variance"
+    val maxDepth = 4
+    val maxBins = 32
+
+    val model = RandomForest.trainRegressor(trainingData, categoricalFeaturesInfo,
+      numTrees, featureSubsetStrategy, impurity, maxDepth, maxBins)
+
+    // Evaluate model on test instances and compute test error
+    val predictionAndLabels: RDD[(Double, Double)] = testData.map { point =>
+      val prediction = model.predict(point.features)
+      log.warn(s"Label: ${point.label}, Prediction: $prediction")
+      (point.label, prediction)
+    }
+
+    val testMSE = predictionAndLabels.map { case (v, p) => math.pow(v - p, 2) }.mean()
+    val accuracy = 1.0 * predictionAndLabels.filter(x => Math.abs(x._1 - x._2) < 0.2).count() / testData.count()
+    log.warn(s"[Model = RandomForestModel, Test Mean Squared Error = $testMSE, Precision = $accuracy]")
+    log.warn("Learned regression forest model:\n" + model.toDebugString)
+  }
+
+  protected def linearRegressionWithSGDModel(data: Array[RDD[LabeledPoint]]): Unit = {
+    val trainingData = data.head
+    val testData = data.last
+
+    val model = LinearRegressionWithSGD.train(trainingData, 500, 0.0000000000000001)
+    val predictionAndLabels = testData.map {
+      point =>
+        val prediction = model.predict(point.features)
+        (prediction, point.label)
+    }
+
+    // Get evaluation metrics.获取评估指标
+    val mse = predictionAndLabels.map { case (v, p) => math.pow(v - p, 2) }.mean()
+    log.warn(s"[Model = LinearRegressionWithSGDModel, Training Mean Squared Error = $mse]")
+  }
+
+  /**
+    * 朴素贝叶斯
+    **/
+  protected def naiveBayesModel(data: Array[RDD[LabeledPoint]], lambda: Double = 1.0, modelType: String = "bernoulli"): Unit = {
+    val trainingData = data.head
+    val testData = data.last
+
+    val model = NaiveBayes.train(trainingData, lambda, modelType)
+    val predictionAndLabels = testData.map {
+      point =>
+        val prediction = model.predict(point.features)
+        (prediction, point.label)
+    }
+
+    // Get evaluation metrics.获取评估指标
+    val accuracy = 1.0 * predictionAndLabels.filter(x => x._1 == x._2).count() / testData.count()
+    log.warn(s"[Model = NaiveBayesModel, Precision = $accuracy]")
   }
 
   private case class DataFields(reportCellKey: String, strongestNBPci: Double, aoa: Double, ta_calc: Double, rsrp: Double, rsrq: Double, ta: Double, taDltValue: Double, mrtime: String, imsi: String, ndsKey: String, ueRecordID: String, startTime: String, endTime: String, positionMarkReal: Int)
