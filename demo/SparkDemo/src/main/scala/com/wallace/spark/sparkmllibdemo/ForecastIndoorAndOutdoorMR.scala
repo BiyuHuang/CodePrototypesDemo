@@ -43,12 +43,9 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
         dataFields.ta,
         dataFields.taDltValue))
     )).cache()
-    val splitRdds: Array[RDD[LabeledPoint]] = inputRDD.randomSplit(Array(0.7, 0.3), seed = 5L) //Split data into training (70%) and test(30%)
-
-    svmWithSGDModel(splitRdds, 200, 0.6)
-    svmWithSGDModel(splitRdds, 200, 0.6, 0.05)
-    svmWithSGDModel(splitRdds, 200, 0.6, 0.10)
-
+    val splitRdds: Array[RDD[LabeledPoint]] = inputRDD.randomSplit(Array(0.7, 0.3), seed = 1L) //Split data into training (70%) and test(30%)
+    svmWithSGDModel(splitRdds, 200, 0.6, 0.0005)
+    svmWithSGDModel(splitRdds, 100)
   }
 
   /**
@@ -89,7 +86,7 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
       **/
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
     val auROC = metrics.areaUnderROC()
-    log.warn(s"[Area under ROC = $auROC, numIterations = $numIterations, stepSize = $stepSize, regParam = $regParam, miniBatchFraction = $miniBatchFraction]")
+    log.error(s"[Area under ROC = $auROC, numIterations = $numIterations, stepSize = $stepSize, regParam = $regParam, miniBatchFraction = $miniBatchFraction]")
   }
 
   private case class DataFields(reportCellKey: String, strongestNBPci: Double, aoa: Double, ta_calc: Double, rsrp: Double, rsrq: Double, ta: Double, taDltValue: Double, mrtime: String, imsi: String, ndsKey: String, ueRecordID: String, startTime: String, endTime: String, positionMarkReal: Int)
