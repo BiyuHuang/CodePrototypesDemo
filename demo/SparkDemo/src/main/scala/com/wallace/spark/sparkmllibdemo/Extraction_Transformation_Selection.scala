@@ -9,7 +9,7 @@ import org.apache.spark.sql.SparkSession
   */
 object Extraction_Transformation_Selection extends CreateSparkSession {
   def main(args: Array[String]): Unit = {
-    val spark = createSparkSession()
+    val spark = createSparkSession("Extraction_Transformation_Selection_Demo")
     //    hashingTF(spark)
     //    word2Vec(spark)
     //    countVectorizer(spark)
@@ -52,10 +52,10 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
     val idf = new IDF().setInputCol("rawFeatures").setOutputCol("features")
     val idfModel = idf.fit(featurizedData)
     val rescaledData = idfModel.transform(featurizedData)
-    rescaledData.select("features", "label").take(3).foreach(println)
+    rescaledData.select("features", "label").take(3).foreach(x => log.info(x.toString))
   }
 
-  def word2Vec(spark: SparkSession) = {
+  def word2Vec(spark: SparkSession): Unit = {
     // Input data: Each row is a bag of words from a sentence or document.
     val documentDF = spark.createDataFrame(Seq(
       "Hi I heard about Spark".split(" "),
@@ -71,10 +71,10 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
       .setMinCount(0)
     val model = word2Vec.fit(documentDF)
     val result = model.transform(documentDF)
-    result.select("result").take(3).foreach(println)
+    result.select("result").take(3).foreach(x => log.info(x.toString))
   }
 
-  def countVectorizer(spark: SparkSession) = {
+  def countVectorizer(spark: SparkSession): Unit = {
     val df = spark.createDataFrame(Seq(
       (0, Array("a", "b", "c")),
       (1, Array("a", "b", "b", "c", "a"))
@@ -110,9 +110,9 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
       .setPattern("\\W") // alternatively .setPattern("\\w+").setGaps(false)
 
     val tokenized = tokenizer.transform(sentenceDataFrame)
-    tokenized.select("words", "label").take(3).foreach(println)
+    tokenized.select("words", "label").take(3).foreach(x => log.info(x.toString))
     val regexTokenized = regexTokenizer.transform(sentenceDataFrame)
-    regexTokenized.select("words", "label").take(3).foreach(log.error(_))
+    regexTokenized.select("words", "label").take(3).foreach(x => log.error(x.toString()))
   }
 
   def stopWordRemover(spark: SparkSession): Unit = {
@@ -140,11 +140,11 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
 
     val ngram = new NGram().setInputCol("words").setOutputCol("ngrams")
     val ngramDataFrame = ngram.transform(wordDataFrame)
-    ngramDataFrame.take(3).map(_.getAs[Stream[String]]("ngrams").toList).foreach(println)
+    ngramDataFrame.take(3).map(_.getAs[Stream[String]]("ngrams").toList).foreach(x => log.info(x.toString()))
   }
 
   /** Binarizer */
-  def binarizer(spark: SparkSession) = {
+  def binarizer(spark: SparkSession): Unit = {
     val data = Array((0, 0.1), (1, 0.8), (2, 0.2))
     val dataFrame = spark.createDataFrame(data).toDF("id", "feature")
     val binarizer = new Binarizer()
@@ -153,7 +153,7 @@ object Extraction_Transformation_Selection extends CreateSparkSession {
       .setThreshold(0.5)
     val binarizedDataFrame = binarizer.transform(dataFrame)
 
-    println(s"Binarizer output with Threshold = ${binarizer.getThreshold}")
+    log.info(s"Binarizer output with Threshold = ${binarizer.getThreshold}")
     binarizedDataFrame.show()
   }
 

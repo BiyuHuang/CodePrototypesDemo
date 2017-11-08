@@ -7,7 +7,8 @@ object Dependencies {
     "mysql" % "mysql-connector-java" % "5.1.31" % "test",
     "ch.ethz.ganymed" % "ganymed-ssh2" % "build210",
     "org.slf4j" % "slf4j-api" % "1.7.7",
-    "org.slf4j" % "slf4j-log4j12" % "1.7.16",
+    "ch.qos.logback" % "logback-core" % "1.1.2",
+    "ch.qos.logback" % "logback-classic" % "1.1.2",
     "com.typesafe.akka" % "akka-actor_2.11" % "2.5.3"
   )
 

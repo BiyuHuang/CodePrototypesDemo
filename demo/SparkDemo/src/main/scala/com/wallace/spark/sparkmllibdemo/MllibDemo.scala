@@ -32,7 +32,7 @@ object MllibDemo extends App with LogSupport {
   val idf = new IDF().setInputCol("rawFeatures").setOutputCol("features")
   val idfModel = idf.fit(featurizedData)
   val rescaledData = idfModel.transform(featurizedData)
-  rescaledData.select("features", "label").take(3).foreach(println)
+  rescaledData.select("features", "label").take(3).foreach(x => log.info(s"$x"))
 
   spark.stop()
 }

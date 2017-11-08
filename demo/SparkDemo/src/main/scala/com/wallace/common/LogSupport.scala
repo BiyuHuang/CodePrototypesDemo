@@ -1,6 +1,6 @@
 package com.wallace.common
 
-import org.apache.log4j.Logger
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Created by Wallace on 2016/5/2.
@@ -21,5 +21,5 @@ trait LogSupport extends Serializable {
   //    protected val log = lc.getLogger(this.getClass)
 
   //3.默认日志配置
-  protected val log: Logger = Logger.getLogger(this.getClass)
+  protected val log: Logger = LoggerFactory.getLogger(this.getClass)
 }
