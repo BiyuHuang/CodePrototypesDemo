@@ -7,7 +7,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by Wallace on 2017/2/8.
   */
-object StringUtils extends LogSupport {
+object ConcatStringUtils extends LogSupport {
 
   def concatCols(data: String, fixedIndex: Int, nCellCols: Int): Array[String] = {
     val temp = data.split(",", -1)

@@ -1,5 +1,7 @@
 package com.wallace.demo.app.utils
 
+import java.text.SimpleDateFormat
+
 import com.wallace.demo.app.common.LogSupport
 
 import scala.collection.mutable.ArrayBuffer
@@ -9,7 +11,13 @@ import scala.collection.mutable.ArrayBuffer
   */
 object StringFuncUtils extends LogSupport {
   def main(args: Array[String]): Unit = {
+
     util.Properties.setProp("scala.time", "true")
+    val baseTimeMills: Long = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse("2000-01-01 00:00:00.000").getTime / 1000 //% 50000 + 50000
+    log.info("%15d".format((System.currentTimeMillis() - baseTimeMills) % Int.MaxValue))
+
+
+    log.info(formatString("16"))
     val str = """1,2,3,4,"a=1,b=2,c=3","e=1.2,f=32.1,g=1.3",7,8,9"""
 
     log.info(str)
@@ -52,6 +60,33 @@ object StringFuncUtils extends LogSupport {
           }
         }
         resultArr.result().toArray
+    }
+  }
+
+  def formatString(s: String): String = {
+    //TODO scala字符串格式化-StringLike.format()
+    s match {
+      case "" => ""
+      case _: String =>
+        val a = "%1$s-%2$s-%3$s".format("scala", "StringLike", "format")
+        val b = "%d%%".format(s.toInt)
+        val c = "%8.3f".format(s.toDouble)
+        val d = "%08.3f".format(s.toDouble)
+        val e = "%09d".format(s.toInt)
+        val f = "%.2f".format(s.toDouble)
+        val g = f"${s.toDouble}%.2f"
+
+        s"""
+           |$a
+           |$b
+           |$c
+           |$d
+           |$e
+           |$f
+           |$g
+         """.stripMargin
+      case _ =>
+        ""
     }
   }
 }
