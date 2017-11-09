@@ -8,7 +8,7 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Wallace on 2017/1/11.
   */
 object StringFuncUtils extends LogSupport {
-  private var uniqueIndex: Long = updateUniqueIndex((System.currentTimeMillis() - 946656000) % Int.MaxValue)
+  private var uniqueIndex: Long = updateUniqueIndex(((System.currentTimeMillis() - 946656000000L) / 1000) % Int.MaxValue)
 
   def splitString(str: String, fieldSeparator: String, specialChar: String): Array[String] = {
     val resultArr = new ArrayBuffer[String]()
@@ -70,8 +70,7 @@ object StringFuncUtils extends LogSupport {
   }
 
   def updateUniqueIndex(initIndex: Long): Long = synchronized {
-    uniqueIndex = if (initIndex > Int.MaxValue) 0L else initIndex
-    uniqueIndex += 1
+    uniqueIndex = if (initIndex > Int.MaxValue) 0L else initIndex + 1
     uniqueIndex
   }
 
