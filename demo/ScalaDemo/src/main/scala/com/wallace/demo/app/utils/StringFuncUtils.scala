@@ -65,9 +65,9 @@ object StringFuncUtils extends LogSupport {
 
   private var uniqueIndex: Long = (System.currentTimeMillis() - 946656000) % Int.MaxValue
 
-  def updateUniqueIndex(index: Long): Unit = {
+  def updateUniqueIndex(initIndex: Long): Long = {
     synchronized {
-      uniqueIndex = if (uniqueIndex > Int.MaxValue) 0L else uniqueIndex + 1
+      if (uniqueIndex > Int.MaxValue) 0L else uniqueIndex + 1
     }
   }
 
