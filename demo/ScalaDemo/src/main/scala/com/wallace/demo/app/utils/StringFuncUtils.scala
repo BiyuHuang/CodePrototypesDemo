@@ -63,6 +63,14 @@ object StringFuncUtils extends LogSupport {
     }
   }
 
+  private var uniqueIndex: Long = (System.currentTimeMillis() - 946656000) % Int.MaxValue
+
+  def updateUniqueIndex(index: Long): Unit = {
+    synchronized {
+      uniqueIndex = if (uniqueIndex > Int.MaxValue) 0L else uniqueIndex + 1
+    }
+  }
+
   def formatString(s: String): String = {
     //TODO scala字符串格式化-StringLike.format()
     s match {
