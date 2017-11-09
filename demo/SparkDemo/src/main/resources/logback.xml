@@ -83,7 +83,7 @@
         </encoder>
     </appender>
 
-    <root level="error">
+    <root level="warn">
         <!-- appender referenced after it is defined -->
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE_ERROR"/>
