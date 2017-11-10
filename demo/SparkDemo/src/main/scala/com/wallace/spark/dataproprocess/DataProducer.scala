@@ -14,7 +14,7 @@ import scala.util.Random
   * Produce Data And Save File on Local Path
   */
 object DataProducer extends LogSupport {
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     /** val eNodeBID = List("614255,49", "614234,40", "615234,1", "625121,32", "623001,33")
       * val random = new Random
       *random.setSeed(10)
@@ -33,10 +33,6 @@ object DataProducer extends LogSupport {
       *Thread.sleep(0)
       * }
       *writer.close()
-      */
-
-
-    /**
       * //读取本地文件
       * val file = Source.fromFile(s"./data/DateProducer_${new SimpleDateFormat("yyyy-MM-dd").format(new Date(System.currentTimeMillis - 24 * 60 * 60 * 1000))}_Test.csv", "UTF-8")
       * val lines = file.getLines.toArray
@@ -59,12 +55,10 @@ object DataProducer extends LogSupport {
       * *
       *file.close()
       */
-
     //网络资源读取
     //    val webFile=Source.fromURL("http://spark.apache.org")
     //    webFile.foreach(print)
     //    webFile.close()
-
     val printWriter: PrintWriter = new PrintWriter(s"./demo/SparkDemo/data/Testing_Data_${TimePara.getDatePartition}.csv", "utf-8")
     val resData = dataProducer(10000)
     resData.indices.foreach {

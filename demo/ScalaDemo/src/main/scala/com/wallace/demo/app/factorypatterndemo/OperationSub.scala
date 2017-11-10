@@ -1,7 +1,5 @@
 package com.wallace.demo.app.factorypatterndemo
 
-import scala.util.Try
-
 /**
   * Created by Wallace on 2017/4/15.
   */
@@ -11,9 +9,9 @@ class OperationSub(numA: Double, numB: Double) extends Operation[Double] {
 
   override def calcResult: Option[Double] = {
     if (numberA > numberB) {
-      Try(numberA - numberB).toOption
+      Some(numberA - numberB)
     } else {
-      Try(numberB - numberA).toOption
+      Some(numberB - numberA)
     }
   }
 }
