@@ -47,10 +47,10 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
     val splitRdds: Array[RDD[LabeledPoint]] = inputRDD.randomSplit(Array(0.7, 0.3), seed = 1L) //Split data into training (70%) and test(30%)
     svmWithSGDModel(splitRdds, 200, 0.6, 0.0005)
     //    linearRegressionWithSGD(splitRdds)
-    logisticRegressionWithLBFGSModel(splitRdds)
+    //logisticRegressionWithLBFGSModel(splitRdds)
     //    naiveBayes(splitRdds)
 
-    randomForestModel(splitRdds)
+    // randomForestModel(splitRdds)
 
   }
 
@@ -73,7 +73,7 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
     // Run training algorithm to build the model
     val model = SVMWithSGD.train(trainingData, numIterations, stepSize, regParam, miniBatchFraction)
     // Clear the default threshold
-    model.clearThreshold()
+    //model.clearThreshold()
     //Compute raw scores on the testData
     val predictionAndLabels: RDD[(Double, Double)] = testData.map {
       point =>
@@ -81,7 +81,7 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
         (score, point.label)
     }
     log.info(s"Compute raw scores on the testData")
-    //scoreAndLabels.foreach(x => log.info(s"score: ${x._1},label: ${x._2}."))
+    predictionAndLabels.foreach(x => log.info(s"score: ${x._1},label: ${x._2}."))
     /**
       * Get evaluation metrics.得到评估指标
       * 以召回率为y轴，以特异性为x轴，我们就直接得到了RoC曲线

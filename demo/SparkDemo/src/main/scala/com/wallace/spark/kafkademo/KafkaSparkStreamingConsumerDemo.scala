@@ -8,7 +8,7 @@ import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.{ConsumerStrategy, HasOffsetRanges, OffsetRange}
-import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.streaming.{Seconds, StreamingContext, Time}
 import org.apache.spark.{SparkConf, TaskContext}
 
 import scala.util.control.NonFatal
@@ -30,7 +30,7 @@ object KafkaSparkStreamingConsumerDemo extends LogSupport {
 
     val topics: Set[String] = Set("test_hby")
     val kafkaParams: Map[String, Object] = Map[String, Object](
-      "bootstrap.servers" -> "10.9.234.32:9092,10.9.234.35:9092",
+      "bootstrap.servers" -> "10.9.234.35:9092",
       "key.deserializer" -> classOf[StringDeserializer],
       "value.deserializer" -> classOf[StringDeserializer],
       "group.id" -> "wallace_temp",
@@ -40,8 +40,10 @@ object KafkaSparkStreamingConsumerDemo extends LogSupport {
     val subScribe: ConsumerStrategy[String, String] = Subscribe[String, String](topics, kafkaParams)
     val stream: InputDStream[ConsumerRecord[String, String]] = createStream(ssc, PreferConsistent, subScribe)
     stream.foreachRDD {
-      rdd =>
+      (rdd, time) =>
+        val batchTime: Time = time
         val offsetRanges: Array[OffsetRange] = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
+        log.warn(s"ID: ${batchTime.milliseconds / 1000}")
         rdd.foreachPartition {
           _ =>
             val offset: OffsetRange = offsetRanges(TaskContext.get.partitionId())
@@ -53,8 +55,7 @@ object KafkaSparkStreamingConsumerDemo extends LogSupport {
                  |UntilOffset: ${offset.untilOffset}""".stripMargin)
         }
     }
-
-    stream.map(x => x.checksum()).foreachRDD(rdd => log.error(s"[KafkaSparkStreamingConsumerDemo] Record Count: ${rdd.max()}."))
+    //stream.map(x => x.checksum()).foreachRDD(rdd => log.error(s"[KafkaSparkStreamingConsumerDemo] Record Count: ${rdd.max()}."))
 
     ssc.start()
 

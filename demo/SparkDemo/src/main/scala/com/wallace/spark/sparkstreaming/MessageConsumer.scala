@@ -71,10 +71,12 @@ object MessageConsumer {
     val stream: InputDStream[ConsumerRecord[String, String]] = createStream(scc, PreferConsistent, subScribe)
     stream.map(record => (record.key(), record.value())).map(_._2).map {
       x =>
+
         val tempContext: Array[String] = x.split(",", -1)
         val key = tempContext(MessageDetail.UE_ID.id)
         (key, x)
     }.updateStateByKey[String](updateValueFunc)
+
 
     //.updateStateByKey[String](updateValueFunc)
     //    val tempDStream = stream.map(_._2) // 取出value

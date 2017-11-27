@@ -5,8 +5,8 @@ import com.wallace.common.timeformat.TimePara
 import com.wallace.spark.sparkdemo.dataframedemo.PersonInfo._
 import com.wallace.spark.sparkdemo.dataframedemo.SpendingInfo.{Id, Spending, Time}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 import scala.util.Try
 
@@ -44,7 +44,6 @@ object DataFrameDemo extends LogSupport {
 
     personDS.createOrReplaceTempView("person_info")
     val res1: DataFrame = spark.sql(s"SELECT * FROM person_info")
-
     res1.map(x => x.getString(1)).rdd.take(1)
     res1.show(3)
     /**
@@ -71,6 +70,7 @@ object DataFrameDemo extends LogSupport {
     res5.show(3)
     //    res5.write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite).save("./temp/")
     //    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
+    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
   }
 
   protected def padto(ls: Array[String], columnNum: Int = 5): Array[String] = if (ls.length > columnNum) ls.dropRight(ls.length - columnNum) else ls.padTo(columnNum, "")
