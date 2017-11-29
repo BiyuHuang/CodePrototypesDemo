@@ -7,7 +7,7 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
-import org.apache.spark.streaming.kafka010.{ConsumerStrategy, HasOffsetRanges, OffsetRange}
+import org.apache.spark.streaming.kafka010.{CanCommitOffsets, ConsumerStrategy, HasOffsetRanges, OffsetRange}
 import org.apache.spark.streaming.{Seconds, StreamingContext, Time}
 import org.apache.spark.{SparkConf, TaskContext}
 
@@ -35,7 +35,7 @@ object KafkaSparkStreamingConsumerDemo extends LogSupport {
       "value.deserializer" -> classOf[StringDeserializer],
       "group.id" -> "wallace_temp",
       "auto.offset.reset" -> "earliest", //earliest消费历史数据, latest消费最新数据
-      "enable.auto.commit" -> (false: java.lang.Boolean)
+      "enable.auto.commit" -> (true: java.lang.Boolean)
     )
     val subScribe: ConsumerStrategy[String, String] = Subscribe[String, String](topics, kafkaParams)
     val stream: InputDStream[ConsumerRecord[String, String]] = createStream(ssc, PreferConsistent, subScribe)
@@ -54,6 +54,7 @@ object KafkaSparkStreamingConsumerDemo extends LogSupport {
                  |FromOffset: ${offset.fromOffset}
                  |UntilOffset: ${offset.untilOffset}""".stripMargin)
         }
+        stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
     }
     //stream.map(x => x.checksum()).foreachRDD(rdd => log.error(s"[KafkaSparkStreamingConsumerDemo] Record Count: ${rdd.max()}."))
 
