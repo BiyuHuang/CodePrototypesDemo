@@ -31,7 +31,7 @@ object MultiThreadTestDemo extends LogSupport {
   class ThreadDemo(threadName: String) extends Runnable {
     override def run(): Unit = {
       val threadId = Thread.currentThread().getId
-      for (i <- 1 to 10) {
+      for (_ <- 1 to 10) {
         log.info(threadName + "|" + threadId)
         Thread.sleep(100)
       }
@@ -40,5 +40,4 @@ object MultiThreadTestDemo extends LogSupport {
       log.info(s"Thread State: $state, Thread Symbol: $symbol, Thread Name: $threadName, Thread ID: $threadId")
     }
   }
-
 }

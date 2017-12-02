@@ -35,7 +35,7 @@ object KafkaSparkStreamingConsumerDemo extends LogSupport {
       "value.deserializer" -> classOf[StringDeserializer],
       "group.id" -> "wallace_temp",
       "auto.offset.reset" -> "earliest", //earliest消费历史数据, latest消费最新数据
-      "enable.auto.commit" -> (false: java.lang.Boolean)
+      "enable.auto.commit" -> (true: java.lang.Boolean)
     )
     val subScribe: ConsumerStrategy[String, String] = Subscribe[String, String](topics, kafkaParams)
     val stream: InputDStream[ConsumerRecord[String, String]] = createStream(ssc, PreferConsistent, subScribe)

@@ -3,7 +3,8 @@ package org.apache.spark.streaming.flumedemo
 import com.wallace.common.LogSupport
 import org.apache.spark.SparkContext
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.streaming.flume.FlumeUtils
+import org.apache.spark.streaming.dstream.ReceiverInputDStream
+import org.apache.spark.streaming.flume.{FlumeUtils, SparkFlumeEvent}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 import scala.util.control.NonFatal
@@ -32,8 +33,8 @@ object SparkStreamingFlumeDemo extends LogSupport {
     val hostname = args(0)
     val port = args(1).toInt
     val storageLevel = StorageLevel.MEMORY_ONLY
-    val flumeStream = FlumeUtils.createStream(ssc, hostname, port, storageLevel)
-    val flumePollingStream = FlumeUtils.createPollingStream(ssc, hostname, port, storageLevel)
+    val flumeStream: ReceiverInputDStream[SparkFlumeEvent] = FlumeUtils.createStream(ssc, hostname, port, storageLevel)
+    val flumePollingStream: ReceiverInputDStream[SparkFlumeEvent] = FlumeUtils.createPollingStream(ssc, hostname, port, storageLevel)
     flumeStream.count().map(cnt => "Received " + cnt + " flume events.").print()
     flumePollingStream.count().map(cnt => "Received " + cnt + " flume events.").print()
 
