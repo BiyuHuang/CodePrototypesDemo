@@ -3,29 +3,28 @@ package com.wallace.demo.app.common
 import java.io.{BufferedInputStream, ByteArrayInputStream, FileOutputStream, IOException}
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs.{FSDataOutputStream, FileSystem, Path}
 import org.apache.hadoop.io.IOUtils
-import org.apache.hadoop.io.compress.CompressionCodecFactory
+import org.apache.hadoop.io.compress.{CompressionCodecFactory, CompressionOutputStream}
 
 /**
   * com.wallace.demo.app.common
-  * Created by 10192057 on 2017/12/5 0005.
+  * Created by Wallace on 2017/12/5 0005.
   */
 trait HdfsSupportHA extends LogSupport {
   def hdfsConf: Configuration
 
-  private var errorHdfsCnt = 0
-  private var usingHdfsCnt = 0
+  private var errorHdfsCnt: Int = 0
+  private var usingHdfsCnt: Int = 0
 
   def usingHdfs(errMsg: String)(f: FileSystem => Unit): Unit = {
-    var hdfs: FileSystem = null
     this.synchronized(usingHdfsCnt += 1)
     if (usingHdfsCnt >= 10000) {
       log.info("Current error count :" + errorHdfsCnt)
       this.synchronized(usingHdfsCnt = 0)
     }
     try {
-      hdfs = FileSystem.get(hdfsConf)
+      val hdfs: FileSystem = FileSystem.get(hdfsConf)
       f(hdfs)
     }
     catch {
@@ -59,11 +58,11 @@ trait HdfsSupportHA extends LogSupport {
     usingHdfs("delete failed.") {
       hdfs =>
         val path = new Path(target)
-        if (hdfs.exists(path)){
+        if (hdfs.exists(path)) {
           log.info(s"Start to delect: ${path.toString}")
           hdfs.delete(path, true)
           log.info(s"End to delect: ${path.toString}")
-        }else{
+        } else {
           log.warn(s"Delete Path Failed! Path: ${path.toString} is not exists!")
         }
 
@@ -154,20 +153,25 @@ trait HdfsSupportHA extends LogSupport {
         val codec = factory.getCodecByClassName(compressionCodecClassName)
         val extension = codec.getDefaultExtension
 
-        val in = new ByteArrayInputStream(source.getBytes("UTF-8"))
-        val outputStream = hdfs.create(new Path(target + extension))
-        val compressionOutStream = codec.createOutputStream(outputStream)
+        val in: ByteArrayInputStream = new ByteArrayInputStream(source.getBytes("UTF-8"))
+        val outputStream: FSDataOutputStream = hdfs.create(new Path(target + extension))
+        val compressionOutStream: CompressionOutputStream = codec.createOutputStream(outputStream)
         try {
           IOUtils.copyBytes(in, compressionOutStream, hdfsConf, true)
           //IOUtils.copyBytes(in, compressionOutStream, source.length, true)
-        }
-        finally {
-          if (in != null) in.close()
-          if (null != compressionOutStream)
-            IOUtils.closeStream(compressionOutStream)
-
-          if (null != outputStream)
-            IOUtils.closeStream(outputStream)
+        } finally {
+          in match {
+            case _: ByteArrayInputStream => in.close()
+            case _ =>
+          }
+          compressionOutStream match {
+            case _: CompressionOutputStream => IOUtils.closeStream(compressionOutStream)
+            case _ =>
+          }
+          outputStream match {
+            case _: FSDataOutputStream => IOUtils.closeStream(outputStream)
+            case _ =>
+          }
         }
     }
   }

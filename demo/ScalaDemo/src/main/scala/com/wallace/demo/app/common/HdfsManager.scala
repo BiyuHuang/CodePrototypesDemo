@@ -9,12 +9,11 @@
 package com.wallace.demo.app.common
 
 import java.io.{File, FileOutputStream}
-import java.net.URI
 import java.util.Date
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.fs._
 import org.apache.hadoop.io.IOUtils
 
 import scala.util.{Failure, Success, Try}
@@ -25,7 +24,7 @@ import scala.util.{Failure, Success, Try}
 object HdfsManager extends HdfsSupportHA with Using {
   lazy val currentPath: String = System.getProperty("user.dir")
 
-  val hdfsConf = configHdfs()
+  val hdfsConf: Configuration = configHdfs()
 
   def configHdfs(): Configuration = {
     val hdfsConfig = new Configuration()
@@ -35,8 +34,7 @@ object HdfsManager extends HdfsSupportHA with Using {
         if (new java.io.File(file).exists()) {
           hdfsConfig.addResource(new Path(file))
           log.debug(s"HdfsFileManager addResource from config directory: $file.current directory $currentPath")
-        }
-        else {
+        } else {
           val configPath = file.split("/").init.mkString("/")
           val configFilename = file.split("/").last
 
@@ -56,14 +54,17 @@ object HdfsManager extends HdfsSupportHA with Using {
 
 
   def fileSize(filename: String): Long = {
-    var size = 0l
+    var size: Option[Long] = None
     usingHdfs("get file status failure") {
       hdfs =>
-        val status = hdfs.getFileStatus(new Path(filename))
-        size = if (status.isDirectory) listFiles(filename).map(file => fileSize(s"$filename/$file")).sum
-        else hdfs.getFileStatus(new Path(filename)).getLen
+        val status: FileStatus = hdfs.getFileStatus(new Path(filename))
+        size = if (status.isDirectory) {
+          Some(listFiles(filename).map(file => fileSize(s"$filename/$file")).sum)
+        } else {
+          Some(hdfs.getFileStatus(new Path(filename)).getLen)
+        }
     }
-    size
+    size.getOrElse(0L)
   }
 
   def isDirectory(dir: String): Boolean = {
@@ -97,13 +98,14 @@ object HdfsManager extends HdfsSupportHA with Using {
   def rename(src: String, target: String): Unit = {
     usingHdfs("rename failed!") {
       hdfs =>
-        val srcpath = new Path(src)
-        val targetpath = new Path(target)
-
-        if (!hdfs.exists(targetpath.getParent)) hdfs.mkdirs(targetpath.getParent)
-        else if (hdfs.exists(targetpath)) delete(target)
-
-        hdfs.rename(srcpath, targetpath)
+        val srcPath = new Path(src)
+        val targetPath = new Path(target)
+        if (!hdfs.exists(targetPath.getParent)) {
+          hdfs.mkdirs(targetPath.getParent)
+        } else {
+          if (hdfs.exists(targetPath)) delete(target)
+        }
+        hdfs.rename(srcPath, targetPath)
     }
   }
 
@@ -114,9 +116,7 @@ object HdfsManager extends HdfsSupportHA with Using {
     }
   }
 
-  def get(srcPath: String, localPath: String, fileFilter: String => Boolean = {
-    str => true
-  }): Unit = {
+  def get(srcPath: String, localPath: String, fileFilter: String => Boolean = { _ => true }): Unit = {
     usingHdfs("get failed!") {
       hdfs =>
         val files = hdfs.listFiles(new Path(srcPath), false)
@@ -129,11 +129,11 @@ object HdfsManager extends HdfsSupportHA with Using {
     }
   }
 
-  def HDFSDownLoad(source: String, target: String, append: Boolean = false): Unit = {
+  def hdfsDownLoadFile(source: String, target: String, append: Boolean = false): Unit = {
     usingHdfs("download failed.") {
       hdfs =>
         val srcPath = source
-        val out = new FileOutputStream(s"$target", append)
+        val out: FileOutputStream = new FileOutputStream(s"$target", append)
         if (hdfs.exists(new Path(srcPath))) {
           val files = hdfs.listFiles(new Path(srcPath), false)
           log.info("files path" + files)
@@ -142,54 +142,26 @@ object HdfsManager extends HdfsSupportHA with Using {
               log.info("while start")
               val file = files.next()
               if (file.getPath.toString.contains("part-")) {
-                val in = hdfs.open(new Path(file.getPath.toString))
+                val in: FSDataInputStream = hdfs.open(new Path(file.getPath.toString))
                 try {
                   IOUtils.copyBytes(in, out, 4096, false)
                 } finally {
-                  if (in != null) in.close()
+                  in match {
+                    case _: FSDataInputStream => in.close()
+                    case _ =>
+                  }
                 }
               }
             }
           } catch {
             case e: Throwable => e.printStackTrace()
           } finally {
-            if (out != null) out.close()
-          }
-        }
-        else {
-          log.debug("download Error:" + srcPath + " not exist ")
-        }
-    }
-  }
-
-  def hdfsFilesDownLoad(source: String, target: String, append: Boolean = false): Unit = {
-    usingHdfs("files download failed.") {
-      hdfs =>
-        val srcPath = source
-        val out = new FileOutputStream(s"$target", append)
-        if (hdfs.exists(new Path(srcPath))) {
-          val files = hdfs.listFiles(new Path(srcPath), true)
-          log.info("files path" + files)
-          try {
-            while (files.hasNext) {
-              log.info("while start")
-              val file = files.next()
-              if (file.getPath.toString.contains("part-")) {
-                val in = hdfs.open(new Path(file.getPath.toString))
-                try {
-                  IOUtils.copyBytes(in, out, 4096, false)
-                } finally {
-                  if (in != null) in.close()
-                }
-              }
+            out match {
+              case _: FileOutputStream => out.close()
+              case _ =>
             }
-          } catch {
-            case e: Throwable => e.printStackTrace()
-          } finally {
-            if (out != null) out.close()
           }
-        }
-        else {
+        } else {
           log.debug("download Error:" + srcPath + " not exist ")
         }
     }
@@ -206,8 +178,8 @@ object HdfsManager extends HdfsSupportHA with Using {
     log.debug(s"try to append $src to $target ...")
     usingHdfs("append failed") {
       hdfs =>
-        val in = hdfs.open(new Path(src))
-        val out = if (hdfs.exists(new Path(target))) {
+        val in: FSDataInputStream = hdfs.open(new Path(src))
+        val out: FSDataOutputStream = if (hdfs.exists(new Path(target))) {
           hdfs.create(new Path(target + System.currentTimeMillis()))
           //          hdfs.append(new Path(target))
         }
@@ -217,21 +189,26 @@ object HdfsManager extends HdfsSupportHA with Using {
         try {
           IOUtils.copyBytes(in, out, 4096, true)
         } finally {
-          if (in != null) in.close()
-          if (out != null) out.close()
+          (in, out) match {
+            case _: (_ <: FSDataInputStream, _ <: FSDataOutputStream) =>
+              in.close()
+              out.close()
+            case _ =>
+          }
         }
     }
     log.debug(s"append $src to $target complete")
   }
 
   def getDfsNameServices: String = {
+    var temp: Option[String] = None
     usingHdfs("") {
       hdfs =>
+        temp = Some(hdfs.getCanonicalServiceName)
     }
-
-    val dfsname = hdfsConf.get("dfs.nameservices")
-    log.info(s"getDfsNameServices return $dfsname")
-    dfsname
+    val dfsName = temp.getOrElse(hdfsConf.get("dfs.nameservices"))
+    log.info(s"getDfsNameServices return $dfsName")
+    dfsName
   }
 
   def downloadFile(hdfsFileName: String, localFileName: String, delSourceFile: Boolean = false): Unit = {
@@ -248,7 +225,7 @@ object HdfsManager extends HdfsSupportHA with Using {
       hdfs =>
         val files = hdfs.listFiles(new Path(remoteHdfsPath), false)
         val gzFiles = Stream.continually(files.hasNext).takeWhile(_.equals(true))
-          .map(x => files.next().getPath).filter(x => x.getName.endsWith(".gz"))
+          .map(_ => files.next().getPath).filter(x => x.getName.endsWith(".gz"))
 
         //create local path if not exist
         createLocalPath(localFileName)
@@ -292,8 +269,7 @@ object HdfsManager extends HdfsSupportHA with Using {
           val file = new File(path)
           val result = file.mkdirs()
           val osName = System.getProperties.getProperty("os.name")
-          if (osName.equalsIgnoreCase("Linux"))
-            Runtime.getRuntime.exec(s"chmod -R 777  $path")
+          if (osName.equalsIgnoreCase("Linux")) Runtime.getRuntime.exec(s"chmod -R 777  $path")
           result
       }
     } match {
@@ -303,7 +279,6 @@ object HdfsManager extends HdfsSupportHA with Using {
         log.error(s"Create directories or change directory authority for file $localFileName. Throw exceptions: ", e)
         false
     }
-
   }
 
   def downloadFile(tgtFileName: String, destFileName: String): Unit = {
