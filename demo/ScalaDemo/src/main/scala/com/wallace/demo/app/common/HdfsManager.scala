@@ -9,8 +9,13 @@
 package com.wallace.demo.app.common
 
 import java.io.{File, FileOutputStream}
+import java.net.URI
 import java.util.Date
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
+
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.hadoop.io.IOUtils
 
 import scala.util.{Failure, Success, Try}
 
@@ -25,7 +30,7 @@ object HdfsManager extends HdfsSupportHA with Using {
   def configHdfs(): Configuration = {
     val hdfsConfig = new Configuration()
 
-    LteConfig.siteConfFiles.foreach {
+    Array("").foreach {
       file =>
         if (new java.io.File(file).exists()) {
           hdfsConfig.addResource(new Path(file))
@@ -219,7 +224,7 @@ object HdfsManager extends HdfsSupportHA with Using {
     log.debug(s"append $src to $target complete")
   }
 
-  def getDfsNameServices(): String = {
+  def getDfsNameServices: String = {
     usingHdfs("") {
       hdfs =>
     }
@@ -229,7 +234,7 @@ object HdfsManager extends HdfsSupportHA with Using {
     dfsname
   }
 
-  def downloadFile(hdfsFileName: String, localFileName: String, delSourceFile: Boolean = false) = {
+  def downloadFile(hdfsFileName: String, localFileName: String, delSourceFile: Boolean = false): Unit = {
     usingHdfs("download one file to local") {
       hdfs =>
         hdfs.copyToLocalFile(delSourceFile, new Path(hdfsFileName), new Path(localFileName))
@@ -237,14 +242,13 @@ object HdfsManager extends HdfsSupportHA with Using {
   }
 
 
-  def downloadGzipFilesToLocal(remoteHdfsPath: String, localFileName: String) {
+  def downloadGzipFilesToLocal(remoteHdfsPath: String, localFileName: String): Unit = {
     log.info(s"downloadGzipFilesToLocal: From $remoteHdfsPath to $localFileName,start time: " + new Date().toString)
-
     usingHdfs("download Hdfs Gzip Files error.") {
       hdfs =>
-
         val files = hdfs.listFiles(new Path(remoteHdfsPath), false)
-        val gzFiles = Stream.continually(files.hasNext).takeWhile(_ == true).map(x => files.next().getPath).filter(x => x.getName.endsWith(".gz"))
+        val gzFiles = Stream.continually(files.hasNext).takeWhile(_.equals(true))
+          .map(x => files.next().getPath).filter(x => x.getName.endsWith(".gz"))
 
         //create local path if not exist
         createLocalPath(localFileName)
@@ -290,7 +294,6 @@ object HdfsManager extends HdfsSupportHA with Using {
           val osName = System.getProperties.getProperty("os.name")
           if (osName.equalsIgnoreCase("Linux"))
             Runtime.getRuntime.exec(s"chmod -R 777  $path")
-
           result
       }
     } match {
@@ -299,6 +302,19 @@ object HdfsManager extends HdfsSupportHA with Using {
       case Failure(e) =>
         log.error(s"Create directories or change directory authority for file $localFileName. Throw exceptions: ", e)
         false
+    }
+
+  }
+
+  def downloadFile(tgtFileName: String, destFileName: String): Unit = {
+    usingHdfs("") {
+      hdfs =>
+        // 调用open方法进行下载，参数HDFS路径
+        val in = hdfs.open(new Path(tgtFileName))
+        // 创建输出流，参数指定文件输出地址
+        val out = new FileOutputStream(destFileName)
+        // 使用Hadoop提供的IOUtils，将in的内容copy到out，设置buffSize大小，是否关闭流设置true
+        IOUtils.copyBytes(in, out, 4096, true);
     }
   }
 }
