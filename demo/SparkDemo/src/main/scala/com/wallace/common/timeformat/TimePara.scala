@@ -126,8 +126,8 @@ object TimePara {
     Calendar.getInstance().setTimeZone(TimeZone.getTimeZone(timeZoneID))
     val sdf: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
     val s: Option[Long] = seconds match {
-      case v: String => Option(v.toLong)
-      case v: Long => Option(v)
+      case v: String => Some(v.toLong)
+      case v: Long => Some(v)
       case _ => None
     }
 
