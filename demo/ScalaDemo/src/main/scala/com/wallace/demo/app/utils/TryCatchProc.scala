@@ -18,7 +18,7 @@ import scala.util.control.NonFatal
   * Created by wallace on 2017/12/4.
   */
 trait TryCatchProc extends Using {
-  def catchAndLogging[A, B](in: A, msg: String)(proc: File => B): Option[B] = {
+  def catchAndLogging[A, B](in: A, msg: String)(proc: A => B): Option[B] = {
     try {
       Some(proc(in))
     } catch {

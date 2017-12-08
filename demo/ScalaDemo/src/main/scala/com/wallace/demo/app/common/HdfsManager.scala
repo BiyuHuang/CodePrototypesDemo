@@ -13,7 +13,7 @@ import java.util.Date
 import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs._
+import org.apache.hadoop.fs.{FSDataInputStream, FSDataOutputStream, Path}
 import org.apache.hadoop.io.IOUtils
 
 import scala.util.{Failure, Success, Try}
@@ -34,7 +34,8 @@ object HdfsManager extends HdfsSupportHA with Using {
         if (new java.io.File(file).exists()) {
           hdfsConfig.addResource(new Path(file))
           log.debug(s"HdfsFileManager addResource from config directory: $file.current directory $currentPath")
-        } else {
+        }
+        else {
           val configPath = file.split("/").init.mkString("/")
           val configFilename = file.split("/").last
 
@@ -54,17 +55,17 @@ object HdfsManager extends HdfsSupportHA with Using {
 
 
   def fileSize(filename: String): Long = {
-    var size: Option[Long] = None
+    var size: Long = 0L
     usingHdfs("get file status failure") {
       hdfs =>
-        val status: FileStatus = hdfs.getFileStatus(new Path(filename))
+        val status = hdfs.getFileStatus(new Path(filename))
         size = if (status.isDirectory) {
-          Some(listFiles(filename).map(file => fileSize(s"$filename/$file")).sum)
+          listFiles(filename).map(file => fileSize(s"$filename/$file")).sum
         } else {
-          Some(hdfs.getFileStatus(new Path(filename)).getLen)
+          hdfs.getFileStatus(new Path(filename)).getLen
         }
     }
-    size.getOrElse(0L)
+    size
   }
 
   def isDirectory(dir: String): Boolean = {
@@ -98,14 +99,16 @@ object HdfsManager extends HdfsSupportHA with Using {
   def rename(src: String, target: String): Unit = {
     usingHdfs("rename failed!") {
       hdfs =>
-        val srcPath = new Path(src)
-        val targetPath = new Path(target)
-        if (!hdfs.exists(targetPath.getParent)) {
-          hdfs.mkdirs(targetPath.getParent)
+        val srcpath = new Path(src)
+        val targetpath = new Path(target)
+
+        if (!hdfs.exists(targetpath.getParent)) {
+          hdfs.mkdirs(targetpath.getParent)
         } else {
-          if (hdfs.exists(targetPath)) delete(target)
+          if (hdfs.exists(targetpath)) delete(target)
         }
-        hdfs.rename(srcPath, targetPath)
+
+        hdfs.rename(srcpath, targetpath)
     }
   }
 
@@ -189,12 +192,8 @@ object HdfsManager extends HdfsSupportHA with Using {
         try {
           IOUtils.copyBytes(in, out, 4096, true)
         } finally {
-          (in, out) match {
-            case _: (_ <: FSDataInputStream, _ <: FSDataOutputStream) =>
-              in.close()
-              out.close()
-            case _ =>
-          }
+          if (in != null) in.close()
+          if (out != null) out.close()
         }
     }
     log.debug(s"append $src to $target complete")

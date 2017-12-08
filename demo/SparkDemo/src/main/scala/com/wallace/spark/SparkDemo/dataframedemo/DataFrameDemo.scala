@@ -4,6 +4,7 @@ import com.wallace.common.LogSupport
 import com.wallace.common.timeformat.TimePara
 import com.wallace.spark.sparkdemo.dataframedemo.PersonInfo._
 import com.wallace.spark.sparkdemo.dataframedemo.SpendingInfo.{Id, Spending, Time}
+import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
@@ -19,6 +20,8 @@ case class Person(NAME: String, AGE: Int, GENDER: String, MARITAL_STATUS: String
 
 case class Customer(Time: String, Id: String, Spending: Int)
 
+case class Record(num: Int, col2: String, col3: String, col4: String, col5: String, index: Int)
+
 object DataFrameDemo extends LogSupport {
 
   def main(args: Array[String]): Unit = {
@@ -28,7 +31,27 @@ object DataFrameDemo extends LogSupport {
       .config("spark.driver.memory", "3g")
       //.enableHiveSupport()
       .getOrCreate()
-    val sc = spark.sparkContext
+    val sc: SparkContext = spark.sparkContext
+    import spark.implicits._
+
+
+    val rdd: RDD[String] = sc.textFile("./demo/SparkDemo/src/main/resources/sample_1.csv")
+    val srcDF: DataFrame = rdd.map(_.split(",", -1)).map {
+      col =>
+        Record(col(0).toInt, col(1), col(2), col(3), col(4), col(5).toInt)
+    }.toDF
+
+    srcDF.show(5)
+
+    val res: RDD[Row] = flatMapFunc(srcDF)
+    res.collect.foreach {
+      row =>
+        log.info(s"#### ${row.mkString(",")}")
+    }
+  }
+
+  protected def demo(spark: SparkSession): Unit = {
+    val sc: SparkContext = spark.sparkContext
     import spark.implicits._
     /**
       * Personal Information
@@ -70,7 +93,7 @@ object DataFrameDemo extends LogSupport {
     res5.show(3)
     //    res5.write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite).save("./temp/")
     //    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
-    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
+    //res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
   }
 
   protected def padto(ls: Array[String], columnNum: Int = 5): Array[String] = if (ls.length > columnNum) ls.dropRight(ls.length - columnNum) else ls.padTo(columnNum, "")
@@ -78,5 +101,38 @@ object DataFrameDemo extends LogSupport {
   protected def getSparkTableLocation(spark: SparkSession, tableName: String): String = {
     val resDF: DataFrame = spark.sql(s"DESC FORMATTED $tableName")
     resDF.filter(resDF.col("col_name") === "Location:").rdd.map(x => x.getString(1)).take(1).head
+  }
+
+  protected def  flatMapFunc(srcDF: DataFrame): RDD[Row] = {
+    srcDF.rdd.flatMap {
+      row =>
+        val num: Int = Try(row.getInt(0)).getOrElse(-1)
+        val res = num match {
+          case 0 => Array(Seq.empty)
+          case _ =>
+            val col2 = Try(row.getString(1)).getOrElse("").split("\\$", -1)
+            val col3 = Try(row.getString(2)).getOrElse("").split("\\$", -1)
+            val col4 = Try(row.getString(3)).getOrElse("").split("\\$", -1)
+            val col5 = Try(row.getString(4)).getOrElse("").split("\\$", -1)
+            val index: Array[Int] = col2.zipWithIndex.map(_._2)
+            if (col2.length != num | col3.length != num | col4.size != num) {
+              Array(Seq.empty)
+            } else {
+              index.map {
+                i =>
+                  if (col5(i) == "") {
+                    Seq.empty
+                  } else {
+                    Seq(i, col2(i), col3(i), col4(i), col5(i), row.getInt(5))
+                  }
+              }
+            }
+        }
+
+        res.filter(_.nonEmpty).map {
+          x =>
+            Row.fromSeq(x)
+        }
+    }
   }
 }
