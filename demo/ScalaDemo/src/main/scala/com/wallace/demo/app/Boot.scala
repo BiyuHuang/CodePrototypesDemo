@@ -13,7 +13,6 @@ import scala.util.control.NonFatal
   * Created by Wallace on 2017/2/24.
   */
 object Boot extends LogSupport {
-
   def convert(time: Long, unit: TimeUnit): Long = unit.convert(time, unit)
 
   def main(args: Array[String]): Unit = {

@@ -5,7 +5,7 @@ import org.slf4j.{Logger, LoggerFactory}
 /**
   * Created by Wallace on 2016/5/2.
   */
-trait LogSupport extends Serializable {
+trait LogSupport {
 
   //1.log4j.properties配置
   //  val rootPath = new File("").getAbsolutePath.replaceAll("\\\\", "/")

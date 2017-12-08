@@ -78,12 +78,12 @@
         </rollingPolicy>
 
         <encoder>
-            <!--%d{yyyy-MM-dd HH:mm:ss.SSS}%-4relative [%thread] %-5level %logger{35} - -->
+            <!--%d{yyyy-MM-dd HH:mm:ss.SSS}%-4relative [%thread] %-5level %logger{26} - -->
             <pattern>%d{HH:mm:ss.SSS} |-[%thread]-[%level]-[%logger{35}.%method:%line] - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <root level="warn">
+    <root level="debug">
         <!-- appender referenced after it is defined -->
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE_ERROR"/>

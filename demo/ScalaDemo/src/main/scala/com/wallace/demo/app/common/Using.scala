@@ -1,6 +1,8 @@
 package com.wallace.demo.app.common
 
-trait Using {
+import com.wallace.demo.app.utils.FuncRuntimeDur
+
+trait Using extends FuncRuntimeDur {
   protected def using[A <: {def close() : Unit}, B](param: A)(f: A => B): B = {
     try {
       f(param)

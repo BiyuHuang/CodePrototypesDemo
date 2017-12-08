@@ -1,14 +1,15 @@
 package com.wallace.demo.app.utils
 
-import com.wallace.demo.app.common.LogSupport
-
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.parallel.ForkJoinTaskSupport
 
 /**
   * Created by Wallace on 2017/1/11.
   */
-object StringFuncUtils extends LogSupport {
-  private var uniqueIndex: Long = updateUniqueIndex(((System.currentTimeMillis() - 946656000000L) / 1000) % Int.MaxValue)
+object StringFuncUtils extends FuncRuntimeDur {
+  private var _uniqueIndex: Long = updateUniqueIndex(((System.currentTimeMillis() - 946656000000L) / 1000) % Int.MaxValue)
+  private val _maxParallelism: Int = Runtime.getRuntime.availableProcessors()
+  private val _curParallelism: Int = Math.min(_maxParallelism, 5)
 
   def splitString(str: String, fieldSeparator: String, specialChar: String): Array[String] = {
     val resultArr = new ArrayBuffer[String]()
@@ -24,7 +25,9 @@ object StringFuncUtils extends LogSupport {
               if (sSub.indexOf(specialChar) == sSub.lastIndexOf(specialChar)) {
                 temp = temp.substring(nPos, temp.length)
                 nPos = temp.indexOf(specialChar)
-                sSub = sSub + temp.substring(0, nPos)
+                if (nPos != -1) {
+                  sSub = sSub + temp.substring(0, nPos)
+                }
                 sSub = sSub.replaceAll(specialChar, "")
                 resultArr.append(sSub)
                 temp = if (nPos + 2 < temp.length) temp.substring(nPos + 2, temp.length) else ""
@@ -47,33 +50,36 @@ object StringFuncUtils extends LogSupport {
   }
 
   def main(args: Array[String]): Unit = {
-
+    val pool = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(_curParallelism))
     util.Properties.setProp("scala.time", "true")
-    //val baseTimeMills: Long = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse("2000-01-01 00:00:00.000").getTime / 1000 //% 50000 + 50000
-    //log.info("%15d".format((System.currentTimeMillis() - baseTimeMills) % Int.MaxValue))
-
-    var cnt = 0L
-    while (cnt < 10) {
-      log.info(updateUniqueIndex(uniqueIndex).toString)
-      Thread.sleep(10)
-      cnt += 1
-    }
+    runtimeDuration({
+      _uniqueIndex = updateUniqueIndex(_uniqueIndex)
+      log.info(s"UniqueIndex: ${_uniqueIndex}")
+    }, 10)
 
     log.info(formatString("16"))
-    val str = """1,2,3,4,"a=1,b=2,c=3","e=1.2,f=32.1,g=1.3",7,8,9"""
-
-    log.info(str)
-    val result: Array[String] = splitString(str, ",", "\"")
-    for (elem <- result) {
-      log.info("@@@@@ " + elem)
+    val str0 = """1,2,3,4,"a=1,b=2,c=3","e=1.2,f=32.1,g=1.3",7,8,9"""
+    val str1 = """1,2,3,"4,"a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
+    val str2 = """1,2,3,4","a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
+    val input = Array(str0, str1, str2)
+    input.par.tasksupport = pool
+    input.par.foreach {
+      str =>
+        val threadName = Thread.currentThread().getName
+        log.info(s"$threadName: $str")
+        val res: Array[String] = splitString(str, ",", "\"")
+        synchronized {
+          res.foreach {
+            elem =>
+              log.info(s"$threadName: $elem")
+          }
+        }
     }
   }
 
   def updateUniqueIndex(initIndex: Long): Long = synchronized {
-    uniqueIndex = if (initIndex > Int.MaxValue) 0L else initIndex + 1
-    uniqueIndex
+    if (initIndex > Int.MaxValue) 0L else initIndex + 1
   }
-
 
   def formatString(s: String): String = {
     //TODO scala字符串格式化-StringLike.format()
