@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/*
  * Created by Wallace on 2017/2/26.
  */
 public class ReloadThread extends Thread {
@@ -41,8 +41,7 @@ public class ReloadThread extends Thread {
         do {
             long time = System.currentTimeMillis();
             long lastModified = configureFile.lastModified();
-            if (lastModified > lastSuccessfulReload
-                    && time > lastModified) {
+            if (lastModified > lastSuccessfulReload && time > lastModified) {
                 try {
                     synchronized (selectedFields) {
                         reloadConfigureFile(configureFile);
@@ -50,9 +49,7 @@ public class ReloadThread extends Thread {
                         lastSuccessfulReload = System.currentTimeMillis();
                     }
                 } catch (Exception ex) {
-                    log.error(
-                            "Failed to reload config file - will use existing configuration.",
-                            ex);
+                    log.error("Failed to reload config file - will use existing configuration.", ex);
                 }
             }
         } while (true);
