@@ -9,6 +9,6 @@ object Boot extends LogSupport {
   def main(args: Array[String]): Unit = {
     val a: StringBuffer = new StringBuffer
     a.append("wallace").append(",").append("hello").append("!")
-    log.error(a.toString)
+    log.info(a.toString)
   }
 }
