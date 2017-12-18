@@ -31,7 +31,7 @@ object FileUtils extends Using {
     val costTime3 = runtimeDuration {
       readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
     }
-    log.info(s"CostTime3: $costTime3 ms.")
+    log.info(s"CostTime3: $costTime3 ms."))
   }
 
   private def readTarGZFile(fileName: String): Unit = {
