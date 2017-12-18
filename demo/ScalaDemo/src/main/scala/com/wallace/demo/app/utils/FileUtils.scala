@@ -31,27 +31,22 @@ object FileUtils extends Using {
     val costTime3 = runtimeDuration {
       readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
     }
-    log.info(s"CostTime3: $costTime3 ms."))
+    log.info(s"CostTime3: $costTime3 ms.")
   }
 
   private def readTarGZFile(fileName: String): Unit = {
-    try {
-      cnt = 0
-      using(new FileInputStream(fileName)) {
-        fin =>
-          using(new GzipCompressorInputStream(fin)) {
-            inputStream =>
-              using(new TarArchiveInputStream(inputStream, "UTF-8")) {
-                tarInput =>
-                  while (tarInput.canReadEntryData(tarInput.getNextTarEntry)) {
-                    processSingleEntry(tarInput, fileName.split("/").last)
-                  }
-              }
-          }
-      }
-    } catch {
-      case NonFatal(e) =>
-        log.error(s"Failed to read $fileName: ", e)
+    cnt = 0
+    usingWithErrMsg(new FileInputStream(fileName), s"Failed to get input stream for $fileName") {
+      fin =>
+        using(new GzipCompressorInputStream(fin)) {
+          inputStream =>
+            using(new TarArchiveInputStream(inputStream, "UTF-8")) {
+              tarInput =>
+                while (tarInput.canReadEntryData(tarInput.getNextTarEntry)) {
+                  processSingleEntry(tarInput, fileName.split("/").last)
+                }
+            }
+        }
     }
   }
 
