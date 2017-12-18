@@ -72,8 +72,8 @@ object FileUtils extends Using {
           using(new GZIPInputStream(new ByteArrayInputStream(context))) {
             xmlInputStream =>
               val handle: MROSax = new MROSax
-              val parser: SAXParser = factory.newSAXParser()
-              val res: Option[DefaultHandler] = parseXML(parser, handle, xmlInputStream, entryName)
+              val saxParser: SAXParser = SAXParserFactory.newInstance().newSAXParser()
+              val res: Option[DefaultHandler] = parseXML(saxParser, handle, xmlInputStream, entryName)
               if (res.isDefined) {
                 val mrRecords = res.get.asInstanceOf[MROSax].getMRO
                 val eNBId: String = mrRecords.geteNB()
