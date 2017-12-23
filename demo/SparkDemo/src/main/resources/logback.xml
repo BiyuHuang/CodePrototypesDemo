@@ -83,7 +83,7 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
+    <root level="info">
         <!-- appender referenced after it is defined -->
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE_ERROR"/>
@@ -92,5 +92,5 @@
         <appender-ref ref="FILE_DEBUG"/>
     </root>
     <logger name="org.apache.kafka.clients.producer" level="WARN"/>  <!-- discard info log from kafka producer...-->
-    <logger name="org.apache.spark." level="ERROR"/>
+    <!--<logger name="org.apache.spark.internal.Logging" level="ERROR"/>-->
 </configuration>

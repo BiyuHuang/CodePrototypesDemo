@@ -92,4 +92,12 @@ class StringFuncUtilsUnitSpec extends FlatSpec with ShouldMatchers with LogSuppo
 
     res shouldBe expect
   }
+  "Wallace Huang" should "do unit test for: countKeyWord" in {
+    val input = "Hello world and Hello again. It's wonderful day!"
+    val res: Map[String, Int] = StringFuncUtils.countKeyWord(input, " ")
+    res.foreach(x => log.info(s"KeyWord: ${x._1}, Count: ${x._2}"))
+    val expect = 2
+    res.getOrElse("Hello", "") shouldBe expect
+    res.getOrElse("wonderful", "") shouldBe 1
+  }
 }
