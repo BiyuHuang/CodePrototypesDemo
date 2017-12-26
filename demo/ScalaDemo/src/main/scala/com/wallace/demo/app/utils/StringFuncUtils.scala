@@ -78,13 +78,13 @@ object StringFuncUtils extends FuncRuntimeDur {
   }
 
   def countKeyWord(in: String, sep: String): Map[String, Int] = {
-    //    val res: Map[String, Array[(String, Int)]] = in.split(sep).map(x => (x, 1)).groupBy(x => x._1)
-    //    res.map(x => (x._1, x._2.length))
+    val res: Map[String, Array[(String, Int)]] = in.split(sep).map(x => (x, 1)).groupBy(x => x._1)
+    res.map(x => (x._1, x._2.length))
 
-    val res: Map[String, Int] = in.split(sep).map(x => (x, 1)).reduceLeft {
-      (r, A) =>
-        if(r.
-    }
+    //    val res: Map[String, Int] = in.split(sep).map(x => (x, 1)).reduceLeft {
+    //      (r, A) =>
+    //        if(r.
+    //    }
   }
 
   def updateUniqueIndex(initIndex: Long): Long = synchronized {
