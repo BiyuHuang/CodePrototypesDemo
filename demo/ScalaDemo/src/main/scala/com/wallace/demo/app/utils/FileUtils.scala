@@ -2,6 +2,7 @@ package com.wallace.demo.app.utils
 
 import java.io._
 import java.nio.charset.Charset
+import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
 
@@ -17,6 +18,14 @@ import scala.util.{Failure, Success, Try}
 object FileUtils extends Using {
   private val factory: SAXParserFactory = SAXParserFactory.newInstance()
   private var cnt: Int = 0
+
+  def filenamePrefixFromOffset(offset: Long): String = {
+    val nf = NumberFormat.getInstance()
+    nf.setMinimumIntegerDigits(20)
+    nf.setMaximumFractionDigits(0)
+    nf.setGroupingUsed(false)
+    nf.format(offset)
+  }
 
   def main(args: Array[String]): Unit = {
     //    // TODO READ GZ FILE
