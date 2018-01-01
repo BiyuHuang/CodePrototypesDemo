@@ -18,6 +18,23 @@ import scala.util.{Failure, Success, Try}
 object FileUtils extends Using {
   private val factory: SAXParserFactory = SAXParserFactory.newInstance()
   private var cnt: Int = 0
+  private val DEFAULT_LENGTH: Long = 100 * 1024 * 1024L
+
+  private var offset: Map[String, Int] = Map.empty
+
+  def writeToFile(data: Array[String], destFile: String, mode: String = "rw"): Unit = {
+    using(new RandomAccessFile(destFile, "rw")) {
+      output =>
+        val currentLen: Long = output.length()
+        require(currentLen < DEFAULT_LENGTH, s"Current length is bigger than default length of $destFile")
+        output.seek(currentLen)
+        output.setLength(DEFAULT_LENGTH)
+        val dataLen: Int = Math.min(data.length, (DEFAULT_LENGTH - currentLen).toInt)
+        val contents = new Array[String](dataLen)
+        data.copyToArray(contents, 0, dataLen)
+        contents.foreach(output.writeBytes)
+    }
+  }
 
   def filenamePrefixFromOffset(offset: Long): String = {
     val nf = NumberFormat.getInstance()
