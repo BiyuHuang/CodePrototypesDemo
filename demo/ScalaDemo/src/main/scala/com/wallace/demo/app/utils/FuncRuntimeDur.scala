@@ -15,9 +15,10 @@ trait FuncRuntimeDur extends LogSupport {
     * @return res: Execute code cost time, unit <ms>
     **/
   def runtimeDuration[T <: Any](code: => T, times: Int = 1): Double = {
-    val startTime = System.nanoTime() * DEFAULT_PRECISION
+    val startTime: Double = System.nanoTime() * DEFAULT_PRECISION
     (0 until times).foreach(_ => code)
-    val endTime = System.nanoTime() * DEFAULT_PRECISION
+    val endTime: Double = System.nanoTime() * DEFAULT_PRECISION
+    assert(endTime >= startTime, s"starTime: $startTime large than endTime: $endTime.")
     val res = endTime - startTime
     res
   }

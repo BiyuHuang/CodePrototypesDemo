@@ -23,6 +23,12 @@ case class Customer(Time: String, Id: String, Spending: Int)
 case class Record(num: Int, col2: String, col3: String, col4: String, col5: String, index: Int)
 
 object DataFrameDemo extends LogSupport {
+  val schema: StructType = StructType(Array(StructField("num", IntegerType, nullable = true),
+    StructField("col2", StringType, nullable = true),
+    StructField("col3", StringType, nullable = true),
+    StructField("col4", StringType, nullable = true),
+    StructField("col5", StringType, nullable = true),
+    StructField("index", IntegerType, nullable = true)))
 
   def main(args: Array[String]): Unit = {
     val warehouseLocation = System.getProperty("user.dir").replaceAll("\\\\", "/") + "/" + "spark-warehouse"
@@ -33,7 +39,6 @@ object DataFrameDemo extends LogSupport {
       .getOrCreate()
     val sc: SparkContext = spark.sparkContext
     import spark.implicits._
-
 
     val rdd: RDD[String] = sc.textFile("./demo/SparkDemo/src/main/resources/sample_1.csv")
     val srcDF: DataFrame = rdd.map(_.split(",", -1)).map {
@@ -48,6 +53,9 @@ object DataFrameDemo extends LogSupport {
       row =>
         log.info(s"#### ${row.mkString(",")}")
     }
+
+    val resDF = spark.createDataFrame(res, schema)
+    resDF.show()
   }
 
   protected def demo(spark: SparkSession): Unit = {
@@ -103,11 +111,23 @@ object DataFrameDemo extends LogSupport {
     resDF.filter(resDF.col("col_name") === "Location:").rdd.map(x => x.getString(1)).take(1).head
   }
 
-  protected def  flatMapFunc(srcDF: DataFrame): RDD[Row] = {
+  protected def explodeFunc(srcDF: DataFrame): DataFrame = {
+    val temp: DataFrame = srcDF.filter(srcDF.col("num") > 0).explode(srcDF.col("col2"), srcDF.col("col3"), srcDF.col("col4"), srcDF.col("col5")) {
+      row: Row =>
+        val col2 = row.getString(0).split("\\$", -1)
+        val col3 = row.getString(1).split("\\$", -1)
+        val col4 = row.getString(2).split("\\$", -1)
+        val col5 = row.getString(3).split("\\$", -1)
+        col5.indices.map(i => (i, col2(i), col3(i), col4(i), col5(i)))
+    }.toDF("num", "col2", "col3", "col4", "col5", "index", "lineNum", "col_2", "col_3", "col_4", "col_5")
+    temp
+  }
+
+  protected def flatMapFunc(srcDF: DataFrame): RDD[Row] = {
     srcDF.rdd.flatMap {
       row =>
         val num: Int = Try(row.getInt(0)).getOrElse(-1)
-        val res = num match {
+        val res: Array[_ >: Seq[Nothing] <: Seq[Any]] = num match {
           case 0 => Array(Seq.empty)
           case _ =>
             val col2 = Try(row.getString(1)).getOrElse("").split("\\$", -1)

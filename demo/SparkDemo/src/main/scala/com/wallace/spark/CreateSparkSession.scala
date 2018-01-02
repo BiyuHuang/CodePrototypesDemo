@@ -7,7 +7,7 @@ import org.apache.spark.sql.SparkSession
   * Created by Wallace on 2016/11/10.
   */
 trait CreateSparkSession extends FuncRuntimeDur with LogSupport {
-  def createSparkSession(appName: String): SparkSession = {
+  def createSparkSession(appName: String, master: String = "local[*]"): SparkSession = {
     val warehouseLocation = System.getProperty("user.dir") + "/" + "spark-warehouse"
     val spark: SparkSession = SparkSession
       .builder()
