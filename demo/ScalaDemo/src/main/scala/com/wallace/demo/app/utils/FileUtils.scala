@@ -18,12 +18,13 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 object FileUtils extends Using {
+
+  case class FileMetadata(file: File, offset: Long)
+
   private val factory: SAXParserFactory = SAXParserFactory.newInstance()
-  private val DEFAULT_FILE_BLOCK_SIZE: Int = 128 * 1024 * 1024
+  private val DEFAULT_FILE_SIZE_THRESHOLD: Int = 128 * 1024 * 1024
   private var cnt: Int = 0
   private val DEFAULT_LENGTH: Long = 100 * 1024 * 1024L
-
-  private var offset: Map[String, Int] = Map.empty
 
   def writeToFile(data: Array[String], destFile: String, mode: String = "rw"): Unit = {
     using(new RandomAccessFile(destFile, "rw")) {
@@ -157,19 +158,19 @@ object FileUtils extends Using {
     val fileList: Array[File] = new File(destFilePath).listFiles().filter(_.getName.startsWith("part-"))
     val prefixDestFile = destFilePath + "part-"
     val destFile: File = fileList.length match {
-      case 0 => new File(prefixDestFile + filenamePrefixFromOffset(0L) + ".csv")
+      case 0 => new File(prefixDestFile + filenamePrefixFromOffset(offset) + ".csv")
       case _ =>
-        fileList.map {
+        val tempFileAndOffset: FileMetadata = fileList.map {
           x =>
             val temp = x.getName.drop(5).dropRight(4).toLong
-            offset += temp
-            (x, temp)
-        }.maxBy(_._2)._1
+            FileMetadata(x, temp)
+        }.maxBy(_.offset)
+        offset = tempFileAndOffset.file.length() + tempFileAndOffset.offset
+        tempFileAndOffset.file
     }
-    offset += destFile.length()
     log.warn(s"Offset: $offset.")
-    if (destFile.length() <= DEFAULT_FILE_BLOCK_SIZE) {
-      destFile.getCanonicalPath
+    if (destFile.length() <= DEFAULT_FILE_SIZE_THRESHOLD) {
+      destFile.getPath
     } else {
       prefixDestFile + filenamePrefixFromOffset(offset) + ".csv"
     }
