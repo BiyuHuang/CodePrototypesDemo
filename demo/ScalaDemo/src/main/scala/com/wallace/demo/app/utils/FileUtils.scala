@@ -137,10 +137,10 @@ object FileUtils extends Using {
   }
 
   def readFileByByteBuffer(srcFile: File, destPath: String): Unit = {
-    val outPutDestPath: String = appendOrRollFile(destPath)
-    using(new FileInputStream(srcFile)) {
+    usingWithErrMsg(new FileInputStream(srcFile), s"Failed to read ${srcFile.getName}.") {
       in =>
-        usingWithErrMsg(new FileOutputStream(outPutDestPath, true), s"Failed to write $outPutDestPath") {
+        val outPutDestPath: File = appendOrRollFile(destPath)
+        using(new FileOutputStream(outPutDestPath, true)) {
           out =>
             val fcIn: FileChannel = in.getChannel
             val fcOut: FileChannel = out.getChannel
@@ -149,7 +149,7 @@ object FileUtils extends Using {
     }
   }
 
-  def appendOrRollFile(path: String): String = {
+  def appendOrRollFile(path: String): File = {
     var offset: Long = 0L
     val destFilePath: String = {
       val tempPath = path.trim.replaceAll("""\\""", "/")
@@ -170,9 +170,9 @@ object FileUtils extends Using {
     }
     log.warn(s"Offset: $offset.")
     if (destFile.length() <= DEFAULT_FILE_SIZE_THRESHOLD) {
-      destFile.getPath
+      destFile
     } else {
-      prefixDestFile + filenamePrefixFromOffset(offset) + ".csv"
+      new File(prefixDestFile + filenamePrefixFromOffset(offset) + ".csv")
     }
   }
 
