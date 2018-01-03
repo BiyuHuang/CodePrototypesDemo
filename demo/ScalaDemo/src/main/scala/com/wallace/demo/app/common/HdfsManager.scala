@@ -27,30 +27,27 @@ object HdfsManager extends HdfsSupportHA with Using {
   val hdfsConf: Configuration = configHdfs()
 
   def configHdfs(): Configuration = {
-    val hdfsConfig = new Configuration()
-
-    Array("").foreach {
+    val hdfsConf: Configuration = new Configuration()
+    val configLists: List[String] = List(s"${configHome}core-site.xml", s"${configHome}hdfs-site.xml", s"${configHome}hive-site.xml")
+    configLists.foreach {
       file =>
         if (new java.io.File(file).exists()) {
-          hdfsConfig.addResource(new Path(file))
-          log.debug(s"HdfsFileManager addResource from config directory: $file.current directory $currentPath")
-        }
-        else {
+          hdfsConf.addResource(new Path(file))
+          log.debug(s"HdfsFileManager addResource from config directory: $file.current directory $configHome")
+        } else {
           val configPath = file.split("/").init.mkString("/")
           val configFilename = file.split("/").last
 
           if (new java.io.File(configFilename).exists()) {
-            hdfsConfig.addResource(new Path(configFilename))
+            hdfsConf.addResource(new Path(configFilename))
             log.debug(s"HdfsFileManager addResource from current directory $currentPath: adding $configFilename: Cannot find file in config directory $configPath")
           } else {
             log.debug(s"HdfsFileManager addResource adding $configFilename failure: Cannot find file in config directory $configPath and current directory $currentPath")
           }
         }
     }
-
-    hdfsConfig.set("io.compression.codecs", "org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.GzipCodec")
-
-    hdfsConfig
+    hdfsConf.set("io.compression.codecs", "org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.GzipCodec")
+    hdfsConf
   }
 
 
@@ -89,7 +86,7 @@ object HdfsManager extends HdfsSupportHA with Using {
   }
 
   // HdfsSupport 中的 upload 在 EmsPmDataImportSpec 用例中总会上传失败，原因未知，暂时先重写一个
-  override def upload(src: String, target: String): Unit = {
+  def upload(src: String, target: String): Unit = {
     usingHdfs("upload failed!") {
       hdfs =>
         hdfs.copyFromLocalFile(false, true, new Path(src), new Path(target))

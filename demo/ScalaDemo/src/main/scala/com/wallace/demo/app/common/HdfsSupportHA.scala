@@ -11,7 +11,7 @@ import org.apache.hadoop.io.compress.{CompressionCodecFactory, CompressionOutput
   * com.wallace.demo.app.common
   * Created by Wallace on 2017/12/5 0005.
   */
-trait HdfsSupportHA extends LogSupport {
+trait HdfsSupportHA extends ProjectConfig {
   def hdfsConf: Configuration
 
   private var errorHdfsCnt: Int = 0
@@ -26,8 +26,7 @@ trait HdfsSupportHA extends LogSupport {
     try {
       val hdfs: FileSystem = FileSystem.get(hdfsConf)
       f(hdfs)
-    }
-    catch {
+    } catch {
       case e: IOException =>
         this.synchronized(errorHdfsCnt += 1)
         log.error(errMsg + s" error Count:$errorHdfsCnt.", e)
@@ -39,15 +38,14 @@ trait HdfsSupportHA extends LogSupport {
     }
   }
 
-  def upload(source: String, target: String): Unit = {
+  def upload(source: String, target: String, overwrite: Boolean): Unit = {
     usingHdfs("upload failed.") {
       hdfs =>
         val in = new BufferedInputStream(this.getClass.getResourceAsStream(source))
-        val out = hdfs.create(new Path(target))
+        val out = hdfs.create(new Path(target), overwrite)
         try {
           IOUtils.copyBytes(in, out, 4096, true)
-        }
-        finally {
+        } finally {
           if (in != null) in.close()
           if (out != null) out.close()
         }
@@ -65,8 +63,6 @@ trait HdfsSupportHA extends LogSupport {
         } else {
           log.warn(s"Delete Path Failed! Path: ${path.toString} is not exists!")
         }
-
-
     }
   }
 
