@@ -49,6 +49,11 @@ object StringFuncUtils extends FuncRuntimeDur {
     }
   }
 
+  def subStr(str: String): String = {
+    val str1 = "/data2/hadoop/vmaxrun/drs/post_telecom_pm_cm/hdfs/zxvmax/telecom/temp/lte/rawdata/itg_pm_lte_enb_h_enb_d/p_provincecode=510000/"
+    ""
+  }
+
   def main(args: Array[String]): Unit = {
     val pool = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(_curParallelism))
     util.Properties.setProp("scala.time", "true")

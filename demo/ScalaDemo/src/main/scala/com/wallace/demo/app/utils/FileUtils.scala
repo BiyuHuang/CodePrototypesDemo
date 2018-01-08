@@ -21,6 +21,14 @@ object FileUtils extends Using {
 
   case class FileMetadata(file: File, offset: Long)
 
+  object FileSuffix {
+    /** a csv file */
+    val csvFileSuffix = ".csv"
+
+    /** a temp file */
+    val tempFileSuffix = ".temp"
+  }
+
   private val factory: SAXParserFactory = SAXParserFactory.newInstance()
   private val DEFAULT_FILE_SIZE_THRESHOLD: Int = 128 * 1024 * 1024
   private var cnt: Int = 0
@@ -150,20 +158,21 @@ object FileUtils extends Using {
   }
 
   def appendOrRollFile(path: String): File = {
-    var offset: Long = 0L
+    var offset: Long = null.asInstanceOf[Long]
     val destFilePath: String = {
       val tempPath = path.trim.replaceAll("""\\""", "/")
       if (tempPath.endsWith("/")) tempPath else tempPath + "/"
     }
-    val fileList: Array[File] = new File(destFilePath).listFiles().filter(_.getName.startsWith("part-"))
-    val prefixDestFile = destFilePath + "part-"
+    val fileList: Array[File] = new File(destFilePath).listFiles().filter(x => x.getName.startsWith("part-") && x.isFile)
+    val prefixDestFile = destFilePath + s"part-${Thread.currentThread().getId}-"
+
     val destFile: File = fileList.length match {
-      case 0 => new File(prefixDestFile + filenamePrefixFromOffset(offset) + ".csv")
+      case 0 => new File(prefixDestFile + filenamePrefixFromOffset(offset) + FileSuffix.csvFileSuffix)
       case _ =>
         val tempFileAndOffset: FileMetadata = fileList.map {
-          x =>
-            val temp = x.getName.drop(5).dropRight(4).toLong
-            FileMetadata(x, temp)
+          elem =>
+            val offset = elem.getName.reverse.substring(4, 24).reverse.toLong
+            FileMetadata(elem, offset)
         }.maxBy(_.offset)
         offset = tempFileAndOffset.file.length() + tempFileAndOffset.offset
         tempFileAndOffset.file
@@ -172,7 +181,7 @@ object FileUtils extends Using {
     if (destFile.length() <= DEFAULT_FILE_SIZE_THRESHOLD) {
       destFile
     } else {
-      new File(prefixDestFile + filenamePrefixFromOffset(offset) + ".csv")
+      new File(prefixDestFile + filenamePrefixFromOffset(offset) + FileSuffix.csvFileSuffix)
     }
   }
 
