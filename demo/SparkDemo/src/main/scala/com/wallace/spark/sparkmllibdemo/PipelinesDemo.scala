@@ -1,6 +1,6 @@
 package com.wallace.spark.sparkmllibdemo
 
-import com.wallace.common.FuncRuntimeDur
+import com.wallace.common.FuncRunDuration
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.feature.{HashingTF, Tokenizer}
@@ -11,7 +11,7 @@ import org.apache.spark.sql.{Row, SparkSession}
 /**
   * Created by Wallace on 2016/11/1.
   */
-object PipelinesDemo extends FuncRuntimeDur {
+object PipelinesDemo extends FuncRunDuration {
   /** Create a LogisticRegression instance. This instance is an Estimator.
     * 逻辑回归函数实例
     * We may set parameters using setter methods.
