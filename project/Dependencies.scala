@@ -29,4 +29,7 @@ object Dependencies {
   )
 
   val sparkAppDependencies: Seq[ModuleID] = commonDependencies ++ hdfsDependencies ++ sparkDependencies
+
+
+  val dataLoaderDependencies: Seq[ModuleID] = commonDependencies ++ hdfsDependencies
 }
