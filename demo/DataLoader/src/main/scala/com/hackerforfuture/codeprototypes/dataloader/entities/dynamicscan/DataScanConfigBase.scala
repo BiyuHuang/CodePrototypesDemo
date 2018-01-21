@@ -8,11 +8,79 @@
 
 package com.hackerforfuture.codeprototypes.dataloader.entities.dynamicscan
 
-import com.typesafe.config.Config
+import java.io.File
+
+import com.hackerforfuture.codeprototypes.dataloader.common.LogSupport
+import com.typesafe.config.{Config, ConfigFactory}
 
 /**
   * Created by wallace on 2018/1/20.
   */
-trait DataScanConfigBase {
-  def loadScanConfig(files: Array[String]): Config
+trait DataScanConfigBase extends LogSupport {
+
+  protected var configHome = "./demo-conf/"
+
+  protected def makePath(filename: String): String = {
+    val newDir = configHome.trim.replaceAll("""\\""", "/")
+    if (newDir.endsWith("/")) configHome + filename else configHome + "/" + filename
+  }
+
+  protected def load(file: String): Config = {
+    val resourceFile = file
+    val configFile = new File(makePath(file))
+    if (configFile.exists()) {
+      log.debug(s"Loading file [${configFile.getPath}] and resource [$resourceFile]")
+      ConfigFactory.parseFile(configFile).withFallback(ConfigFactory.load(resourceFile))
+    } else {
+      log.debug(s"Loading resource [$resourceFile]")
+      ConfigFactory.load(resourceFile)
+    }
+  }
+
+  def loadScanConfig(files: Array[String]): Config = {
+    files.map(load).reduce((a, b) => a.withFallback(b))
+  }
+
+  def loadScanConfig(files: Array[File]): Config = {
+    loadScanConfig(files.map(_.getName))
+  }
+
+  def configFilePattern: String
+
+  protected val getAllConfigFiles: Array[File] = if (configFilePattern.nonEmpty) {
+    new File(configHome).listFiles().filter(_.getName.matches(configFilePattern))
+  } else {
+    Array.empty
+  }
+
+  protected val lastModifiedMap: Map[String, Long] = {
+    if (getAllConfigFiles.nonEmpty) {
+      getAllConfigFiles.map {
+        file =>
+          val fileName = file.getName
+          val lastModified = file.lastModified()
+          (fileName, lastModified)
+      }.toMap
+    } else {
+      log.warn("Does any upload config file exist?")
+      Map.empty
+    }
+  }
+
+  protected val getAllChangedConfigFiles: Array[File] = {
+    getAllConfigFiles.map {
+      file =>
+        val fileName = file.getName
+        val oldLastModified: Long = lastModifiedMap.apply(fileName)
+        val newLastModified: Long = file.lastModified()
+
+        if (newLastModified == oldLastModified) {
+          log.debug(s"$fileName never changed.")
+          null
+        } else {
+          lastModifiedMap.updated(fileName, newLastModified)
+          file
+        }
+    }.filter(_ != null)
+  }
 }

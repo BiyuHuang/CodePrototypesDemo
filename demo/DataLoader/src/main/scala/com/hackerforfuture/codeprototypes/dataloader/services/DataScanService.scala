@@ -8,11 +8,13 @@
 
 package com.hackerforfuture.codeprototypes.dataloader.services
 
+import java.util.Timer
+
 /**
   * Created by wallace on 2018/1/20.
   */
 object DataScanService {
   def execute(): Unit = {
-
+    val timer = new Timer
   }
 }
