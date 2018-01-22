@@ -1,12 +1,14 @@
 package com.wallace.demo.app.utils
 
+import com.wallace.demo.app.common.Using
+
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
 
 /**
   * Created by Wallace on 2017/1/11.
   */
-object StringFuncUtils extends FuncRuntimeDur {
+object StringFuncUtils extends Using {
   private var _uniqueIndex: Long = updateUniqueIndex(((System.currentTimeMillis() - 946656000000L) / 1000) % Int.MaxValue)
   private val _maxParallelism: Int = Runtime.getRuntime.availableProcessors()
   private val _curParallelism: Int = Math.min(_maxParallelism, 5)
@@ -51,8 +53,14 @@ object StringFuncUtils extends FuncRuntimeDur {
 
   def subStr(str: String): String = {
     val str1 = "/data2/hadoop/vmaxrun/drs/post_telecom_pm_cm/hdfs/zxvmax/telecom/temp/lte/rawdata/itg_pm_lte_enb_h_enb_d/p_provincecode=510000/"
-    ""
+    str.substring(str1.indexOf("post_"), str1.length)
   }
+
+  def stringConventToBytes(str: String, charsetName: String = "UTF-8"): Array[Byte] = try {
+    str.getBytes(charsetName)
+  }
+
+  def bytesCoventToString(bytes: Array[Byte], charsetName: String = "UTF-8"): String = new String(bytes, charsetName)
 
   def main(args: Array[String]): Unit = {
     val pool = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(_curParallelism))
@@ -122,4 +130,6 @@ object StringFuncUtils extends FuncRuntimeDur {
         ""
     }
   }
+}
+
 }
