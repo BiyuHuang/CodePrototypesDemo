@@ -22,7 +22,7 @@ object DataLoader extends LogSupport {
 
   private var stopSymbol: Boolean = false
 
-  def awaitStopOrSleep(sleepTime: Long = 10000L): Unit = {
+  private def awaitStopOrSleep(sleepTime: Long = 10000L): Unit = {
     while (!stopSymbol) {
       stopSymbol = new File("stop.txt").exists()
       log.debug(s"StopSymbol: $stopSymbol, Thread sleep $sleepTime ms.")
