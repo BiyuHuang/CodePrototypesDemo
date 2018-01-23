@@ -131,5 +131,3 @@ object StringFuncUtils extends Using {
     }
   }
 }
-
-}

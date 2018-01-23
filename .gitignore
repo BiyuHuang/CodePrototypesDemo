@@ -12,7 +12,12 @@ target/
 metastore_db/
 
 *.log
+*.csv
 .checkpoint-*
 checkpoint*
 receivedBlockMetadata/
 sh.exe.stackdump
+
+resources/*.csv
+temp/
+test/
