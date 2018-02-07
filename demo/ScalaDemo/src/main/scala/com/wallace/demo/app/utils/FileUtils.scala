@@ -10,7 +10,8 @@ import javax.xml.parsers.{SAXParser, SAXParserFactory}
 
 import com.wallace.demo.app.common.Using
 import com.wallace.demo.app.parsexml.MROSax
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
+import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.xml.sax.helpers.DefaultHandler
 
@@ -138,10 +139,24 @@ object FileUtils extends Using {
     //    log.info(s"Offset: $offset")
 
     // TODO readFileByByteBuffer
-    val costTime4 = runtimeDuration {
-      readFileByByteBuffer(new File("./demo/ScalaDemo/src/main/resources/testingData.csv"), "./demo/ScalaDemo/src/main/resources/")
+    //    val costTime4 = runtimeDuration {
+    //      readFileByByteBuffer(new File("./demo/ScalaDemo/src/main/resources/testingData.csv"), "./demo/ScalaDemo/src/main/resources/")
+    //    }
+    //    log.info(s"CostTime4: $costTime4 ms.")
+
+
+    val data = Array(1, 2, 3, 4)
+    var size = data.length
+    while (size > 0) {
+      size -= 1
+      try {
+        if (size == 2) throw new Exception("test exception")
+        log.info(data(size).toString)
+      } catch {
+        case e: Exception =>
+          log.error(e.getMessage)
+      }
     }
-    log.info(s"CostTime4: $costTime4 ms.")
   }
 
   def readFileByByteBuffer(srcFile: File, destPath: String): Unit = {
@@ -221,6 +236,7 @@ object FileUtils extends Using {
             gis =>
               using(new BufferedReader(new InputStreamReader(gis, "GBK"))) {
                 br =>
+                  br.lines().toArray.foreach(line => log.info(s"$line"))
                   while (br.ready()) {
                     val oneLine = br.readLine().replaceAll("null", "")
                     oneLine.length
@@ -266,6 +282,30 @@ object FileUtils extends Using {
     }
   }
 
+  private def readZipArchiveFile(fileName: String): Unit = {
+    import java.util.zip.ZipFile
+    val f = new ZipFile(fileName)
+    f.close()
+    usingWithErrMsg(new FileInputStream(fileName), s"Failed to get input stream for $fileName") {
+      inputStream =>
+        using(new ZipArchiveInputStream(inputStream, "UTF-8")) {
+          zipIns =>
+            while (zipIns.canReadEntryData(zipIns.getNextZipEntry)) {
+              val entry: ZipArchiveEntry = zipIns.getNextZipEntry
+              val size = entry.getSize
+              val context = new Array[Byte](size.toInt)
+              var offset = 0
+              while (zipIns.available() > 0) {
+                offset += zipIns.read(context, offset, 40960)
+              }
+
+              val res: ByteArrayInputStream = new ByteArrayInputStream(context)
+
+            }
+        }
+    }
+  }
+
   private def readTarGZFile(fileName: String): Unit = {
     cnt = 0
     usingWithErrMsg(new FileInputStream(fileName), s"Failed to get input stream for $fileName") {
@@ -283,7 +323,7 @@ object FileUtils extends Using {
   }
 
   def processSingleEntry(tarInput: TarArchiveInputStream, fileName: String): Unit = {
-    val entry = tarInput.getCurrentEntry
+    val entry: TarArchiveEntry = tarInput.getCurrentEntry
     if (!entry.isDirectory) {
       val size: Long = entry.getSize
       val entryName: String = entry.getName
@@ -299,7 +339,6 @@ object FileUtils extends Using {
         case v if v.contains("_MRS_") =>
         case v if v.contains("_MRE_") =>
         case v if v.contains("_MRO_") =>
-
           cnt += 1
           using(new GZIPInputStream(new ByteArrayInputStream(context))) {
             xmlInputStream =>

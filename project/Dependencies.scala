@@ -10,7 +10,8 @@ object Dependencies {
     "ch.qos.logback" % "logback-core" % "1.1.2",
     "ch.qos.logback" % "logback-classic" % "1.1.2",
     "com.typesafe.akka" % "akka-actor_2.11" % "2.5.3",
-    "org.apache.commons" % "commons-compress" % "1.15"
+    "org.apache.commons" % "commons-compress" % "1.15",
+    "com.github.pathikrit" %% "better-files" % "2.17.1"
   )
   val hdfsDependencies: Seq[ModuleID] = Seq(
     "org.apache.hadoop" % "hadoop-common" % "2.7.2",
