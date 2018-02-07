@@ -49,6 +49,47 @@ object FileUtils extends Using {
     }
   }
 
+//  def betterFilesFunc(): Unit = {
+  //    import better.files.File
+  //    val f = File("./demo/ScalaDemo/src/main/resources/testingData.csv")
+  //    log.info(s"File Path: ${f.path}")
+  //    //log.info(s"File CheckSum: ${f.sha512}")
+  //    log.info(s"File Line Size: ${f.lines.size}")
+  //    log.info(s"File Context Size: ${f.size / 1024L / 1024L} MB")
+  //    log.info(s"File LastModifiedTime: ${f.lastModifiedTime}")
+  //    log.info(s"File DosAttributes: ${f.dosAttributes}")
+  //
+  //    //TODO 普通的Java文件监控
+  //    val watchDir: File = f.parent
+  //    log.info(s"File Parent: $watchDir, IsDirectory: ${watchDir.isDirectory}")
+  //    import java.nio.file.{StandardWatchEventKinds => EventType}
+  //    val service: WatchService = watchDir.newWatchService
+  //    watchDir.register(service, events = Seq(EventType.ENTRY_MODIFY))
+  //    var symbolCnt: Int = 0
+  //    val watcher = new ThreadBackedFileMonitor(watchDir, recursive = true) {
+  //      //      override def onEvent(eventType: WatchEvent.Kind[Path], file: File): Unit = eventType match {
+  //      //        case EventType.ENTRY_CREATE => log.info(s"$file got created")
+  //      //        case EventType.ENTRY_MODIFY => log.info(s"$file got modified")
+  //      //        case EventType.ENTRY_DELETE => log.info(s"$file got deleted")
+  //      //      }
+  //      override def onModify(file: File): Unit = {
+  //        symbolCnt += 1
+  //        log.info(s"${file.name} got modified")
+  //      }
+  //    }
+  //    watcher.start()
+  //
+  //    //TODO Akka风格的文件监控
+  //    //    implicit val system = ActorSystem("Directory Watcher System")
+  //    //    import better.files._, FileWatcher._
+  //    //    val akkaWatcher = watchDir.newWatcher()
+  //
+  //    while (symbolCnt < 10) {
+  //      Thread.sleep(1000)
+  //      log.info(s"Watching ${watchDir.name} ($symbolCnt)...")
+  //    }
+  //  }
+
   def readFileByLine(bufSize: Int, fcin: FileChannel, rBuf: ByteBuffer, fcout: FileChannel, wBuf: ByteBuffer): Unit = {
     val buffer: Array[Byte] = new Array[Byte](bufSize)
     val temp: Array[Byte] = new Array[Byte](500)
@@ -128,12 +169,12 @@ object FileUtils extends Using {
     //    val costTime2 = runtimeDuration(readZipFile("./demo/ScalaDemo/src/main/resources/CDT_ZTE_V3.5_963847_20171201180000.zip"))
     //    log.info(s"CostTime2: $costTime2 ms.")
 
-    //    // TODO READ TAR.GZ FILE
-    //    val costTime3 = runtimeDuration {
-    //      readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
-    //    }
-    //    log.info(s"CostTime3: $costTime3 ms.")
-    //
+    // TODO READ TAR.GZ FILE
+    val costTime3 = runtimeDuration {
+      readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
+    }
+    log.info(s"CostTime3: $costTime3 ms.")
+
     //    // TODO Run test for filenamePrefixFromOffset
     //    val offset = filenamePrefixFromOffset(100L)
     //    log.info(s"Offset: $offset")
@@ -144,19 +185,22 @@ object FileUtils extends Using {
     //    }
     //    log.info(s"CostTime4: $costTime4 ms.")
 
+    //TODO Try Catch Exception
+    //    val data = Array(1, 2, 3, 4)
+    //    var size = data.length
+    //    while (size > 0) {
+    //      size -= 1
+    //      try {
+    //        if (size == 2) throw new Exception("test exception")
+    //        log.info(data(size).toString)
+    //      } catch {
+    //        case e: Exception =>
+    //          log.error(e.getMessage)
+    //      }
+    //    }
 
-    val data = Array(1, 2, 3, 4)
-    var size = data.length
-    while (size > 0) {
-      size -= 1
-      try {
-        if (size == 2) throw new Exception("test exception")
-        log.info(data(size).toString)
-      } catch {
-        case e: Exception =>
-          log.error(e.getMessage)
-      }
-    }
+    //TODO betterFilesFunc
+   // betterFilesFunc()
   }
 
   def readFileByByteBuffer(srcFile: File, destPath: String): Unit = {
@@ -282,6 +326,10 @@ object FileUtils extends Using {
     }
   }
 
+  def readMultiZipArchiveFile(fileName: String): Unit = {
+
+  }
+
   private def readZipArchiveFile(fileName: String): Unit = {
     import java.util.zip.ZipFile
     val f = new ZipFile(fileName)
@@ -370,3 +418,4 @@ object FileUtils extends Using {
     }
   }
 }
+
