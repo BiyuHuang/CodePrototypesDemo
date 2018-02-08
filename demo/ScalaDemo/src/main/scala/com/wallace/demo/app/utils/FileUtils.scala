@@ -4,6 +4,7 @@ import java.io.{FileInputStream, FileOutputStream, _}
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.charset.Charset
+import java.nio.file.WatchService
 import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
@@ -15,6 +16,7 @@ import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInp
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.xml.sax.helpers.DefaultHandler
 
+import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -49,116 +51,57 @@ object FileUtils extends Using {
     }
   }
 
-//  def betterFilesFunc(): Unit = {
-  //    import better.files.File
-  //    val f = File("./demo/ScalaDemo/src/main/resources/testingData.csv")
-  //    log.info(s"File Path: ${f.path}")
-  //    //log.info(s"File CheckSum: ${f.sha512}")
-  //    log.info(s"File Line Size: ${f.lines.size}")
-  //    log.info(s"File Context Size: ${f.size / 1024L / 1024L} MB")
-  //    log.info(s"File LastModifiedTime: ${f.lastModifiedTime}")
-  //    log.info(s"File DosAttributes: ${f.dosAttributes}")
-  //
-  //    //TODO 普通的Java文件监控
-  //    val watchDir: File = f.parent
-  //    log.info(s"File Parent: $watchDir, IsDirectory: ${watchDir.isDirectory}")
-  //    import java.nio.file.{StandardWatchEventKinds => EventType}
-  //    val service: WatchService = watchDir.newWatchService
-  //    watchDir.register(service, events = Seq(EventType.ENTRY_MODIFY))
-  //    var symbolCnt: Int = 0
-  //    val watcher = new ThreadBackedFileMonitor(watchDir, recursive = true) {
-  //      //      override def onEvent(eventType: WatchEvent.Kind[Path], file: File): Unit = eventType match {
-  //      //        case EventType.ENTRY_CREATE => log.info(s"$file got created")
-  //      //        case EventType.ENTRY_MODIFY => log.info(s"$file got modified")
-  //      //        case EventType.ENTRY_DELETE => log.info(s"$file got deleted")
-  //      //      }
-  //      override def onModify(file: File): Unit = {
-  //        symbolCnt += 1
-  //        log.info(s"${file.name} got modified")
-  //      }
-  //    }
-  //    watcher.start()
-  //
-  //    //TODO Akka风格的文件监控
-  //    //    implicit val system = ActorSystem("Directory Watcher System")
-  //    //    import better.files._, FileWatcher._
-  //    //    val akkaWatcher = watchDir.newWatcher()
-  //
-  //    while (symbolCnt < 10) {
-  //      Thread.sleep(1000)
-  //      log.info(s"Watching ${watchDir.name} ($symbolCnt)...")
-  //    }
-  //  }
+  def betterFilesFunc(): Unit = {
+    import better.files.{File, FileMonitor}
+    val f = File("./demo/ScalaDemo/src/main/resources/testingData.csv")
+    log.info(s"File Path: ${f.path}")
+    //log.info(s"File CheckSum: ${f.sha512}")
+    log.info(s"File Line Size: ${f.lines(Charset.forName("UTF-8")).size}")
+    log.info(s"File Context Size: ${f.size / 1024L / 1024L} MB")
+    log.info(s"File LastModifiedTime: ${f.lastModifiedTime}")
 
-  def readFileByLine(bufSize: Int, fcin: FileChannel, rBuf: ByteBuffer, fcout: FileChannel, wBuf: ByteBuffer): Unit = {
-    val buffer: Array[Byte] = new Array[Byte](bufSize)
-    val temp: Array[Byte] = new Array[Byte](500)
-    while (fcin.read(rBuf) != -1) {
-      val rSize = rBuf.position()
-      rBuf.rewind()
-      rBuf.get(buffer)
-      rBuf.clear()
-
-      var startNum: Int = 0
-      var len: Int = 0
-      (0 until rSize).foreach {
-        i =>
-          if (buffer(i) == 10.toByte) {
-            startNum = i
-            (0 until 500).foreach {
-              k =>
-                if (temp(k) == 0.toByte) {
-                  len = i + k
-                  (0 to i).foreach {
-                    j =>
-                      temp.update(k + j, buffer(j))
-                  }
-                }
-            }
-          }
-      }
-
-      val tempStr1: String = new String(temp, 0, len + 1, "GBK")
-      temp.map(_ => 0.toByte)
-      var endNum: Int = 0
-      var k: Int = 0
-      (0 until rSize).reverse.foreach {
-        i =>
-          if (buffer(i) == 10.toByte) {
-            endNum = i
-            ((i + 1) to rSize).foreach {
-              j =>
-                k += 1
-                temp.update(k, buffer(j))
-                buffer.update(j, 0.toByte)
-            }
-          }
-      }
-      val tempStr2: String = new String(buffer, startNum + 1, endNum - startNum, "GBK")
-      val tempStr: String = tempStr1 + tempStr2
-      var fromIndex: Int = 0
-      var endIndex: Int = 0
-      while ((endIndex = tempStr.indexOf("\n", fromIndex)) != -1) {
-        val line = tempStr.substring(fromIndex, endIndex) + "\n" //按行截取字符串
-        println(line)
-        //写入文件
-        writeFileByLine(fcout, wBuf, line)
-
-        fromIndex = endIndex + 1
+    //TODO 普通的Java文件监控
+    val watchDir: File = f.parent
+    log.info(s"File Parent: $watchDir, IsDirectory: ${watchDir.isDirectory}")
+    import java.nio.file.{StandardWatchEventKinds => EventType}
+    val service: WatchService = watchDir.newWatchService
+    watchDir.register(service, events = Seq(EventType.ENTRY_MODIFY))
+    var symbolCnt: Int = 0
+    val watcher = new FileMonitor(watchDir, recursive = true) {
+      //      override def onEvent(eventType: WatchEvent.Kind[Path], file: File, count: Int): Unit = eventType match {
+      //        case EventType.ENTRY_CREATE => log.info(s"$file got created")
+      //        case EventType.ENTRY_MODIFY => log.info(s"$file got modified")
+      //        case EventType.ENTRY_DELETE => log.info(s"$file got deleted")
+      //      }
+      override def onModify(file: File, count: Int): Unit = {
+        symbolCnt += 1
+        log.info(s"${file.name} got modified @$count")
       }
     }
-  }
+    watcher.start()(ExecutionContext.global)
 
-  @SuppressWarnings(Array("static-access"))
-  def writeFileByLine(fcout: FileChannel, wBuffer: ByteBuffer, line: String): Unit = {
-    using(fcout) {
-      fc =>
-        val buf = wBuffer.put(line.getBytes("UTF-8"))
-        buf.flip()
-        fc.write(buf, fcout.size)
+    //    //    //TODO Akka风格的文件监控
+    //    implicit val system: ActorSystem = ActorSystem("Directory Watcher System")
+    //    import better.files._
+    //    import FileWatcher._
+    //    val akkaWatcher: ActorRef = watchDir.newWatcher(recursive = true)
+    //
+    //    // register partial function for an event
+    //    akkaWatcher ! on(EventType.ENTRY_DELETE) {
+    //      case file if file.isDirectory => log.info(s"$file got deleted")
+    //    }
+    //
+    //    // watch for multiple events
+    //    akkaWatcher ! when(events = EventType.ENTRY_CREATE, EventType.ENTRY_MODIFY) {
+    //      case (EventType.ENTRY_CREATE, file, count) => log.info(s"$file got created")
+    //      case (EventType.ENTRY_MODIFY, file, count) => log.info(s"$file got modified $count times")
+    //    }
+
+    while (symbolCnt < 10) {
+      Thread.sleep(1000)
+      log.info(s"Watching ${watchDir.name} ($symbolCnt)...")
     }
   }
-
 
   def main(args: Array[String]): Unit = {
     //    // TODO READ GZ FILE
@@ -170,16 +113,16 @@ object FileUtils extends Using {
     //    log.info(s"CostTime2: $costTime2 ms.")
 
     // TODO READ TAR.GZ FILE
-    val costTime3 = runtimeDuration {
-      readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
-    }
-    log.info(s"CostTime3: $costTime3 ms.")
+    //    val costTime3 = runtimeDuration {
+    //      readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
+    //    }
+    //    log.info(s"CostTime3: $costTime3 ms.")
 
     //    // TODO Run test for filenamePrefixFromOffset
     //    val offset = filenamePrefixFromOffset(100L)
     //    log.info(s"Offset: $offset")
 
-    // TODO readFileByByteBuffer
+    //    // TODO readFileByByteBuffer
     //    val costTime4 = runtimeDuration {
     //      readFileByByteBuffer(new File("./demo/ScalaDemo/src/main/resources/testingData.csv"), "./demo/ScalaDemo/src/main/resources/")
     //    }
@@ -200,7 +143,7 @@ object FileUtils extends Using {
     //    }
 
     //TODO betterFilesFunc
-   // betterFilesFunc()
+    betterFilesFunc()
   }
 
   def readFileByByteBuffer(srcFile: File, destPath: String): Unit = {
