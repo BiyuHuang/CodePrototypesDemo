@@ -360,5 +360,46 @@ object FileUtils extends Using {
         None
     }
   }
+
+
+  // TODO Delete file
+  def deleteFile(file: File): Boolean = {
+    var delState = false
+    if (file.exists() && file.canExecute) {
+      if (file.delete()) {
+        delState = true
+      } else {
+        log.error(s"Failed to delete ${file.getCanonicalPath}.")
+        delState = false
+      }
+    } else {
+      log.warn(s"${file.getName} doesn't exist or has no execute permission.")
+    }
+    delState
+  }
+
+  // TODO Recursive Delete Dirs and Files
+  def recursiveDelDirsAndFiles(rootFile: File): Boolean = {
+    var delState: Boolean = false
+    if (rootFile.isDirectory) {
+      val files: Array[File] = rootFile.listFiles
+      if (files.nonEmpty) {
+        files.foreach {
+          file =>
+            if (file.isDirectory) {
+              recursiveDelDirsAndFiles(file)
+            } else {
+              delState = deleteFile(file)
+            }
+        }
+      } else {
+        delState = deleteFile(rootFile)
+      }
+    } else {
+      delState = deleteFile(rootFile)
+    }
+
+    delState
+  }
 }
 
