@@ -143,7 +143,11 @@ object FileUtils extends Using {
     //    }
 
     //TODO betterFilesFunc
-    betterFilesFunc()
+    //    betterFilesFunc()
+
+    // TODO recursiveDelDirsAndFiles
+    val f: File = new File("./demo/ScalaDemo/src/main/resources/temp/")
+    recursiveDelDirsAndFiles(f)
   }
 
   def readFileByByteBuffer(srcFile: File, destPath: String): Unit = {
@@ -365,12 +369,26 @@ object FileUtils extends Using {
   // TODO Delete file
   def deleteFile(file: File): Boolean = {
     var delState = false
-    if (file.exists() && file.canExecute) {
-      if (file.delete()) {
-        delState = true
+    if (file.exists()) {
+      if (file.canExecute) {
+        if (file.delete()) {
+          delState = true
+        } else {
+          log.error(s"Failed to delete ${file.getCanonicalPath}.")
+          delState = false
+        }
       } else {
-        log.error(s"Failed to delete ${file.getCanonicalPath}.")
-        delState = false
+        if (file.setExecutable(true)) {
+          if (file.delete()) {
+            delState = true
+          } else {
+            log.error(s"Failed to delete ${file.getCanonicalPath}.")
+            delState = false
+          }
+        } else {
+          log.warn(s"Failed to set executable for ${file.getName}")
+          file.deleteOnExit()
+        }
       }
     } else {
       log.warn(s"${file.getName} doesn't exist or has no execute permission.")
@@ -393,8 +411,9 @@ object FileUtils extends Using {
             }
         }
       } else {
-        delState = deleteFile(rootFile)
+        log.debug(s"${rootFile.getName} is an empty directory, just delete it.")
       }
+      delState = deleteFile(rootFile)
     } else {
       delState = deleteFile(rootFile)
     }
