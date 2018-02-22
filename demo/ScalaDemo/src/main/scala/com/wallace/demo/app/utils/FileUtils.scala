@@ -148,6 +148,13 @@ object FileUtils extends Using {
     // TODO recursiveDelDirsAndFiles
     val f: File = new File("./demo/ScalaDemo/src/main/resources/temp/")
     recursiveDelDirsAndFiles(f)
+
+
+    val a = Array("test", "test/test1", "test/test1/test2", "test33/")
+    a.groupBy(x => x.length).filterNot(x => x._1 == 1)
+    f.lastModified()
+    System.currentTimeMillis()
+
   }
 
   def readFileByByteBuffer(srcFile: File, destPath: String): Unit = {
