@@ -14,7 +14,7 @@ import org.apache.spark.sql.SparkSession
   */
 object RddDemo extends CreateSparkSession with Using {
   private val _spark: SparkSession = createSparkSession("RddDemo")
-  val path: String = "./demo/SparkDemo/src/main/resources/"
+  val path: String = "./demo/SparkDemo/src/main/resources/trainingData.csv.gz"
   val minPartitions: Int = Math.min(Runtime.getRuntime.availableProcessors(), 10)
 
   def readTextFile(filePath: String): Unit = {
@@ -35,6 +35,7 @@ object RddDemo extends CreateSparkSession with Using {
 
     log.warn(s"Count1: ${data.count()}")
     log.warn(s"Count2: ${fileRdd.count()}")
+    log.info(s"Last String: ${data.collect().last}")
     fileRdd.map(x => (x, 1)).reduceByKey(_ + _)
   }
 }
