@@ -14,6 +14,7 @@ object StringFuncUtils extends Using {
   private val _curParallelism: Int = Math.min(_maxParallelism, 5)
 
   def splitString(str: String, fieldSeparator: String, specialChar: String): Array[String] = {
+    //TODO There is some error
     val resultArr = new ArrayBuffer[String]()
     var temp = str
     str match {
@@ -74,6 +75,8 @@ object StringFuncUtils extends Using {
     val str0 = """1,2,3,4,"a=1,b=2,c=3","e=1.2,f=32.1,g=1.3",7,8,9"""
     val str1 = """1,2,3,"4,"a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
     val str2 = """1,2,3,4","a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
+    val vRes: java.util.Vector[String] = new java.util.Vector[String]()
+    FuncUtil.GetSplitString(vRes, str0, ",")
     val input = Array(str0, str1, str2)
     input.par.tasksupport = pool
     input.par.foreach {
