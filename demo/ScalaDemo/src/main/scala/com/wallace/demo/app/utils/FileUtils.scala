@@ -4,26 +4,38 @@ import java.io.{FileInputStream, FileOutputStream, _}
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.charset.Charset
+import java.nio.file.WatchService
 import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
 
 import com.wallace.demo.app.common.Using
 import com.wallace.demo.app.parsexml.MROSax
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
+import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.xml.sax.helpers.DefaultHandler
 
+import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 object FileUtils extends Using {
+
+  case class FileMetadata(file: File, offset: Long)
+
+  object FileSuffix {
+    /** a csv file */
+    val csvFileSuffix = ".csv"
+
+    /** a temp file */
+    val tempFileSuffix = ".temp"
+  }
+
   private val factory: SAXParserFactory = SAXParserFactory.newInstance()
-  private val DEFAULT_FILE_BLOCK_SIZE: Int = 128 * 1024 * 1024
+  private val DEFAULT_FILE_SIZE_THRESHOLD: Int = 128 * 1024 * 1024
   private var cnt: Int = 0
   private val DEFAULT_LENGTH: Long = 100 * 1024 * 1024L
-
-  private var offset: Map[String, Int] = Map.empty
 
   def writeToFile(data: Array[String], destFile: String, mode: String = "rw"): Unit = {
     using(new RandomAccessFile(destFile, "rw")) {
@@ -39,75 +51,57 @@ object FileUtils extends Using {
     }
   }
 
-  def readFileByLine(bufSize: Int, fcin: FileChannel, rBuf: ByteBuffer, fcout: FileChannel, wBuf: ByteBuffer): Unit = {
-    val buffer: Array[Byte] = new Array[Byte](bufSize)
-    val temp: Array[Byte] = new Array[Byte](500)
-    while (fcin.read(rBuf) != -1) {
-      val rSize = rBuf.position()
-      rBuf.rewind()
-      rBuf.get(buffer)
-      rBuf.clear()
+  def betterFilesFunc(): Unit = {
+    import better.files.{File, FileMonitor}
+    val f = File("./demo/ScalaDemo/src/main/resources/testingData.csv")
+    log.info(s"File Path: ${f.path}")
+    //log.info(s"File CheckSum: ${f.sha512}")
+    log.info(s"File Line Size: ${f.lines(Charset.forName("UTF-8")).size}")
+    log.info(s"File Context Size: ${f.size / 1024L / 1024L} MB")
+    log.info(s"File LastModifiedTime: ${f.lastModifiedTime}")
 
-      var startNum: Int = 0
-      var len: Int = 0
-      (0 until rSize).foreach {
-        i =>
-          if (buffer(i) == 10.toByte) {
-            startNum = i
-            (0 until 500).foreach {
-              k =>
-                if (temp(k) == 0.toByte) {
-                  len = i + k
-                  (0 to i).foreach {
-                    j =>
-                      temp.update(k + j, buffer(j))
-                  }
-                }
-            }
-          }
-      }
-
-      val tempStr1: String = new String(temp, 0, len + 1, "GBK")
-      temp.map(_ => 0.toByte)
-      var endNum: Int = 0
-      var k: Int = 0
-      (0 until rSize).reverse.foreach {
-        i =>
-          if (buffer(i) == 10.toByte) {
-            endNum = i
-            ((i + 1) to rSize).foreach {
-              j =>
-                k += 1
-                temp.update(k, buffer(j))
-                buffer.update(j, 0.toByte)
-            }
-          }
-      }
-      val tempStr2: String = new String(buffer, startNum + 1, endNum - startNum, "GBK")
-      val tempStr: String = tempStr1 + tempStr2
-      var fromIndex: Int = 0
-      var endIndex: Int = 0
-      while ((endIndex = tempStr.indexOf("\n", fromIndex)) != -1) {
-        val line = tempStr.substring(fromIndex, endIndex) + "\n" //按行截取字符串
-        println(line)
-        //写入文件
-        writeFileByLine(fcout, wBuf, line)
-
-        fromIndex = endIndex + 1
+    //TODO 普通的Java文件监控
+    val watchDir: File = f.parent
+    log.info(s"File Parent: $watchDir, IsDirectory: ${watchDir.isDirectory}")
+    import java.nio.file.{StandardWatchEventKinds => EventType}
+    val service: WatchService = watchDir.newWatchService
+    watchDir.register(service, events = Seq(EventType.ENTRY_MODIFY))
+    var symbolCnt: Int = 0
+    val watcher = new FileMonitor(watchDir, recursive = true) {
+      //      override def onEvent(eventType: WatchEvent.Kind[Path], file: File, count: Int): Unit = eventType match {
+      //        case EventType.ENTRY_CREATE => log.info(s"$file got created")
+      //        case EventType.ENTRY_MODIFY => log.info(s"$file got modified")
+      //        case EventType.ENTRY_DELETE => log.info(s"$file got deleted")
+      //      }
+      override def onModify(file: File, count: Int): Unit = {
+        symbolCnt += 1
+        log.info(s"${file.name} got modified @$count")
       }
     }
-  }
+    watcher.start()(ExecutionContext.global)
 
-  @SuppressWarnings(Array("static-access"))
-  def writeFileByLine(fcout: FileChannel, wBuffer: ByteBuffer, line: String): Unit = {
-    using(fcout) {
-      fc =>
-        val buf = wBuffer.put(line.getBytes("UTF-8"))
-        buf.flip()
-        fc.write(buf, fcout.size)
+    //    //    //TODO Akka风格的文件监控
+    //    implicit val system: ActorSystem = ActorSystem("Directory Watcher System")
+    //    import better.files._
+    //    import FileWatcher._
+    //    val akkaWatcher: ActorRef = watchDir.newWatcher(recursive = true)
+    //
+    //    // register partial function for an event
+    //    akkaWatcher ! on(EventType.ENTRY_DELETE) {
+    //      case file if file.isDirectory => log.info(s"$file got deleted")
+    //    }
+    //
+    //    // watch for multiple events
+    //    akkaWatcher ! when(events = EventType.ENTRY_CREATE, EventType.ENTRY_MODIFY) {
+    //      case (EventType.ENTRY_CREATE, file, count) => log.info(s"$file got created")
+    //      case (EventType.ENTRY_MODIFY, file, count) => log.info(s"$file got modified $count times")
+    //    }
+
+    while (symbolCnt < 10) {
+      Thread.sleep(1000)
+      log.info(s"Watching ${watchDir.name} ($symbolCnt)...")
     }
   }
-
 
   def main(args: Array[String]): Unit = {
     //    // TODO READ GZ FILE
@@ -118,28 +112,56 @@ object FileUtils extends Using {
     //    val costTime2 = runtimeDuration(readZipFile("./demo/ScalaDemo/src/main/resources/CDT_ZTE_V3.5_963847_20171201180000.zip"))
     //    log.info(s"CostTime2: $costTime2 ms.")
 
-    //    // TODO READ TAR.GZ FILE
+    // TODO READ TAR.GZ FILE
     //    val costTime3 = runtimeDuration {
     //      readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
     //    }
     //    log.info(s"CostTime3: $costTime3 ms.")
-    //
+
     //    // TODO Run test for filenamePrefixFromOffset
     //    val offset = filenamePrefixFromOffset(100L)
     //    log.info(s"Offset: $offset")
 
-    // TODO readFileByByteBuffer
-    val costTime4 = runtimeDuration {
-      readFileByByteBuffer(new File("./demo/ScalaDemo/src/main/resources/testingData.csv"), "./demo/ScalaDemo/src/main/resources/")
-    }
-    log.info(s"CostTime4: $costTime4 ms.")
+    //    // TODO readFileByByteBuffer
+    //    val costTime4 = runtimeDuration {
+    //      readFileByByteBuffer(new File("./demo/ScalaDemo/src/main/resources/testingData.csv"), "./demo/ScalaDemo/src/main/resources/")
+    //    }
+    //    log.info(s"CostTime4: $costTime4 ms.")
+
+    //TODO Try Catch Exception
+    //    val data = Array(1, 2, 3, 4)
+    //    var size = data.length
+    //    while (size > 0) {
+    //      size -= 1
+    //      try {
+    //        if (size == 2) throw new Exception("test exception")
+    //        log.info(data(size).toString)
+    //      } catch {
+    //        case e: Exception =>
+    //          log.error(e.getMessage)
+    //      }
+    //    }
+
+    //TODO betterFilesFunc
+    //    betterFilesFunc()
+
+    // TODO recursiveDelDirsAndFiles
+    val f: File = new File("./demo/ScalaDemo/src/main/resources/temp/")
+    recursiveDelDirsAndFiles(f)
+
+
+    val a = Array("test", "test/test1", "test/test1/test2", "test33/")
+    a.groupBy(x => x.length).filterNot(x => x._1 == 1)
+    f.lastModified()
+    System.currentTimeMillis()
+
   }
 
   def readFileByByteBuffer(srcFile: File, destPath: String): Unit = {
-    val outPutDestPath: String = appendOrRollFile(destPath)
-    using(new FileInputStream(srcFile)) {
+    usingWithErrMsg(new FileInputStream(srcFile), s"Failed to read ${srcFile.getName}.") {
       in =>
-        usingWithErrMsg(new FileOutputStream(outPutDestPath, true), s"Failed to write $outPutDestPath") {
+        val outPutDestPath: File = appendOrRollFile(destPath)
+        using(new FileOutputStream(outPutDestPath, true)) {
           out =>
             val fcIn: FileChannel = in.getChannel
             val fcOut: FileChannel = out.getChannel
@@ -148,30 +170,31 @@ object FileUtils extends Using {
     }
   }
 
-  def appendOrRollFile(path: String): String = {
-    var offset: Long = 0L
+  def appendOrRollFile(path: String): File = {
+    var offset: Long = null.asInstanceOf[Long]
     val destFilePath: String = {
       val tempPath = path.trim.replaceAll("""\\""", "/")
       if (tempPath.endsWith("/")) tempPath else tempPath + "/"
     }
-    val fileList: Array[File] = new File(destFilePath).listFiles().filter(_.getName.startsWith("part-"))
-    val prefixDestFile = destFilePath + "part-"
+    val fileList: Array[File] = new File(destFilePath).listFiles().filter(x => x.getName.startsWith("part-") && x.isFile)
+    val prefixDestFile = destFilePath + s"part-${Thread.currentThread().getId}-"
+
     val destFile: File = fileList.length match {
-      case 0 => new File(prefixDestFile + filenamePrefixFromOffset(0L) + ".csv")
+      case 0 => new File(prefixDestFile + filenamePrefixFromOffset(offset) + FileSuffix.csvFileSuffix)
       case _ =>
-        fileList.map {
-          x =>
-            val temp = x.getName.drop(5).dropRight(4).toLong
-            offset += temp
-            (x, temp)
-        }.maxBy(_._2)._1
+        val tempFileAndOffset: FileMetadata = fileList.map {
+          elem =>
+            val offset = elem.getName.reverse.substring(4, 24).reverse.toLong
+            FileMetadata(elem, offset)
+        }.maxBy(_.offset)
+        offset = tempFileAndOffset.file.length() + tempFileAndOffset.offset
+        tempFileAndOffset.file
     }
-    offset += destFile.length()
     log.warn(s"Offset: $offset.")
-    if (destFile.length() <= DEFAULT_FILE_BLOCK_SIZE) {
-      destFile.getCanonicalPath
+    if (destFile.length() <= DEFAULT_FILE_SIZE_THRESHOLD) {
+      destFile
     } else {
-      prefixDestFile + filenamePrefixFromOffset(offset) + ".csv"
+      new File(prefixDestFile + filenamePrefixFromOffset(offset) + FileSuffix.csvFileSuffix)
     }
   }
 
@@ -211,6 +234,7 @@ object FileUtils extends Using {
             gis =>
               using(new BufferedReader(new InputStreamReader(gis, "GBK"))) {
                 br =>
+                  br.lines().toArray.foreach(line => log.info(s"$line"))
                   while (br.ready()) {
                     val oneLine = br.readLine().replaceAll("null", "")
                     oneLine.length
@@ -256,6 +280,34 @@ object FileUtils extends Using {
     }
   }
 
+  def readMultiZipArchiveFile(fileName: String): Unit = {
+
+  }
+
+  private def readZipArchiveFile(fileName: String): Unit = {
+    import java.util.zip.ZipFile
+    val f = new ZipFile(fileName)
+    f.close()
+    usingWithErrMsg(new FileInputStream(fileName), s"Failed to get input stream for $fileName") {
+      inputStream =>
+        using(new ZipArchiveInputStream(inputStream, "UTF-8")) {
+          zipIns =>
+            while (zipIns.canReadEntryData(zipIns.getNextZipEntry)) {
+              val entry: ZipArchiveEntry = zipIns.getNextZipEntry
+              val size = entry.getSize
+              val context = new Array[Byte](size.toInt)
+              var offset = 0
+              while (zipIns.available() > 0) {
+                offset += zipIns.read(context, offset, 40960)
+              }
+
+              val res: ByteArrayInputStream = new ByteArrayInputStream(context)
+
+            }
+        }
+    }
+  }
+
   private def readTarGZFile(fileName: String): Unit = {
     cnt = 0
     usingWithErrMsg(new FileInputStream(fileName), s"Failed to get input stream for $fileName") {
@@ -273,7 +325,7 @@ object FileUtils extends Using {
   }
 
   def processSingleEntry(tarInput: TarArchiveInputStream, fileName: String): Unit = {
-    val entry = tarInput.getCurrentEntry
+    val entry: TarArchiveEntry = tarInput.getCurrentEntry
     if (!entry.isDirectory) {
       val size: Long = entry.getSize
       val entryName: String = entry.getName
@@ -289,7 +341,6 @@ object FileUtils extends Using {
         case v if v.contains("_MRS_") =>
         case v if v.contains("_MRE_") =>
         case v if v.contains("_MRO_") =>
-
           cnt += 1
           using(new GZIPInputStream(new ByteArrayInputStream(context))) {
             xmlInputStream =>
@@ -320,4 +371,61 @@ object FileUtils extends Using {
         None
     }
   }
+
+
+  // TODO Delete file
+  def deleteFile(file: File): Boolean = {
+    var delState = false
+    if (file.exists()) {
+      if (file.canExecute) {
+        if (file.delete()) {
+          delState = true
+        } else {
+          log.error(s"Failed to delete ${file.getCanonicalPath}.")
+          delState = false
+        }
+      } else {
+        if (file.setExecutable(true)) {
+          if (file.delete()) {
+            delState = true
+          } else {
+            log.error(s"Failed to delete ${file.getCanonicalPath}.")
+            delState = false
+          }
+        } else {
+          log.warn(s"Failed to set executable for ${file.getName}")
+          file.deleteOnExit()
+        }
+      }
+    } else {
+      log.warn(s"${file.getName} doesn't exist or has no execute permission.")
+    }
+    delState
+  }
+
+  // TODO Recursive Delete Dirs and Files
+  def recursiveDelDirsAndFiles(rootFile: File): Boolean = {
+    var delState: Boolean = false
+    if (rootFile.isDirectory) {
+      val files: Array[File] = rootFile.listFiles
+      if (files.nonEmpty) {
+        files.foreach {
+          file =>
+            if (file.isDirectory) {
+              recursiveDelDirsAndFiles(file)
+            } else {
+              delState = deleteFile(file)
+            }
+        }
+      } else {
+        log.debug(s"${rootFile.getName} is an empty directory, just delete it.")
+      }
+      delState = deleteFile(rootFile)
+    } else {
+      delState = deleteFile(rootFile)
+    }
+
+    delState
+  }
 }
+

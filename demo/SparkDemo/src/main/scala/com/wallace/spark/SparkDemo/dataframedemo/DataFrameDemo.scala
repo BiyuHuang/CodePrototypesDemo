@@ -101,7 +101,8 @@ object DataFrameDemo extends LogSupport {
     res5.show(3)
     //    res5.write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite).save("./temp/")
     //    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
-    //res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
+    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
+    res5.write.mode(SaveMode.Append).parquet("/")
   }
 
   protected def padto(ls: Array[String], columnNum: Int = 5): Array[String] = if (ls.length > columnNum) ls.dropRight(ls.length - columnNum) else ls.padTo(columnNum, "")

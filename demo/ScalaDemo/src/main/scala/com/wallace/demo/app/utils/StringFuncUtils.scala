@@ -1,17 +1,20 @@
 package com.wallace.demo.app.utils
 
+import com.wallace.demo.app.common.Using
+
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
 
 /**
   * Created by Wallace on 2017/1/11.
   */
-object StringFuncUtils extends FuncRuntimeDur {
+object StringFuncUtils extends Using {
   private var _uniqueIndex: Long = updateUniqueIndex(((System.currentTimeMillis() - 946656000000L) / 1000) % Int.MaxValue)
   private val _maxParallelism: Int = Runtime.getRuntime.availableProcessors()
   private val _curParallelism: Int = Math.min(_maxParallelism, 5)
 
   def splitString(str: String, fieldSeparator: String, specialChar: String): Array[String] = {
+    //TODO There is some error
     val resultArr = new ArrayBuffer[String]()
     var temp = str
     str match {
@@ -49,6 +52,17 @@ object StringFuncUtils extends FuncRuntimeDur {
     }
   }
 
+  def subStr(str: String): String = {
+    val str1 = "/data2/hadoop/vmaxrun/drs/post_telecom_pm_cm/hdfs/zxvmax/telecom/temp/lte/rawdata/itg_pm_lte_enb_h_enb_d/p_provincecode=510000/"
+    str.substring(str1.indexOf("post_"), str1.length)
+  }
+
+  def stringConventToBytes(str: String, charsetName: String = "UTF-8"): Array[Byte] = try {
+    str.getBytes(charsetName)
+  }
+
+  def bytesCoventToString(bytes: Array[Byte], charsetName: String = "UTF-8"): String = new String(bytes, charsetName)
+
   def main(args: Array[String]): Unit = {
     val pool = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(_curParallelism))
     util.Properties.setProp("scala.time", "true")
@@ -61,6 +75,8 @@ object StringFuncUtils extends FuncRuntimeDur {
     val str0 = """1,2,3,4,"a=1,b=2,c=3","e=1.2,f=32.1,g=1.3",7,8,9"""
     val str1 = """1,2,3,"4,"a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
     val str2 = """1,2,3,4","a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
+    val vRes: java.util.Vector[String] = new java.util.Vector[String]()
+    FuncUtil.GetSplitString(vRes, str0, ",")
     val input = Array(str0, str1, str2)
     input.par.tasksupport = pool
     input.par.foreach {

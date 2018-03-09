@@ -49,7 +49,7 @@ object DynamicLoadConfig extends LogSupport {
     util.Properties.setProp("scala.time", "true")
     val props: Properties = new Properties()
     val timer = new Timer
-    timer.schedule(new DynamicLoadConfig(props, "conf", "test.conf"), 1000L, 10000L)
+    timer.schedule(new DynamicLoadConfig(props, "conf", "test.conf", "test1.conf"), 1000L, 10000L)
 
     var cnt: Int = 0
     while (cnt < 10) {
