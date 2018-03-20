@@ -146,25 +146,58 @@ object FileUtils extends Using {
     //    betterFilesFunc()
 
     // TODO recursiveDelDirsAndFiles
-    val f: File = new File("./demo/ScalaDemo/src/main/resources/temp/")
-    recursiveDelDirsAndFiles(f)
+    //    val f: File = new File("./demo/ScalaDemo/src/main/resources/temp/")
+    //    recursiveDelDirsAndFiles(f)
+    //
+    //    val a = Array("test", "test/test1", "test/test1/test2", "test33/")
+    //    a.groupBy(x => x.length).filterNot(x => x._1 == 1)
 
+    // TODO GetTotalLines
+    val srcFileName = "./demo/ScalaDemo/src/main/resources/testingData.csv"
+    val srcFile = new File(srcFileName)
+    val startTime = System.currentTimeMillis()
+    //    val totalLines = getTotalLines(testFile)
+    val totalLines = getTotalLines(srcFile)
+    val endTime = System.currentTimeMillis()
+    log.info(s"[$srcFileName]TotalLines: $totalLines, CostTime: ${endTime - startTime} ms.")
 
-    val a = Array("test", "test/test1", "test/test1/test2", "test33/")
-    a.groupBy(x => x.length).filterNot(x => x._1 == 1)
-    f.lastModified()
-    System.currentTimeMillis()
+  }
 
+  private def getTotalLines(srcFile: File): Int = {
+    val reader = new LineNumberReader(new FileReader(srcFile))
+    reader.skip(srcFile.length())
+    val totalLines = reader.getLineNumber
+    reader.close()
+    totalLines
+    //    using(new LineNumberReader(new FileReader(srcFile))) {
+    //      reader =>
+    //        //        var totalLines = 0
+    //        //        var strLine = reader.readLine
+    //        //        while (strLine != null) {
+    //        //          totalLines += 1
+    //        //          strLine = reader.readLine
+    //        //        }
+    //        //
+    //        //        totalLines
+    //
+    //        reader.skip(srcFile.length())
+    //        reader.getLineNumber
+    //    }
+  }
+
+  private def getTotalLines(fileName: String): Int = {
+    val srcFile = new File(fileName)
+    getTotalLines(srcFile)
   }
 
   def readFileByByteBuffer(srcFile: File, destPath: String): Unit = {
     usingWithErrMsg(new FileInputStream(srcFile), s"Failed to read ${srcFile.getName}.") {
       in =>
-        val outPutDestPath: File = appendOrRollFile(destPath)
+        val outPutDestPath = appendOrRollFile(destPath)
         using(new FileOutputStream(outPutDestPath, true)) {
           out =>
-            val fcIn: FileChannel = in.getChannel
-            val fcOut: FileChannel = out.getChannel
+            val fcIn = in.getChannel
+            val fcOut = out.getChannel
             writeToFileByByte(in, fcIn, fcOut)
         }
     }
