@@ -100,4 +100,11 @@ class StringFuncUtilsUnitSpec extends FlatSpec with ShouldMatchers with LogSuppo
     res.getOrElse("Hello", "") shouldBe expect
     res.getOrElse("wonderful", "") shouldBe 1
   }
+
+  "Wallace Huang" should "do unit test for: convertStrToFixedFormat" in {
+    val res = StringFuncUtils.convertStrToFixedFormat("25525511135")
+
+    res.contains("255.255.11.135") shouldBe true
+    res.length shouldBe 2
+  }
 }

@@ -1,7 +1,9 @@
 package com.wallace.demo.app.utils
 
 import com.wallace.demo.app.common.Using
+import com.wallace.demo.app.utils.stringutils.StringUtils
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
 
@@ -132,5 +134,10 @@ object StringFuncUtils extends Using {
       case _ =>
         ""
     }
+  }
+
+  //TODO Convert "25525511135" to “255.255.11.135”, “255.255.111.35”
+  def convertStrToFixedFormat(str: String): List[String] = {
+    StringUtils.restoreIpAddresses(str).asScala.toList
   }
 }
