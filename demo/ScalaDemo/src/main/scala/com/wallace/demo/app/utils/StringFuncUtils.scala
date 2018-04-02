@@ -15,6 +15,21 @@ object StringFuncUtils extends Using {
   private val _maxParallelism: Int = Runtime.getRuntime.availableProcessors()
   private val _curParallelism: Int = Math.min(_maxParallelism, 5)
 
+  def convertStringFormat(src: String): String = {
+    //TODO  1. 表头信息/索引
+    //TODO  2. 输出信息/索引
+    //TODO  3. 解析逻辑(包含索引、字段)
+    //TODO     提取列      5人天
+    //TODO     字段拆分与拼接(输入字段(索引) => 输出字段(索引))  3人天
+    //TODO     字符串替换(可配置： replace_string) 1人天
+    //TODO     取子串(可配置：[0，length])     1人天
+    //TODO     单位转换(支持简单四则运算、求余、进制转换)  3人天
+    //TODO     公共字段拼接(如文件名中的时间戳)
+    //TODO     时间戳转换(*******???)
+
+    ""
+  }
+
   def splitString(str: String, fieldSeparator: String, specialChar: String): Array[String] = {
     //TODO There is some error
     val resultArr = new ArrayBuffer[String]()
