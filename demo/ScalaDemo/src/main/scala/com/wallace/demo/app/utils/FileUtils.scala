@@ -7,8 +7,9 @@ import java.nio.charset.Charset
 import java.nio.file.WatchService
 import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
-import javax.xml.parsers.{SAXParser, SAXParserFactory}
 
+import com.typesafe.config.{Config, ConfigFactory}
+import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import com.wallace.demo.app.common.Using
 import com.wallace.demo.app.parsexml.MROSax
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
@@ -16,9 +17,11 @@ import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInp
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.xml.sax.helpers.DefaultHandler
 
+import scala.collection.immutable
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
+import scala.xml.XML
 
 object FileUtils extends Using {
 
@@ -405,6 +408,78 @@ object FileUtils extends Using {
     }
   }
 
+  case class AlgMetadata(algArgs: Config, className: String) {
+    private val args: String = Option(algArgs) match {
+      case Some(value) => value.toString
+      case None => "null"
+    }
+
+    override def toString: String = s"""AlgArgs: $args, ClassName: $className"""
+  }
+
+  // TODO Recursive List Files
+  def recursiveListFiles(rootFile: File): Array[File] = {
+    if (rootFile.isFile) {
+      Array(rootFile)
+    } else {
+      rootFile.listFiles().flatMap(recursiveListFiles)
+    }
+  }
+
+  private def load(fileName: String): Config = {
+    val projectConfigFile = fileName
+    val udfConfigFile: Array[File] = Array(new File(SystemEnvUtils.getUserDir + "../conf/" + fileName))
+    if (udfConfigFile.nonEmpty) {
+      log.debug(s"loading file[${udfConfigFile.head.getPath}] and resource[$projectConfigFile]")
+      ConfigFactory.parseFile(udfConfigFile.head).withFallback(ConfigFactory.load(projectConfigFile))
+    } else {
+      log.debug(s"loading resource[$projectConfigFile]")
+      ConfigFactory.load(projectConfigFile)
+    }
+  }
+
+  def readXMLFile(algPath: String): Map[_ <: String, AlgMetadata] = {
+    val pluginParentFile: File = new File(algPath)
+    val adapters: Array[File] = if (pluginParentFile.exists()) {
+      recursiveListFiles(pluginParentFile).filter(_.getName.endsWith(".xml"))
+    } else {
+      Array.empty
+    }
+    if (adapters.isEmpty) {
+      Map.empty
+    } else {
+      val res = adapters.map {
+        f =>
+          val algXml = XML.loadFile(f)
+          (algXml \ "algorithm").map {
+            rootNode =>
+              val pluginConfFileName = (rootNode \\ "@confPath").toString()
+              val algorithmArgs: Config = if (pluginConfFileName.trim.nonEmpty) load(pluginConfFileName) else null
+              val algorithmID = (rootNode \\ "@id").toString()
+              println(algorithmID + ", " + pluginConfFileName)
+              val algorithmInfo = (rootNode \ "algorithminfo").map {
+                treeNode =>
+                  val className = (treeNode \ "className").text
+                  val target = (treeNode \\ "@target").toString()
+                  val regionID = (treeNode \\ "@regionid").toString()
+                  val algorithmKey = if (regionID.nonEmpty) target + "_" + regionID else target
+                  (algorithmKey, className)
+              }
+              (algorithmID, algorithmArgs, algorithmInfo)
+          }
+      }
+      res.flatMap {
+        algID =>
+          algID.flatMap {
+            adaptor =>
+              adaptor._3.map {
+                algInfo =>
+                  (algInfo._1, AlgMetadata(adaptor._2, algInfo._2))
+              }
+          }
+      }.toMap
+    }
+  }
 
   // TODO Delete file
   def deleteFile(file: File): Boolean = {

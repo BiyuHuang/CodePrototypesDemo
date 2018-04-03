@@ -1,11 +1,14 @@
 package com.wallace.demo.app.utils
 
+import java.io.{BufferedReader, File, FileInputStream, InputStreamReader}
+
 import com.wallace.demo.app.common.Using
 import com.wallace.demo.app.utils.stringutils.StringUtils
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
+import scala.util.control.NonFatal
 
 /**
   * Created by Wallace on 2017/1/11.
@@ -26,6 +29,13 @@ object StringFuncUtils extends Using {
     //TODO     单位转换(支持简单四则运算、求余、进制转换)  3人天
     //TODO     公共字段拼接(如文件名中的时间戳)
     //TODO     时间戳转换(*******???)
+
+    using(new BufferedReader(new InputStreamReader(new FileInputStream(new File(""))))){
+      br =>
+        while(br.ready()){
+          ???
+        }
+    }
 
     ""
   }
