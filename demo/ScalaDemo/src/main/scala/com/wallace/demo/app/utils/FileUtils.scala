@@ -15,6 +15,7 @@ import com.wallace.demo.app.parsexml.MROSax
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
 import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.utils.IOUtils
 import org.xml.sax.helpers.DefaultHandler
 
 import scala.collection.immutable
@@ -164,6 +165,12 @@ object FileUtils extends Using {
     val endTime = System.currentTimeMillis()
     log.info(s"[$srcFileName]TotalLines: $totalLines, CostTime: ${endTime - startTime} ms.")
 
+    // TODO Read readZipArchiveFile
+    //val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335110_20180403101500.zip"
+    val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335112_20180403101500.xml.zip"
+    //val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ZTE_OMC1_637784_20170522204500.zip"
+    val costTime4: Double = runtimeDuration(readZipArchiveFile(fileName))
+    log.info(s"CostTime3: $costTime4 ms.")
   }
 
   private def getTotalLines(srcFile: File): Int = {
@@ -301,7 +308,7 @@ object FileUtils extends Using {
                         var cnt: Long = 1
                         while (br.ready() && (cnt <= size)) {
                           val line = br.readLine()
-                          line.length
+                          log.info(s"${line.length}")
                           //log.info(s"$cnt: $line")
                           cnt += 1
                         }
@@ -328,17 +335,25 @@ object FileUtils extends Using {
       inputStream =>
         using(new ZipArchiveInputStream(inputStream, "UTF-8")) {
           zipIns =>
-            while (zipIns.canReadEntryData(zipIns.getNextZipEntry)) {
-              val entry: ZipArchiveEntry = zipIns.getNextZipEntry
+            var entry: ZipArchiveEntry = zipIns.getNextZipEntry
+            while (zipIns.canReadEntryData(entry) && entry != null) {
               val size = entry.getSize
-              val context = new Array[Byte](size.toInt)
-              var offset = 0
-              while (zipIns.available() > 0) {
-                offset += zipIns.read(context, offset, 40960)
+              log.info(s"Entry Name: ${entry.getName}, Entry Size: $size.")
+              val defaultSize: Long = Math.min(Runtime.getRuntime.freeMemory(), Int.MaxValue)
+              log.debug(s"FreeMemory: ${Runtime.getRuntime.freeMemory() / (1024 * 1024)} MB. Default Bytes Size: $defaultSize Bytes")
+              val currentSize: Long = if (size < 0) defaultSize else size
+              val bos = new ByteArrayOutputStream(currentSize.toInt)
+              IOUtils.copy(zipIns, bos, 40960)
+              val res: ByteArrayInputStream = new ByteArrayInputStream(bos.toByteArray)
+              using(new BufferedReader(new InputStreamReader(res))) {
+                br =>
+                  while (br.ready()) {
+                    log.info(br.readLine())
+                  }
               }
-
-              val res: ByteArrayInputStream = new ByteArrayInputStream(context)
-
+              bos.flush()
+              bos.close()
+              entry = zipIns.getNextZipEntry
             }
         }
     }
