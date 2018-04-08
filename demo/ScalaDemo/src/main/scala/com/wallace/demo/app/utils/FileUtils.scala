@@ -11,7 +11,7 @@ import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
 import com.typesafe.config.{Config, ConfigFactory}
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import com.wallace.demo.app.common.Using
-import com.wallace.demo.app.parsexml.MROSax
+import com.wallace.demo.app.parsexml.{MROSax, SaxHandler}
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
 import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
@@ -117,10 +117,10 @@ object FileUtils extends Using {
     //    log.info(s"CostTime2: $costTime2 ms.")
 
     // TODO READ TAR.GZ FILE
-    //    val costTime3 = runtimeDuration {
-    //      readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
-    //    }
-    //    log.info(s"CostTime3: $costTime3 ms.")
+    val costTime3 = runtimeDuration {
+      readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
+    }
+    log.info(s"CostTime3: $costTime3 ms.")
 
     //    // TODO Run test for filenamePrefixFromOffset
     //    val offset = filenamePrefixFromOffset(100L)
@@ -397,9 +397,9 @@ object FileUtils extends Using {
             xmlInputStream =>
               val handle: MROSax = new MROSax
               val saxParser: SAXParser = SAXParserFactory.newInstance().newSAXParser()
-              val res: Option[DefaultHandler] = parseXML(saxParser, handle, xmlInputStream, entryName)
+              val res: Option[SaxHandler] = parseXML(saxParser, handle, xmlInputStream, entryName)
               if (res.isDefined) {
-                val mrRecords = res.get.asInstanceOf[MROSax].getMRO
+                val mrRecords = res.get.getResult
                 val eNBId: String = mrRecords.geteNB()
                 log.info(s"[$cnt]$entryName => EnodeBID: $eNBId")
               } else {
@@ -410,7 +410,7 @@ object FileUtils extends Using {
     }
   }
 
-  protected def parseXML(parser: SAXParser, handle: DefaultHandler, ins: InputStream, entryName: String): Option[DefaultHandler] = {
+  protected def parseXML(parser: SAXParser, handle: SaxHandler, ins: InputStream, entryName: String): Option[SaxHandler] = {
     Try {
       parser.parse(ins, handle)
       handle

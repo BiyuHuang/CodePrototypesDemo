@@ -4,13 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * com.wallace.demo.app.parsexml
  * Created by 10192057 on 2017/12/11 0011.
  */
-public class MROSax extends DefaultHandler {
+public class MROSax extends SaxHandler {
     private Logger log = LoggerFactory.getLogger(this.getClass());
     private HW_ASmr asmr;
     private MRO mro;
@@ -148,31 +147,26 @@ public class MROSax extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException {
-        if(flag.equals("RIP")){
+        if (flag.equals("RIP")) {
             return;
         }
         if ("v".equals(preTag) && nullFlag == 0) {
             String data = xmldata.toString();
-            if(flag.equals("Plr")){
+            if (flag.equals("Plr")) {
                 //QCI的拼接及存储属性值
                 SplicePlr(data);
-            }else if(flag.equals("smr")) {
+            } else if (flag.equals("smr")) {
                 //填充Field的属性值
                 SetField(data);
             }
-        }else if("smr".equals(preTag)) {
+        } else if ("smr".equals(preTag)) {
             String data = xmldata.toString();
-            if(data.contains("MR.LteScRIP"))
-            {
+            if (data.contains("MR.LteScRIP")) {
                 flag = "RIP";
-            }
-            else if(data.contains("MR.LteScPci"))
-            {
+            } else if (data.contains("MR.LteScPci")) {
                 flag = "smr";
                 handler.setNorthMRInfo(data);
-            }
-            else if(data.contains("MR.LteScPlrULQci"))
-            {
+            } else if (data.contains("MR.LteScPlrULQci")) {
                 flag = "Plr";
             }
         }
@@ -195,6 +189,11 @@ public class MROSax extends DefaultHandler {
     }
 
     public MRO getMRO() {
+        return mro;
+    }
+
+    @Override
+    public MRO getResult() {
         return mro;
     }
 }
