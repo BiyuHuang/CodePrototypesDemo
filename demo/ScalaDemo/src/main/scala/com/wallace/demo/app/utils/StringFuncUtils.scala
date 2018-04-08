@@ -18,10 +18,41 @@ object StringFuncUtils extends Using {
   private val _maxParallelism: Int = Runtime.getRuntime.availableProcessors()
   private val _curParallelism: Int = Math.min(_maxParallelism, 5)
 
-  private val srcColumnsFields: Map[String, Int] = "time,key1,key2,lon,lat,mark,col1,col2,col3,col4,col5,col6".split(",", -1).map(_.trim).zipWithIndex.toMap
-  private val tgtColumnsFields: Array[String] = "time,key1,key2,mark,col1,lon,lat".split(",", -1)
 
-  def extractFields(src: String, defaultSep: String = ","): String = {
+  private val srcColumnsFields: Map[String, Int] = "time,key1,key2,lon,lat,mark,col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31,col32,col33,col34,col35,col36,col37,col38,col39,col40,col41,col42,col43,col44,col45,col46,col47,col48,col49,col50".split(",", -1).map(_.trim).zipWithIndex.toMap
+  private val tgtColumnsFields: Array[String] = "time,key1,key2,mark,col1,lon,lat,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31,col32,col33,col34,col35,col36,col37,col38,col39,col40,col41,col42,col43,col44,col45,col46,col47,col48,col49,col50".split(",", -1)
+  private val m_SrcColumnsFields: util.HashMap[String, Int] = new util.HashMap[String, Int]
+  m_SrcColumnsFields.putAll(srcColumnsFields.asJava)
+
+  private val m_TgtColumnsFields: util.ArrayList[String] = new util.ArrayList[String]()
+  tgtColumnsFields.foreach(m_TgtColumnsFields.add)
+
+
+  private val splitColumnsFields: Map[String, (String, Int)] = {
+    val temp: Array[String] = "col1 = extra_col1,extra_col2".split("=", -1).map(_.trim)
+    val keyWithIndex = temp.last.split(",").zipWithIndex
+    val value = temp.head
+
+    keyWithIndex.flatMap {
+      ki =>
+        Map(ki._1 -> (value, ki._2))
+    }.toMap
+  }
+  private val m_SplitColumnsFields: util.HashMap[String, (String, Int)] = new util.HashMap[String, (String, Int)]()
+  m_SplitColumnsFields.putAll(splitColumnsFields.asJava)
+
+  private val concatColumnsFields: Map[String, Array[String]] = {
+    val temp: Array[String] = "col1,col2 = concat_col1".split("=", -1).map(_.trim)
+    val key = temp.last
+    val value = temp.head.split(",")
+
+    Map(key -> value)
+  }
+
+  private val m_ConcatColumnsFields: util.HashMap[String, Array[String]] = new util.HashMap[String, Array[String]]()
+  m_ConcatColumnsFields.putAll(concatColumnsFields.asJava)
+
+  def extractFieldsJava(src: String, defaultSep: String = ","): String = {
     //TODO  1. 表头信息/索引
     //TODO  2. 输出信息/索引
     //TODO  3. 解析逻辑(包含索引、字段)
@@ -38,18 +69,66 @@ object StringFuncUtils extends Using {
       * OutPut: 2018-4-8 17:19:19,666666,1,true,1,109.01,32.34
       */
     val res: StringBuilder = new StringBuilder
-    val temp: Array[String] = src.split(defaultSep, -1)
+    val data: Array[String] = if (src.contains("\"")) src.split(defaultSep, -1) else splitString(src, ",", "\"")
+    val symbol: Int = m_TgtColumnsFields.size() - 1
+    val cachedData: util.HashMap[String, Array[String]] = new util.HashMap[String, Array[String]]()
+    tgtColumnsFields.indices.foreach {
+      i =>
+        val key = m_TgtColumnsFields.get(i)
+
+        if (m_SrcColumnsFields.containsKey(key)) {
+          res.append(data(m_SrcColumnsFields.get(key)))
+          if (i < symbol) res.append(",")
+        } else if (m_SplitColumnsFields.containsKey(key)) {
+          val keyWithIndex: (String, Int) = m_SplitColumnsFields.get(key)
+          if (!cachedData.containsKey(key)) {
+            cachedData.put(key, data(m_SrcColumnsFields.get(keyWithIndex._1)).split("$"))
+          }
+          res.append(cachedData.get(key)(keyWithIndex._2))
+          if (i < symbol) res.append(",")
+        } else if (m_ConcatColumnsFields.containsKey(key)) {
+          val tempData: Array[String] = m_ConcatColumnsFields.get(key).map(
+            k =>
+              data(m_SrcColumnsFields.get(k))
+          )
+          res.append(tempData.mkString("#"))
+          if (i < symbol) res.append(",")
+        }
+    }
+
+    cachedData.clear()
+    res.result()
+  }
+
+  def extractFieldsScala(src: String, defaultSep: String = ","): String = {
+    val res: StringBuilder = new StringBuilder
+    val data: Array[String] = if (src.contains("\"")) src.split(defaultSep, -1) else splitString(src, ",", "\"")
     val symbol: Int = tgtColumnsFields.length - 1
+    val cachedData: util.HashMap[String, Array[String]] = new util.HashMap[String, Array[String]]()
     tgtColumnsFields.indices.foreach {
       i =>
         val key = tgtColumnsFields(i)
         if (srcColumnsFields.contains(key)) {
-          res.append(temp(srcColumnsFields.get(key).head))
-          if (i < symbol) {
-            res.append(",")
+          res.append(data(srcColumnsFields.get(key).head))
+          if (i < symbol) res.append(",")
+        } else if (splitColumnsFields.contains(key)) {
+          val keyWithIndex: (String, Int) = splitColumnsFields.get(key).head
+          if (!cachedData.containsKey(key)) {
+            cachedData.put(key, data(m_SrcColumnsFields.get(keyWithIndex._1)).split("$"))
           }
+          res.append(cachedData.get(key)(keyWithIndex._2))
+          if (i < symbol) res.append(",")
+        } else if (concatColumnsFields.contains(key)) {
+          val tempData: Array[String] = concatColumnsFields.get(key).head.map(
+            k =>
+              data(m_SrcColumnsFields.get(k))
+          )
+          res.append(tempData.mkString("#"))
+          if (i < symbol) res.append(",")
         }
     }
+
+    cachedData.clear()
     res.result()
   }
 
