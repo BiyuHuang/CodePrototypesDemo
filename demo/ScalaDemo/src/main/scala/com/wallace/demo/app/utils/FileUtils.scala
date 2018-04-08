@@ -453,7 +453,7 @@ object FileUtils extends Using {
     }
   }
 
-  def readXMLFile(algPath: String): Map[_ <: String, AlgMetadata] = {
+  def readXMLConfigFile(algPath: String): Map[_ <: String, AlgMetadata] = {
     val pluginParentFile: File = new File(algPath)
     val adapters: Array[File] = if (pluginParentFile.exists()) {
       recursiveListFiles(pluginParentFile).filter(_.getName.endsWith(".xml"))

@@ -1,6 +1,6 @@
 package com.wallace.demo.app.utils
 
-import java.io.{BufferedReader, File, FileInputStream, InputStreamReader}
+import java.util
 
 import com.wallace.demo.app.common.Using
 import com.wallace.demo.app.utils.stringutils.StringUtils
@@ -8,7 +8,7 @@ import com.wallace.demo.app.utils.stringutils.StringUtils
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
-import scala.util.control.NonFatal
+import scala.util.Properties
 
 /**
   * Created by Wallace on 2017/1/11.
@@ -18,7 +18,10 @@ object StringFuncUtils extends Using {
   private val _maxParallelism: Int = Runtime.getRuntime.availableProcessors()
   private val _curParallelism: Int = Math.min(_maxParallelism, 5)
 
-  def convertStringFormat(src: String): String = {
+  private val srcColumnsFields: Map[String, Int] = "time,key1,key2,lon,lat,mark,col1,col2,col3,col4,col5,col6".split(",", -1).map(_.trim).zipWithIndex.toMap
+  private val tgtColumnsFields: Array[String] = "time,key1,key2,mark,col1,lon,lat".split(",", -1)
+
+  def extractFields(src: String, defaultSep: String = ","): String = {
     //TODO  1. 表头信息/索引
     //TODO  2. 输出信息/索引
     //TODO  3. 解析逻辑(包含索引、字段)
@@ -29,15 +32,25 @@ object StringFuncUtils extends Using {
     //TODO     单位转换(支持简单四则运算、求余、进制转换)  3人天
     //TODO     公共字段拼接(如文件名中的时间戳)
     //TODO     时间戳转换(*******???)
-
-    using(new BufferedReader(new InputStreamReader(new FileInputStream(new File(""))))){
-      br =>
-        while(br.ready()){
-          ???
+    /**
+      * Example
+      * InPut: 2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6
+      * OutPut: 2018-4-8 17:19:19,666666,1,true,1,109.01,32.34
+      */
+    val res: StringBuilder = new StringBuilder
+    val temp: Array[String] = src.split(defaultSep, -1)
+    val symbol: Int = tgtColumnsFields.length - 1
+    tgtColumnsFields.indices.foreach {
+      i =>
+        val key = tgtColumnsFields(i)
+        if (srcColumnsFields.contains(key)) {
+          res.append(temp(srcColumnsFields.get(key).head))
+          if (i < symbol) {
+            res.append(",")
+          }
         }
     }
-
-    ""
+    res.result()
   }
 
   def splitString(str: String, fieldSeparator: String, specialChar: String): Array[String] = {
@@ -92,7 +105,7 @@ object StringFuncUtils extends Using {
 
   def main(args: Array[String]): Unit = {
     val pool = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(_curParallelism))
-    util.Properties.setProp("scala.time", "true")
+    Properties.setProp("scala.time", "true")
     runtimeDuration({
       _uniqueIndex = updateUniqueIndex(_uniqueIndex)
       log.info(s"UniqueIndex: ${_uniqueIndex}")

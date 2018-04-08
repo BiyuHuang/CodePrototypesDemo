@@ -1,12 +1,11 @@
 package com.wallace.demo.app.utils
 
-import com.wallace.demo.app.common.LogSupport
-import org.scalatest.{FlatSpec, ShouldMatchers}
+import com.wallace.demo.app.UnitSpec
 
 /**
   * Created by Wallace on 2017/1/14.
   */
-class StringFuncUtilsUnitSpec extends FlatSpec with ShouldMatchers with LogSupport {
+class StringFuncUtilsUnitSpec extends UnitSpec {
 
   "Wallace Huang" should "test StringFuncUtils: empty elements" in {
     val str = ",,,"
@@ -106,5 +105,15 @@ class StringFuncUtilsUnitSpec extends FlatSpec with ShouldMatchers with LogSuppo
 
     res.contains("255.255.11.135") shouldBe true
     res.length shouldBe 2
+  }
+
+  "Wallace Huang" should "do unit test for: extractFields" in {
+    val res: String = StringFuncUtils.extractFields("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6")
+    val expect: String = "2018-4-8 17:19:19,666666,1,true,1,109.01,32.34"
+
+    runTimes = 1000000
+    val costTime: Double = runtimeDuration(StringFuncUtils.extractFields("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6"), runTimes)
+    log.info(s"[BenchmarkTest] Times: $runTimes, CostTime: $costTime ms, Rate(Records/sec): ${runTimes / (costTime / 1000)}")
+    res shouldBe expect
   }
 }
