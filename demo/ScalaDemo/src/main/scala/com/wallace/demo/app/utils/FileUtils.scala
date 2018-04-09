@@ -9,20 +9,19 @@ import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
 
 import com.typesafe.config.{Config, ConfigFactory}
-import javax.xml.parsers.{SAXParser, SAXParserFactory}
-import com.wallace.demo.app.common.Using
+import com.wallace.demo.app.common.{DataType, FieldsSep, Using}
 import com.wallace.demo.app.parsexml.{MROSax, SaxHandler}
+import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
 import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.utils.IOUtils
-import org.xml.sax.helpers.DefaultHandler
 
 import scala.collection.immutable
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
-import scala.xml.XML
+import scala.xml.{Node, NodeSeq, XML}
 
 object FileUtils extends Using {
 
@@ -423,13 +422,17 @@ object FileUtils extends Using {
     }
   }
 
-  case class AlgMetadata(algArgs: Config, className: String) {
-    private val args: String = Option(algArgs) match {
-      case Some(value) => value.toString
-      case None => "null"
-    }
+  case class AlgMetadata(algArgs: Config, className: String, parsersMetaData: ParserMetaData) {
+    override def toString: String = s"""AlgArgs: ${algArgs.toString}, ClassName: $className, ParsersMetaData: ${parsersMetaData.toString}"""
+  }
 
-    override def toString: String = s"""AlgArgs: $args, ClassName: $className"""
+  case class ParserMetaData(inputFields: String, outputFields: String, parsers: Array[Map[String, (String, String, Map[String, String])]]) {
+    def empty: ParserMetaData = ParserMetaData.apply("", "", Array.empty)
+
+    override def toString: String =
+      s"""|InputFields: $inputFields
+          |OutputFields: $outputFields
+          |Parsers: ${parsers.mkString("\n")}""".stripMargin
   }
 
   // TODO Recursive List Files
@@ -453,7 +456,18 @@ object FileUtils extends Using {
     }
   }
 
-  def readXMLConfigFile(algPath: String): Map[_ <: String, AlgMetadata] = {
+  private def getAttrValue(node: Node, key: String, defaultValue: String = ""): String = node.attribute(key) match {
+    case Some(res) => res.mkString.trim.toLowerCase
+    case None => defaultValue
+  }
+
+  private def getNodeSeqText(nodeSeq: NodeSeq, defaultValue: String = ""): String = nodeSeq.text match {
+    case v: String => v.trim
+    case _ => defaultValue
+  }
+
+
+  def readXMLConfigFile(algPath: String): Map[String, AlgMetadata] = {
     val pluginParentFile: File = new File(algPath)
     val adapters: Array[File] = if (pluginParentFile.exists()) {
       recursiveListFiles(pluginParentFile).filter(_.getName.endsWith(".xml"))
@@ -463,22 +477,43 @@ object FileUtils extends Using {
     if (adapters.isEmpty) {
       Map.empty
     } else {
-      val res = adapters.map {
+      val res: Array[immutable.Seq[(String, Config, immutable.Seq[(String, String, String, String,
+        Array[Map[String, (String, String, Map[String, String])]])])]] = adapters.map {
         f =>
           val algXml = XML.loadFile(f)
+          println(algXml \\ "_")
           (algXml \ "algorithm").map {
             rootNode =>
-              val pluginConfFileName = (rootNode \\ "@confPath").toString()
-              val algorithmArgs: Config = if (pluginConfFileName.trim.nonEmpty) load(pluginConfFileName) else null
-              val algorithmID = (rootNode \\ "@id").toString()
+              val pluginConfFileName: String = getAttrValue(rootNode, "confPath")
+              val algorithmArgs: Config = if (pluginConfFileName.nonEmpty) load(pluginConfFileName) else ConfigFactory.empty()
+              val dataType: String = getAttrValue(rootNode, "dataType", DataType.DEFAULT_TYPE)
+              val fieldsSep: String = getAttrValue(rootNode, "fieldSeparator", FieldsSep.DEFAULT_SEP)
+              val algorithmID = getAttrValue(rootNode, "id")
+              assert(algorithmID.nonEmpty, "algorithmID must be nonEmpty.")
               println(algorithmID + ", " + pluginConfFileName)
               val algorithmInfo = (rootNode \ "algorithminfo").map {
                 treeNode =>
-                  val className = (treeNode \ "className").text
-                  val target = (treeNode \\ "@target").toString()
-                  val regionID = (treeNode \\ "@regionid").toString()
-                  val algorithmKey = if (regionID.nonEmpty) target + "_" + regionID else target
-                  (algorithmKey, className)
+                  val className: String = getNodeSeqText(treeNode \ "className")
+                  val target: String = getAttrValue(treeNode, "target")
+                  val regionID: String = getAttrValue(treeNode, "regionid")
+                  val algorithmKey: String = if (regionID.nonEmpty) target + "_" + regionID else target
+
+                  val inputFields: String = getNodeSeqText(treeNode \ "inputFields")
+                  val outputFields: String = getNodeSeqText(treeNode \ "outputFields")
+                  val fieldsProcess: Array[Map[String, (String, String, Map[String, String])]] = (treeNode \ "fieldsProcess" \ "process").map {
+                    procNode =>
+                      val method: String = getAttrValue(procNode, "method")
+                      val pInputFields: String = getNodeSeqText(procNode \ "inputFields")
+                      val pOutputFields: String = getNodeSeqText(procNode \ "outFields")
+                      val conf: Map[String, String] = (procNode \ "conf").flatMap {
+                        itemNode =>
+                          val key = getAttrValue(itemNode, "name")
+                          val value = getNodeSeqText(itemNode \ "item")
+                          Map(key -> value)
+                      }.toMap
+                      Map(method -> (pInputFields, pOutputFields, conf))
+                  }.toArray
+                  (algorithmKey, className, inputFields, outputFields, fieldsProcess)
               }
               (algorithmID, algorithmArgs, algorithmInfo)
           }
@@ -489,7 +524,7 @@ object FileUtils extends Using {
             adaptor =>
               adaptor._3.map {
                 algInfo =>
-                  (algInfo._1, AlgMetadata(adaptor._2, algInfo._2))
+                  (algInfo._1, AlgMetadata(adaptor._2, algInfo._2, ParserMetaData(algInfo._3, algInfo._4, algInfo._5)))
               }
           }
       }.toMap
