@@ -112,18 +112,18 @@ class StringFuncUtilsUnitSpec extends UnitSpec {
     val res1: String = StringFuncUtils.extractFieldsScala("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50")
     val expect: String = "2018-4-8 17:19:19,666666,1,true,1,109.01,32.34,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"
 
-    runTimes = 1000
+    runTimes = 10000
     val costTime1: Double = runtimeDuration(StringFuncUtils.extractFieldsJava("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"), runTimes)
     val costTime2: Double = runtimeDuration(StringFuncUtils.extractFieldsJava("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"), runTimes)
     val costTime3: Double = runtimeDuration(StringFuncUtils.extractFieldsScala("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"), runTimes)
     val costTime4: Double = runtimeDuration(StringFuncUtils.extractFieldsScala("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"), runTimes)
     val costTime5: Double = runtimeDuration(StringFuncUtils.extractFieldsJava("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"), runTimes)
     val costTime6: Double = runtimeDuration(StringFuncUtils.extractFieldsScala("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"), runTimes)
-    log.info(s"[BenchmarkTest ### extractFieldsJava] Times: $runTimes, CostTime: $costTime1 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime1 / 1000.0)}")
-    log.info(s"[BenchmarkTest ### extractFieldsJava] Times: $runTimes, CostTime: $costTime2 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime2 / 1000.0)}")
+    log.info(s"[BenchmarkTest ### extractFieldsJava ] Times: $runTimes, CostTime: $costTime1 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime1 / 1000.0)}")
+    log.info(s"[BenchmarkTest ### extractFieldsJava ] Times: $runTimes, CostTime: $costTime2 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime2 / 1000.0)}")
     log.info(s"[BenchmarkTest ### extractFieldsScala] Times: $runTimes, CostTime: $costTime3 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime3 / 1000.0)}")
     log.info(s"[BenchmarkTest ### extractFieldsScala] Times: $runTimes, CostTime: $costTime4 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime4 / 1000.0)}")
-    log.info(s"[BenchmarkTest ### extractFieldsJava] Times: $runTimes, CostTime: $costTime5 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime5 / 1000.0)}")
+    log.info(s"[BenchmarkTest ### extractFieldsJava ] Times: $runTimes, CostTime: $costTime5 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime5 / 1000.0)}")
     log.info(s"[BenchmarkTest ### extractFieldsScala] Times: $runTimes, CostTime: $costTime6 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime6 / 1000.0)}")
 
     res0 shouldBe expect
