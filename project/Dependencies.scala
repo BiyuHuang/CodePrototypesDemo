@@ -12,7 +12,8 @@ object Dependencies {
     "com.typesafe.akka" % "akka-actor_2.11" % "2.5.3",
     "org.apache.commons" % "commons-compress" % "1.15",
     "com.github.pathikrit" %% "better-files" % "3.4.0",
-    "com.github.pathikrit" %% "better-files-akka" % "3.4.0"
+    "com.github.pathikrit" %% "better-files-akka" % "3.4.0",
+    "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0"
   )
   val hdfsDependencies: Seq[ModuleID] = Seq(
     "org.apache.hadoop" % "hadoop-common" % "2.7.2",
