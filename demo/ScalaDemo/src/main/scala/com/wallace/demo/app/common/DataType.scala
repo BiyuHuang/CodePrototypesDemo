@@ -11,4 +11,5 @@ object DataType {
 
 object FieldsSep {
   val DEFAULT_SEP: String = ","
+  val DEFAULT_CONCAT_SEP: String = "$"
 }

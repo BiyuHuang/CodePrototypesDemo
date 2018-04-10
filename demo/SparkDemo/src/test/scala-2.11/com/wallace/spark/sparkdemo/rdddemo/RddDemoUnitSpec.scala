@@ -8,6 +8,6 @@ import com.wallace.common.UnitSpecTrait
   */
 class RddDemoUnitSpec extends UnitSpecTrait {
   runTest("unit test for readTextFile") {
-    RddDemo.readTextFile(RddDemo.path)
+    RddDemo.readTextFile(filePath = RddDemo.path)
   }
 }

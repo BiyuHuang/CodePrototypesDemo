@@ -322,10 +322,6 @@ object FileUtils extends Using {
     }
   }
 
-  def readMultiZipArchiveFile(fileName: String): Unit = {
-
-  }
-
   private def readZipArchiveFile(fileName: String): Unit = {
     import java.util.zip.ZipFile
     val f = new ZipFile(fileName)
@@ -452,14 +448,6 @@ object FileUtils extends Using {
   private def getNodeSeqText(nodeSeq: NodeSeq, defaultValue: String = ""): String = nodeSeq.text match {
     case v: String => v.trim
     case _ => defaultValue
-  }
-
-  def generateParsers(targetKey: String, xmlConfig: Map[String, AlgMetaData]): Unit = {
-    if (xmlConfig.contains(targetKey)) {
-      val algMetaData: AlgMetaData = xmlConfig(targetKey)
-      algMetaData.parsersMetaData
-
-    }
   }
 
   def readXMLConfigFile(algPath: String): Map[String, AlgMetaData] = {

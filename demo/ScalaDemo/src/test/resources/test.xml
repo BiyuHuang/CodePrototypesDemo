@@ -27,7 +27,9 @@
                 <process method="concat">
                     <inputFields>a,b,c</inputFields>
                     <outputFields>d</outputFields>
-                    <conf></conf>
+                    <conf>
+                        <item name="separator">$</item>
+                    </conf>
                 </process>
                 <process method="subString">
                     <inputFields>e</inputFields>
@@ -47,7 +49,7 @@
                 </process>
                 <process method="split">
                     <inputFields>g</inputFields>
-                    <outputFields>g</outputFields>
+                    <outputFields></outputFields>
                     <conf>
                         <item name="separator">,</item>
                     </conf>

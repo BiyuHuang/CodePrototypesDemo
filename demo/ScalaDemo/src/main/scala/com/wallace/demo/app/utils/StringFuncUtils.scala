@@ -109,17 +109,17 @@ object StringFuncUtils extends Using {
       i =>
         val key = tgtColumnsFields(i)
         if (srcColumnsFields.contains(key)) {
-          res.append(data(srcColumnsFields.get(key).head))
+          res.append(data(srcColumnsFields(key)))
           if (i < symbol) res.append(",")
         } else if (splitColumnsFields.contains(key)) {
-          val keyWithIndex: (String, Int) = splitColumnsFields.get(key).head
+          val keyWithIndex: (String, Int) = splitColumnsFields(key)
           if (!cachedData.containsKey(key)) {
-            cachedData.put(key, data(m_SrcColumnsFields.get(keyWithIndex._1)).split("$"))
+            cachedData.put(key, data(m_SrcColumnsFields.getOrDefault(keyWithIndex._1, keyWithIndex._2)).split("$"))
           }
           res.append(cachedData.get(key)(keyWithIndex._2))
           if (i < symbol) res.append(",")
         } else if (concatColumnsFields.contains(key)) {
-          val tempData: Array[String] = concatColumnsFields.get(key).head.map(
+          val tempData: Array[String] = concatColumnsFields(key).map(
             k =>
               data(m_SrcColumnsFields.get(k))
           )
