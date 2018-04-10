@@ -19,50 +19,50 @@
     </algorithm>
 
     <algorithm id="test3" confPath="test3.conf" dataType="structured " fieldSeparator=",">
-        <algorithminfo target="t5" regionid="100005">
+        <algorithminfo target="t5" regionid="1000005">
             <className>com.wallace.demo5</className>
-            <inputFields></inputFields>
-            <outputFields>有表头的填字段名，没表头的填原始数据的index</outputFields>
+            <inputFields>A,B,C,D,E,F,G,H,I,J</inputFields>
+            <outputFields>D,E,F,G,H,I,J,K</outputFields>
             <fieldsProcess>
                 <process method="concat">
-                    <inputFields>a b c</inputFields>
+                    <inputFields>a,b,c</inputFields>
                     <outputFields>d</outputFields>
                     <conf></conf>
                 </process>
                 <process method="subString">
-                    <inputFields></inputFields>
-                    <outputFields></outputFields>
+                    <inputFields>e</inputFields>
+                    <outputFields>e</outputFields>
                     <conf>
-                        <item name="startIndex"></item>
-                        <item name="endIndex"></item>
+                        <item name="startIndex">1</item>
+                        <item name="endIndex">10</item>
                     </conf>
                 </process>
                 <process method="replaceString">
-                    <inputFields></inputFields>
-                    <outputFields></outputFields>
+                    <inputFields>f</inputFields>
+                    <outputFields>f</outputFields>
                     <conf>
                         <item name="source">,</item>
                         <item name="target">$</item>
                     </conf>
                 </process>
                 <process method="split">
-                    <inputFields></inputFields>
-                    <outputFields></outputFields>
+                    <inputFields>g</inputFields>
+                    <outputFields>g</outputFields>
                     <conf>
                         <item name="separator">,</item>
                     </conf>
                 </process>
                 <process method="addTimestamp">
                     <inputFields></inputFields>
-                    <outputFields></outputFields>
+                    <outputFields>k</outputFields>
                     <conf>
                         <item name="index">1</item>
                         <item name="length">14</item>
                     </conf>
                 </process>
                 <process method="compute">
-                    <inputFields></inputFields>
-                    <outputFields></outputFields>
+                    <inputFields>j</inputFields>
+                    <outputFields>j</outputFields>
                     <conf>
                         <item name="inputSystem">H</item>
                         <item name="outputSystem">D</item>

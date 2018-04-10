@@ -9,7 +9,7 @@ import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
 
 import com.typesafe.config.{Config, ConfigFactory}
-import com.wallace.demo.app.common.{DataType, FieldsSep, Using}
+import com.wallace.demo.app.common._
 import com.wallace.demo.app.parsexml.{MROSax, SaxHandler}
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
@@ -422,18 +422,6 @@ object FileUtils extends Using {
     }
   }
 
-  case class AlgMetadata(algArgs: Config, className: String, parsersMetaData: ParserMetaData) {
-    override def toString: String = s"""AlgArgs: ${algArgs.toString}, ClassName: $className, ParsersMetaData: ${parsersMetaData.toString}"""
-  }
-
-  case class ParserMetaData(inputFields: String, outputFields: String, parsers: Array[Map[String, (String, String, Map[String, String])]]) {
-    def empty: ParserMetaData = ParserMetaData.apply("", "", Array.empty)
-
-    override def toString: String =
-      s"""|InputFields: $inputFields
-          |OutputFields: $outputFields
-          |Parsers: ${parsers.mkString("\n")}""".stripMargin
-  }
 
   // TODO Recursive List Files
   def recursiveListFiles(rootFile: File): Array[File] = {
@@ -466,8 +454,15 @@ object FileUtils extends Using {
     case _ => defaultValue
   }
 
+  def generateParsers(targetKey: String, xmlConfig: Map[String, AlgMetaData]): Unit = {
+    if (xmlConfig.contains(targetKey)) {
+      val algMetaData: AlgMetaData = xmlConfig(targetKey)
+      algMetaData.parsersMetaData
 
-  def readXMLConfigFile(algPath: String): Map[String, AlgMetadata] = {
+    }
+  }
+
+  def readXMLConfigFile(algPath: String): Map[String, AlgMetaData] = {
     val pluginParentFile: File = new File(algPath)
     val adapters: Array[File] = if (pluginParentFile.exists()) {
       recursiveListFiles(pluginParentFile).filter(_.getName.endsWith(".xml"))
@@ -477,54 +472,52 @@ object FileUtils extends Using {
     if (adapters.isEmpty) {
       Map.empty
     } else {
-      val res: Array[immutable.Seq[(String, Config, immutable.Seq[(String, String, String, String,
-        Array[Map[String, (String, String, Map[String, String])]])])]] = adapters.map {
+      val res: Array[immutable.Seq[(String, Config, String, String,
+        immutable.Seq[(String, String, String, String, Map[String, MethodMetaData])])]] = adapters.map {
         f =>
           val algXml = XML.loadFile(f)
-          println(algXml \\ "_")
           (algXml \ "algorithm").map {
             rootNode =>
               val pluginConfFileName: String = getAttrValue(rootNode, "confPath")
               val algorithmArgs: Config = if (pluginConfFileName.nonEmpty) load(pluginConfFileName) else ConfigFactory.empty()
-              val dataType: String = getAttrValue(rootNode, "dataType", DataType.DEFAULT_TYPE)
-              val fieldsSep: String = getAttrValue(rootNode, "fieldSeparator", FieldsSep.DEFAULT_SEP)
+              val dataType: String = getAttrValue(rootNode, "dataType")
+              val fieldsSep: String = getAttrValue(rootNode, "fieldSeparator")
               val algorithmID = getAttrValue(rootNode, "id")
               assert(algorithmID.nonEmpty, "algorithmID must be nonEmpty.")
-              println(algorithmID + ", " + pluginConfFileName)
-              val algorithmInfo = (rootNode \ "algorithminfo").map {
+              val algorithmInfo: immutable.Seq[(String, String, String, String,
+                Map[String, MethodMetaData])] = (rootNode \ "algorithminfo").map {
                 treeNode =>
                   val className: String = getNodeSeqText(treeNode \ "className")
                   val target: String = getAttrValue(treeNode, "target")
                   val regionID: String = getAttrValue(treeNode, "regionid")
                   val algorithmKey: String = if (regionID.nonEmpty) target + "_" + regionID else target
-
                   val inputFields: String = getNodeSeqText(treeNode \ "inputFields")
                   val outputFields: String = getNodeSeqText(treeNode \ "outputFields")
-                  val fieldsProcess: Array[Map[String, (String, String, Map[String, String])]] = (treeNode \ "fieldsProcess" \ "process").map {
+                  val parsersInfo: Map[String, MethodMetaData] = (treeNode \ "fieldsProcess" \ "process").flatMap {
                     procNode =>
                       val method: String = getAttrValue(procNode, "method")
                       val pInputFields: String = getNodeSeqText(procNode \ "inputFields")
-                      val pOutputFields: String = getNodeSeqText(procNode \ "outFields")
-                      val conf: Map[String, String] = (procNode \ "conf").flatMap {
-                        itemNode =>
-                          val key = getAttrValue(itemNode, "name")
-                          val value = getNodeSeqText(itemNode \ "item")
+                      val pOutputFields: String = getNodeSeqText(procNode \ "outputFields")
+                      val conf: Map[String, String] = (procNode \ "conf" \ "item").flatMap {
+                        iNode =>
+                          val key = getAttrValue(iNode, "name")
+                          val value = getNodeSeqText(iNode)
                           Map(key -> value)
                       }.toMap
-                      Map(method -> (pInputFields, pOutputFields, conf))
-                  }.toArray
-                  (algorithmKey, className, inputFields, outputFields, fieldsProcess)
+                      Map(method -> MethodMetaData(pInputFields, pOutputFields, conf))
+                  }.toMap
+                  (algorithmKey, className, inputFields, outputFields, parsersInfo)
               }
-              (algorithmID, algorithmArgs, algorithmInfo)
+              (algorithmID, algorithmArgs, dataType, fieldsSep, algorithmInfo)
           }
       }
       res.flatMap {
         algID =>
           algID.flatMap {
             adaptor =>
-              adaptor._3.map {
+              adaptor._5.map {
                 algInfo =>
-                  (algInfo._1, AlgMetadata(adaptor._2, algInfo._2, ParserMetaData(algInfo._3, algInfo._4, algInfo._5)))
+                  (algInfo._1, AlgMetaData(adaptor._2, algInfo._2, ParserMetaData(adaptor._3, adaptor._4, algInfo._3, algInfo._4, algInfo._5)))
               }
           }
       }.toMap
@@ -539,7 +532,9 @@ object FileUtils extends Using {
         if (file.delete()) {
           delState = true
         } else {
-          log.error(s"Failed to delete ${file.getCanonicalPath}.")
+          log.error(s"Failed to delete ${
+            file.getCanonicalPath
+          }.")
           delState = false
         }
       } else {
@@ -547,16 +542,22 @@ object FileUtils extends Using {
           if (file.delete()) {
             delState = true
           } else {
-            log.error(s"Failed to delete ${file.getCanonicalPath}.")
+            log.error(s"Failed to delete ${
+              file.getCanonicalPath
+            }.")
             delState = false
           }
         } else {
-          log.warn(s"Failed to set executable for ${file.getName}")
+          log.warn(s"Failed to set executable for ${
+            file.getName
+          }")
           file.deleteOnExit()
         }
       }
     } else {
-      log.warn(s"${file.getName} doesn't exist or has no execute permission.")
+      log.warn(s"${
+        file.getName
+      } doesn't exist or has no execute permission.")
     }
     delState
   }
@@ -576,7 +577,9 @@ object FileUtils extends Using {
             }
         }
       } else {
-        log.debug(s"${rootFile.getName} is an empty directory, just delete it.")
+        log.debug(s"${
+          rootFile.getName
+        } is an empty directory, just delete it.")
       }
       delState = deleteFile(rootFile)
     } else {
