@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adapter>
+    <algorithm id="test1" confPath="udf_test.conf">
+        <algorithminfo target="t1" regionid="1000001">
+            <className>com.walla.demo1</className>
+        </algorithminfo>
+        <algorithminfo target="t2" regionid="1000002">
+            <className>com.wallace.demo2</className>
+        </algorithminfo>
+    </algorithm>
+
+    <algorithm id="test2">
+        <algorithminfo target="t3" regionid="1000003">
+            <className>com.wallace.demo3</className>
+        </algorithminfo>
+        <algorithminfo target="t4" regionid="1000004">
+            <className>com.wallace.demo4</className>
+        </algorithminfo>
+    </algorithm>
+
+    <algorithm id="test3" confPath="test3.conf" dataType="structured " fieldSeparator=",">
+        <algorithminfo target="t5" regionid="100005">
+            <className>com.wallace.demo5</className>
+            <inputFields></inputFields>
+            <outputFields>有表头的填字段名，没表头的填原始数据的index</outputFields>
+            <fieldsProcess>
+                <process method="concat">
+                    <inputFields>a b c</inputFields>
+                    <outputFields>d</outputFields>
+                    <conf></conf>
+                </process>
+                <process method="subString">
+                    <inputFields></inputFields>
+                    <outputFields></outputFields>
+                    <conf>
+                        <item name="startIndex"></item>
+                        <item name="endIndex"></item>
+                    </conf>
+                </process>
+                <process method="replaceString">
+                    <inputFields></inputFields>
+                    <outputFields></outputFields>
+                    <conf>
+                        <item name="source">,</item>
+                        <item name="target">$</item>
+                    </conf>
+                </process>
+                <process method="split">
+                    <inputFields></inputFields>
+                    <outputFields></outputFields>
+                    <conf>
+                        <item name="separator">,</item>
+                    </conf>
+                </process>
+                <process method="addTimestamp">
+                    <inputFields></inputFields>
+                    <outputFields></outputFields>
+                    <conf>
+                        <item name="index">1</item>
+                        <item name="length">14</item>
+                    </conf>
+                </process>
+                <process method="compute">
+                    <inputFields></inputFields>
+                    <outputFields></outputFields>
+                    <conf>
+                        <item name="inputSystem">H</item>
+                        <item name="outputSystem">D</item>
+                        <item name="operator">+</item>
+                        <item name="operand">5</item>
+                    </conf>
+                </process>
+            </fieldsProcess>
+        </algorithminfo>
+    </algorithm>
+
+</adapter>
