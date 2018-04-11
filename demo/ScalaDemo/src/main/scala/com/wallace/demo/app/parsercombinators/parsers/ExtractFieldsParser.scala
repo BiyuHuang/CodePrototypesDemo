@@ -11,9 +11,10 @@ class ExtractFieldsParser extends Parser {
 
   override def parse(record: Array[String]): Array[String] = ???
 
-  object Builder extends super.Builder {
+  class Builder extends super.Builder {
     override def build: Parser = {
-
+      ???
     }
   }
+
 }
