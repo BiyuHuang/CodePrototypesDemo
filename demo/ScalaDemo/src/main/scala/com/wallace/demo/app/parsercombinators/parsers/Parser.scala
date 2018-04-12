@@ -3,7 +3,7 @@ package com.wallace.demo.app.parsercombinators.parsers
 /**
   * Created by 10192057 on 2018/4/11 0011.
   */
-trait Parser {
+trait Parser extends Configurable {
   /**
     * Any initialization / startup needed by the Parser.
     */

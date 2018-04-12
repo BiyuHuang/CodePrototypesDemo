@@ -7,7 +7,7 @@ import com.wallace.demo.app.common.ParserType
 /**
   * Created by 10192057 on 2018/4/11 0011.
   */
-object ParserBuilderFactory {
+object ParserBuilderFactory extends Configurable {
 
   private def lookUp(name: String): Option[Class[_ <: Parser]] = try {
     Option(ParserType.valueOf(name.toUpperCase(Locale.ENGLISH)).getBuilderClass)
@@ -22,5 +22,9 @@ object ParserBuilderFactory {
     } else {
       Class.forName(name).asInstanceOf[Parser]
     }
+  }
+
+  override def configure(context: Context): Unit = {
+
   }
 }
