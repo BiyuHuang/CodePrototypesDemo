@@ -68,68 +68,63 @@ object StringFuncUtils extends Using {
       * InPut: 2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6
       * OutPut: 2018-4-8 17:19:19,666666,1,true,1,109.01,32.34
       */
-    val res: StringBuilder = new StringBuilder
+    val res = new StringBuilder
+    val len = tgtColumnsFields.length - 1
     val data: Array[String] = if (src.contains("\"")) src.split(defaultSep, -1) else splitString(src, ",", "\"")
-    val symbol: Int = m_TgtColumnsFields.size() - 1
     val cachedData: util.HashMap[String, Array[String]] = new util.HashMap[String, Array[String]]()
     tgtColumnsFields.indices.foreach {
       i =>
-        val key = m_TgtColumnsFields.get(i)
-
-        if (m_SrcColumnsFields.containsKey(key)) {
-          res.append(data(m_SrcColumnsFields.get(key)))
-          if (i < symbol) res.append(",")
-        } else if (m_SplitColumnsFields.containsKey(key)) {
+        val key = tgtColumnsFields(i)
+        val value: String = if (m_SplitColumnsFields.containsKey(key)) {
           val keyWithIndex: (String, Int) = m_SplitColumnsFields.get(key)
           if (!cachedData.containsKey(key)) {
             cachedData.put(key, data(m_SrcColumnsFields.get(keyWithIndex._1)).split("$"))
           }
-          res.append(cachedData.get(key)(keyWithIndex._2))
-          if (i < symbol) res.append(",")
+          cachedData.get(key)(keyWithIndex._2)
         } else if (m_ConcatColumnsFields.containsKey(key)) {
           val tempData: Array[String] = m_ConcatColumnsFields.get(key).map(
             k =>
               data(m_SrcColumnsFields.get(k))
           )
-          res.append(tempData.mkString("#"))
-          if (i < symbol) res.append(",")
+          tempData.mkString("#")
+        } else {
+          data(m_SrcColumnsFields.get(key))
         }
+        if (i < len) res.append(value).append(",") else res.append(value)
     }
 
     cachedData.clear()
-    res.result()
+    res.toString()
   }
 
   def extractFieldsScala(src: String, defaultSep: String = ","): String = {
-    val res: StringBuilder = new StringBuilder
+    val res = new StringBuilder
+    val len = tgtColumnsFields.length - 1
     val data: Array[String] = if (src.contains("\"")) src.split(defaultSep, -1) else splitString(src, ",", "\"")
-    val symbol: Int = tgtColumnsFields.length - 1
     val cachedData: util.HashMap[String, Array[String]] = new util.HashMap[String, Array[String]]()
     tgtColumnsFields.indices.foreach {
       i =>
         val key = tgtColumnsFields(i)
-        if (srcColumnsFields.contains(key)) {
-          res.append(data(srcColumnsFields(key)))
-          if (i < symbol) res.append(",")
-        } else if (splitColumnsFields.contains(key)) {
+        val value: String = if (splitColumnsFields.contains(key)) {
           val keyWithIndex: (String, Int) = splitColumnsFields(key)
           if (!cachedData.containsKey(key)) {
             cachedData.put(key, data(m_SrcColumnsFields.getOrDefault(keyWithIndex._1, keyWithIndex._2)).split("$"))
           }
-          res.append(cachedData.get(key)(keyWithIndex._2))
-          if (i < symbol) res.append(",")
+          cachedData.get(key)(keyWithIndex._2)
         } else if (concatColumnsFields.contains(key)) {
           val tempData: Array[String] = concatColumnsFields(key).map(
             k =>
               data(m_SrcColumnsFields.get(k))
           )
-          res.append(tempData.mkString("#"))
-          if (i < symbol) res.append(",")
+          tempData.mkString("#")
+        } else {
+          data(srcColumnsFields(key))
         }
+        if (i < len) res.append(value).append(",") else res.append(value)
     }
 
     cachedData.clear()
-    res.result()
+    res.toString()
   }
 
   def splitString(str: String, fieldSeparator: String, specialChar: String): Array[String] = {

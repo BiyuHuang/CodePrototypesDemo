@@ -3,7 +3,7 @@ package com.wallace.demo.app.parsercombinators.parsers
 /**
   * Created by 10192057 on 2018/4/11 0011.
   */
-trait Parser extends Configurable {
+trait AbstractParser extends Configurable {
   /**
     * Any initialization / startup needed by the Parser.
     */
@@ -17,9 +17,5 @@ trait Parser extends Configurable {
     *         is to be dropped (i.e. filtered out).
     */
   def parse(record: Array[String]): String
-
-  //  trait Builder {
-  //    def build: Parser
-  //  }
 
 }

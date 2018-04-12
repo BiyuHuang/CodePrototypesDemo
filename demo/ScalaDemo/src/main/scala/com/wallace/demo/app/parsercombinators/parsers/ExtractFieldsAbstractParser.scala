@@ -8,7 +8,7 @@ import scala.collection.mutable
 /**
   * Created by 10192057 on 2018/4/11 0011.
   */
-class ExtractFieldsParser extends Parser {
+class ExtractFieldsAbstractParser extends AbstractParser {
   private val srcColumnsFields: mutable.Map[String, Int] = mutable.Map.empty
   private val tgtColumnsFields: mutable.Map[String, Int] = mutable.Map.empty
   private val m_SrcColumnsFields: util.HashMap[String, Int] = new util.HashMap[String, Int]
@@ -25,7 +25,7 @@ class ExtractFieldsParser extends Parser {
     ""
   }
 
-  override def configure(context: Context): Unit = {
+  override def configure(context: MethodContext): Unit = {
 
   }
 }
