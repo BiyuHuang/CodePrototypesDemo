@@ -2,9 +2,6 @@ package com.wallace.demo.app.parsercombinators.parsers
 
 import java.util
 
-import scala.collection.JavaConverters._
-import scala.util.Try
-
 /**
   * Created by 10192057 on 2018/4/11 0011.
   */
