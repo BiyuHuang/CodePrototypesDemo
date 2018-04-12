@@ -9,18 +9,18 @@ import com.wallace.demo.app.common.ParserType
   */
 object ParserBuilderFactory {
 
-  private def lookUp(name: String): Option[Class[_ <: Builder]] = try {
+  private def lookUp(name: String): Option[Class[_ <: Parser]] = try {
     Option(ParserType.valueOf(name.toUpperCase(Locale.ENGLISH)).getBuilderClass)
   } catch {
     case _: IllegalArgumentException => None
   }
 
-  def newInstance(name: String): Builder = {
-    val clazz: Option[Class[_ <: Builder]] = lookUp(name)
+  def newInstance(name: String): Parser = {
+    val clazz: Option[Class[_ <: Parser]] = lookUp(name)
     if (clazz.isDefined) {
       clazz.get.newInstance()
     } else {
-      Class.forName(name).asInstanceOf[Builder]
+      Class.forName(name).asInstanceOf[Parser]
     }
   }
 }

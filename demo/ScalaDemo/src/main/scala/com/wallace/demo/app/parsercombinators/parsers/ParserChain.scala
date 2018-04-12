@@ -17,13 +17,20 @@ class ParserChain(parsers: Array[Parser]) extends Parser {
     }
   }
 
-  override def parse(record: Array[String]): Array[String] = {
+  override def parse(record: Array[String]): String = {
     //TODO 接口需重新定义
-    var res: Array[String] = Array.empty
+    val res = new StringBuilder
+
+    record.indices.foreach {
+      i =>
+
+        parse(record)
+
+    }
     parsers.foreach {
       parser =>
-        res = parser.parse(record)
+        res.append(parser.parse(record))
     }
-    res
+    res.result()
   }
 }

@@ -16,10 +16,10 @@ trait Parser {
     * @return single numeric field, or { @code null} if the numeric field
     *         is to be dropped (i.e. filtered out).
     */
-  def parse(record: Array[String]): Array[String]
+  def parse(record: Array[String]): String
 
-  trait Builder {
-    def build: Parser
-  }
+  //  trait Builder {
+  //    def build: Parser
+  //  }
 
 }

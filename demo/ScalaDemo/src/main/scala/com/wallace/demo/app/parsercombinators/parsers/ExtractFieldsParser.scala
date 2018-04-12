@@ -9,12 +9,7 @@ class ExtractFieldsParser extends Parser {
 
   }
 
-  override def parse(record: Array[String]): Array[String] = ???
+  override def parse(record: Array[String]): String = ???
 
-  class Builder extends super.Builder {
-    override def build: Parser = {
-      ???
-    }
-  }
 
 }

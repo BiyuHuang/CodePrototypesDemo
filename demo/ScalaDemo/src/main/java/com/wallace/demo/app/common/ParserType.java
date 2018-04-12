@@ -7,17 +7,17 @@ import com.wallace.demo.app.parsercombinators.parsers.Parser;
  */
 public enum ParserType {
 
-    EXTRACT_FIELDS(com.wallace.demo.app.parsercombinators.parsers.ExtractFieldsParser.Builder.class)
+    EXTRACT_FIELDS(com.wallace.demo.app.parsercombinators.parsers.ExtractFieldsParser.class)
     //,SEARCH_REPLACE();
     ;
 
-    private final Class<? extends Parser.Builder> builderClass;
+    private final Class<? extends Parser> builderClass;
 
-    ParserType(Class<? extends Parser.Builder> builderClass) {
+    ParserType(Class<? extends Parser> builderClass) {
         this.builderClass = builderClass;
     }
 
-    public Class<? extends Parser.Builder> getBuilderClass() {
+    public Class<? extends Parser> getBuilderClass() {
         return builderClass;
     }
 }
