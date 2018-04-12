@@ -16,6 +16,6 @@ trait AbstractParser extends Configurable {
     * @return single numeric field, or { @code null} if the numeric field
     *         is to be dropped (i.e. filtered out).
     */
-  def parse(record: Array[String]): String
+  def parse(record: Array[String], filed: FieldInfo): String
 
 }

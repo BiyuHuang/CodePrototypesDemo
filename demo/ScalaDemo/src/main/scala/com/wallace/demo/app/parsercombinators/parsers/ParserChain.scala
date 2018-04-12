@@ -24,19 +24,19 @@ class ParserChain(rawDataMetaData: RawDataMetaData, parsers: util.HashMap[String
     }
   }
 
-  override def parse(record: Array[String]): String = {
+  override def parse(record: Array[String], fieldInfo: FieldInfo = FieldInfo("", -1, MethodKeyType.default)): String = {
     //TODO 接口需重新定义
     val res: StringBuilder = new StringBuilder
     m_TgtColumnsFields.indices.foreach {
       i =>
-        val field = m_TgtColumnsFields(i)
-        val value = parsers.get(field.methodKey).parse(record)
+        val field: FieldInfo = m_TgtColumnsFields(i)
+        val value = parsers.get(field.methodKey).parse(record, field)
         if (i < symbol) res.append(value).append(rawDataMetaData.fieldsSep) else res.append(value)
     }
     res.toString()
   }
 
-  override def configure(context: MethodContext): Unit = {
+  override def configure(context: MethodContext, m_SrcColumnsFields: util.HashMap[String, Int]): Unit = {
     //no-op
   }
 }

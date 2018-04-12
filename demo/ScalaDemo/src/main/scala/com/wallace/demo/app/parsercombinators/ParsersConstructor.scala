@@ -17,12 +17,11 @@ case class ParserExecuteInfo(rawDataMetaData: RawDataMetaData,
                              m_ConcatColumnsFields: util.HashMap[String, (Array[String], String)])
 
 class ParsersConstructor(parsersConfig: Map[String, AlgMetaData]) extends Using {
-  private val m_Parsers: util.HashMap[String, AbstractParser] = new util.HashMap[String, AbstractParser]()
-
   def generateParsers(): Map[String, ParserChain] = parsersConfig.map {
     parsersConf =>
+      val m_Parsers: util.HashMap[String, AbstractParser] = new util.HashMap[String, AbstractParser]()
       val m_SrcColumnsFields: util.HashMap[String, Int] = new util.HashMap[String, Int]()
-      val targetKey = parsersConf._1
+      val targetKey: String = parsersConf._1
       val parserMetaData: ParserMetaData = parsersConf._2.parsersMetaData
       val parsers: Map[String, MethodMetaData] = parserMetaData.parsers
       val srcColumnsFields: Map[String, Int] = Try(parserMetaData.inputFields.split(",", -1).map(_.trim).zipWithIndex.toMap[String, Int]).getOrElse(Map.empty)
@@ -50,19 +49,25 @@ class ParsersConstructor(parsersConfig: Map[String, AlgMetaData]) extends Using 
       }
       if (srcColumnsFields.nonEmpty) m_SrcColumnsFields.putAll(srcColumnsFields.asJava)
 
+      assert(!m_SrcColumnsFields.isEmpty && !m_TgtColumnsFields.isEmpty, "Failed to parse configuration file")
       val rawDataMetaData: RawDataMetaData = RawDataMetaData(fieldsSep, m_SrcColumnsFields, m_TgtColumnsFields)
-
       if (parsers.nonEmpty) {
         parsers.foreach {
           parser =>
-            val context = MethodContext(parser._1, parser._2)
+            val context: MethodContext = MethodContext(parser._1, parser._2)
             val p = ParserFactory.newInstance(parser._1)
-            p.configure(context)
+            p.configure(context, m_SrcColumnsFields)
             m_Parsers.put(parser._1, p)
         }
       }
+      val extractFieldsParser = ParserFactory.newInstance(MethodKeyType.default)
+      extractFieldsParser.configure(
+        MethodContext(MethodKeyType.default, MethodMetaData(parserMetaData.inputFields, parserMetaData.outputFields, Map.empty)),
+        m_SrcColumnsFields)
+      m_Parsers.put(MethodKeyType.default, extractFieldsParser)
 
       val parserChain: ParserChain = new ParserChain(rawDataMetaData, m_Parsers)
+      parserChain.initialize()
       (targetKey, parserChain)
   }
 }

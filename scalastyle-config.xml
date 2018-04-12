@@ -129,6 +129,6 @@
         </parameters>
         <customMessage>Avoid casting.</customMessage>
     </check>
-    <check level="warning" class="org.scalastyle.scalariform.UnderscoreImportChecker" enabled="true"/>
+    <check level="warning" class="org.scalastyle.scalariform.UnderscoreImportChecker" enabled="false"/>
     <check level="warning" class="org.scalastyle.scalariform.DeprecatedJavaChecker" enabled="true"/>
 </scalastyle>

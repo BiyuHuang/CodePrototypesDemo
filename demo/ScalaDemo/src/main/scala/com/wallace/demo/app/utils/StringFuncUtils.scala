@@ -77,10 +77,10 @@ object StringFuncUtils extends Using {
         val key = tgtColumnsFields(i)
         val value: String = if (m_SplitColumnsFields.containsKey(key)) {
           val keyWithIndex: (String, Int) = m_SplitColumnsFields.get(key)
-          if (!cachedData.containsKey(key)) {
-            cachedData.put(key, data(m_SrcColumnsFields.get(keyWithIndex._1)).split("$"))
+          if (!cachedData.containsKey(keyWithIndex._1)) {
+            cachedData.put(keyWithIndex._1, data(m_SrcColumnsFields.get(keyWithIndex._1)).split("$"))
           }
-          cachedData.get(key)(keyWithIndex._2)
+          cachedData.get(keyWithIndex._1)(keyWithIndex._2)
         } else if (m_ConcatColumnsFields.containsKey(key)) {
           val tempData: Array[String] = m_ConcatColumnsFields.get(key).map(
             k =>
