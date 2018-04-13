@@ -49,7 +49,7 @@
                 </process>
                 <process method="split">
                     <inputFields>g</inputFields>
-                    <outputFields></outputFields>
+                    <outputFields>g,h</outputFields>
                     <conf>
                         <item name="separator">,</item>
                     </conf>
@@ -76,4 +76,20 @@
         </algorithminfo>
     </algorithm>
 
+    <algorithm id="test4" confPath="test4.conf" dataType="structured " fieldSeparator=",">
+        <algorithminfo target="t6" regionid="1000006">
+            <className>com.wallace.demo5</className>
+            <inputFields>o,p,q,r,s,t</inputFields>
+            <outputFields>x,p,q,r,s,y,z</outputFields>
+            <fieldsProcess>
+                <process method="split">
+                    <inputFields>t</inputFields>
+                    <outputFields>x,y,z</outputFields>
+                    <conf>
+                        <item name="separator">#</item>
+                    </conf>
+                </process>
+            </fieldsProcess>
+        </algorithminfo>
+    </algorithm>
 </adapter>

@@ -446,7 +446,7 @@ object FileUtils extends Using {
   }
 
   private def getNodeSeqText(nodeSeq: NodeSeq, defaultValue: String = ""): String = nodeSeq.text match {
-    case v: String => v.trim
+    case v: String => v.trim.toLowerCase
     case _ => defaultValue
   }
 

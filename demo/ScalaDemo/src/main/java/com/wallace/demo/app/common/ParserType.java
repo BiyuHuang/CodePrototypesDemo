@@ -7,7 +7,7 @@ import com.wallace.demo.app.parsercombinators.parsers.AbstractParser;
  */
 public enum ParserType {
 
-    EXTRACT_FIELDS(com.wallace.demo.app.parsercombinators.parsers.ExtractFieldsAbstractParser.class)
+    EXTRACT_FIELDS(com.wallace.demo.app.parsercombinators.parsers.ExtractFieldsParser.class)
     //,SEARCH_REPLACE();
     ;
 

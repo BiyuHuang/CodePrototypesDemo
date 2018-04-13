@@ -1,6 +1,9 @@
 package com.wallace.demo.app.parsercombinators.parsers
 
 import java.util
+
+import com.wallace.demo.app.utils.FuncUtil
+
 import scala.collection.JavaConverters._
 
 /**
@@ -17,16 +20,28 @@ class ParserChain(rawDataMetaData: RawDataMetaData, parsers: util.HashMap[String
   private val m_TgtColumnsFields: Array[FieldInfo] = rawDataMetaData.m_TgtColumnsFields
   private val symbol: Int = m_TgtColumnsFields.length - 1
 
-  override def initialize(): Unit = {
+  def initialize(): Unit = {
+    initialize(rawDataMetaData.m_SrcColumnsFields)
     parsers.asScala.foreach {
       parser =>
-        parser._2.initialize()
+        parser._2.initialize(rawDataMetaData.m_SrcColumnsFields)
     }
   }
 
+  def parse(recordLine: String): String = {
+    val record: Array[String] = if (recordLine.contains("\"")) {
+      FuncUtil.split(recordLine, rawDataMetaData.fieldsSep, "\"")
+    } else if (recordLine.contains("\'")) {
+      FuncUtil.split(recordLine, rawDataMetaData.fieldsSep, "\'")
+    } else {
+      recordLine.split(rawDataMetaData.fieldsSep, -1)
+    }
+    parse(record)
+  }
+
   override def parse(record: Array[String], fieldInfo: FieldInfo = FieldInfo("", -1, MethodKeyType.default)): String = {
-    //TODO 接口需重新定义
     val res: StringBuilder = new StringBuilder
+    assert(m_SrcColumnsFields.size() == record.length, "ArrayIndexOutOfBoundsException")
     m_TgtColumnsFields.indices.foreach {
       i =>
         val field: FieldInfo = m_TgtColumnsFields(i)
@@ -36,7 +51,7 @@ class ParserChain(rawDataMetaData: RawDataMetaData, parsers: util.HashMap[String
     res.toString()
   }
 
-  override def configure(context: MethodContext, m_SrcColumnsFields: util.HashMap[String, Int]): Unit = {
+  override def configure(context: MethodContext): Unit = {
     //no-op
   }
 }

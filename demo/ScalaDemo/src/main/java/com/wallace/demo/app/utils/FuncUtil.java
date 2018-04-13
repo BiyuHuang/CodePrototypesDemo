@@ -1,6 +1,7 @@
 package com.wallace.demo.app.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -8,15 +9,21 @@ import java.util.Vector;
  * Created by 10192057 on 2018/3/5 0005.
  */
 public class FuncUtil {
+    public static String[] split(String str, String sep, String other) {
+        return split(str, sep.charAt(0), other.charAt(0));
+    }
 
-    public static ArrayList<String> split(String str, char split, char other) {
+    public static String[] split(String str, char split, char other) {
+        //        if (!str.contains(other + "")) {
+        //        return str.split(split + "", -1);
+        //    } else {
         ArrayList<String> strList = new ArrayList<>();
-        int num = 0;//other干扰符个数
-        int off = 0;//字串的起始位置
-        int subStrSize = 0;//字串的长度
+        int num = 0;// other干扰符个数
+        int off = 0;// 字串的起始位置
+        int subStrSize = 0;// 字串的长度
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
-            //最后一个字符
+            // 最后一个字符
             if (c != split && i == str.length() - 1) {
                 strList.add(str.substring(off, off + subStrSize + 1));
             }
@@ -31,9 +38,8 @@ public class FuncUtil {
                 subStrSize++;
             }
         }
-        //String fields[] = new String[strList.size()];
-        //return strList.toArray(fields);
-        return strList;
+        String fields[] = new String[strList.size()];
+        return strList.toArray(fields);
     }
 
     /**
@@ -153,7 +159,7 @@ public class FuncUtil {
     }
 
     public static Vector<String> ProcessNeighbourInfoOther(String OneLineInfo) {
-        ArrayList<String> MRField = split(OneLineInfo, ',', '"');
-        return ProcessNeighbourInfo(MRField);
+        String[] MRField = split(OneLineInfo, ',', '"');
+        return ProcessNeighbourInfo(Arrays.asList(MRField));
     }
 }

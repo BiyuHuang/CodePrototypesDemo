@@ -1,20 +1,27 @@
 package com.wallace.demo.app.parsercombinators.parsers
 
+import java.util
+
 /**
   * Created by 10192057 on 2018/4/11 0011.
   */
 trait AbstractParser extends Configurable {
-  /**
-    * Any initialization / startup needed by the Parser.
-    */
-  def initialize(): Unit
+  protected val m_SrcColumnsFields: util.HashMap[String, Int] = new util.HashMap[String, Int]
 
   /**
-    * Parsed of a single {@link numeric record}.
+    * Necessary Initialization / startup needed by the Parser.
     *
-    * @param record numeric field to be parsed
-    * @return single numeric field, or { @code null} if the numeric field
-    *         is to be dropped (i.e. filtered out).
+    * @param srcColumnsFields Raw data header
+    */
+  def initialize(srcColumnsFields: util.HashMap[String, Int]): Unit = synchronized {
+    m_SrcColumnsFields.putAll(srcColumnsFields)
+  }
+
+  /**
+    * Parsed of a single line of Record.
+    *
+    * @param record numeric fields of Record to be parsed
+    * @return single numeric field
     */
   def parse(record: Array[String], filed: FieldInfo): String
 
