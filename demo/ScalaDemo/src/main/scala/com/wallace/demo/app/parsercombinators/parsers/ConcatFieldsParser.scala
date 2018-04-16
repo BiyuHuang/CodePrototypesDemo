@@ -2,8 +2,6 @@ package com.wallace.demo.app.parsercombinators.parsers
 
 import java.util
 
-import com.wallace.demo.app.common.FieldsSep
-
 import scala.collection.JavaConverters._
 
 /**
@@ -14,10 +12,13 @@ class ConcatFieldsParser extends AbstractParser {
   private var concat_sep: String = ""
 
   override def parse(record: Array[String], fieldInfo: FieldInfo): String = {
-    m_ConcatColumnsFields.get(fieldInfo.name).map {
-      k =>
-        record(m_SrcColumnsFields.get(k))
-    }.mkString(concat_sep)
+    if (m_ConcatColumnsFields.containsKey(fieldInfo.name)) {
+      m_ConcatColumnsFields.get(fieldInfo.name)
+        .map(k => if (m_SrcColumnsFields.containsKey(k)) record(m_SrcColumnsFields.get(k)) else "")
+        .mkString(concat_sep)
+    } else {
+      ""
+    }
   }
 
   override def configure(context: MethodContext): Unit = {
@@ -28,6 +29,9 @@ class ConcatFieldsParser extends AbstractParser {
     }
 
     m_ConcatColumnsFields.putAll(concatColumnsFields.asJava)
-    concat_sep = context.methodMetaData.conf.getOrElse("separator", FieldsSep.DEFAULT_CONCAT_SEP)
+    concat_sep = context.methodMetaData.conf("separator")
+    if (concat_sep.isEmpty) {
+      log.warn(s"Concat Sep[$concat_sep] is empty.")
+    }
   }
 }

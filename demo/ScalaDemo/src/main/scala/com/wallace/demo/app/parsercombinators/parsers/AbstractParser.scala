@@ -23,6 +23,6 @@ trait AbstractParser extends Configurable {
     * @param record numeric fields of Record to be parsed
     * @return single numeric field
     */
-  def parse(record: Array[String], filed: FieldInfo): String
+  def parse(record: Array[String], field: FieldInfo): String
 
 }

@@ -1,15 +1,13 @@
 package com.wallace.demo.app.parsercombinators.parsers
 
-import java.util
-
-import com.wallace.demo.app.common.MethodMetaData
+import com.wallace.demo.app.common.{LogSupport, MethodMetaData}
 
 /**
   * Created by 10192057 on 2018/4/12 0012.
   */
-trait Configurable {
+trait Configurable extends LogSupport {
   /**
-    * @param context          MethodContext
+    * @param context MethodContext
     **/
   def configure(context: MethodContext): Unit
 }
