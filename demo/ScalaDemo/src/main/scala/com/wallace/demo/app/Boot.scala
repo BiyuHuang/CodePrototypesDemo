@@ -15,8 +15,6 @@ import scala.util.control.NonFatal
 object Boot extends LogSupport {
   def convert(time: Long, unit: TimeUnit): Long = unit.convert(time, unit)
 
-
-  val arr = Array("")
   def main(args: Array[String]): Unit = {
     util.Properties.setProp("scala.time", "true")
     var file: Option[File] = None

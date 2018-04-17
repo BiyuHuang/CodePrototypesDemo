@@ -2,6 +2,7 @@ package com.wallace.spark.sparkdemo.dataframedemo
 
 import com.wallace.common.LogSupport
 import com.wallace.common.timeformat.TimePara
+import com.wallace.spark.CreateSparkSession
 import com.wallace.spark.sparkdemo.dataframedemo.PersonInfo._
 import com.wallace.spark.sparkdemo.dataframedemo.SpendingInfo.{Id, Spending, Time}
 import org.apache.spark.SparkContext
@@ -22,7 +23,7 @@ case class Customer(Time: String, Id: String, Spending: Int)
 
 case class Record(num: Int, col2: String, col3: String, col4: String, col5: String, index: Int)
 
-object DataFrameDemo extends LogSupport {
+object DataFrameDemo extends CreateSparkSession {
   val schema: StructType = StructType(Array(StructField("num", IntegerType, nullable = true),
     StructField("col2", StringType, nullable = true),
     StructField("col3", StringType, nullable = true),
@@ -31,34 +32,30 @@ object DataFrameDemo extends LogSupport {
     StructField("index", IntegerType, nullable = true)))
 
   def main(args: Array[String]): Unit = {
-    val warehouseLocation = System.getProperty("user.dir").replaceAll("\\\\", "/") + "/" + "spark-warehouse"
-    val spark: SparkSession = SparkSession
-      .builder().master("local[*]").appName("RddConvertToDataFrame").config("spark.sql.warehouse.dir", warehouseLocation)
-      .config("spark.driver.memory", "3g")
-      //.enableHiveSupport()
-      .getOrCreate()
+    val spark = createSparkSession("DataFrameDemo")
+    spark.conf.set("spark.driver.memory", "3g")
+    sqlDemo(spark)
+  }
+
+  protected def udfFuncDemo(spark: SparkSession): Unit = {
     val sc: SparkContext = spark.sparkContext
     import spark.implicits._
-
     val rdd: RDD[String] = sc.textFile("./demo/SparkDemo/src/main/resources/sample_1.csv")
     val srcDF: DataFrame = rdd.map(_.split(",", -1)).map {
       col =>
         Record(col(0).toInt, col(1), col(2), col(3), col(4), col(5).toInt)
     }.toDF
-
     srcDF.show(5)
-
     val res: RDD[Row] = flatMapFunc(srcDF)
     res.collect.foreach {
       row =>
         log.info(s"#### ${row.mkString(",")}")
     }
-
     val resDF = spark.createDataFrame(res, schema)
     resDF.show()
   }
 
-  protected def demo(spark: SparkSession): Unit = {
+  protected def sqlDemo(spark: SparkSession): Unit = {
     val sc: SparkContext = spark.sparkContext
     import spark.implicits._
     /**
@@ -75,7 +72,7 @@ object DataFrameDemo extends LogSupport {
 
     personDS.createOrReplaceTempView("person_info")
     val res1: DataFrame = spark.sql(s"SELECT * FROM person_info")
-    res1.map(x => x.getString(1)).rdd.take(1)
+    res1.map(x => x.getInt(1)).rdd.take(1)
     res1.show(3)
     /**
       * Purchase Something
@@ -101,8 +98,8 @@ object DataFrameDemo extends LogSupport {
     res5.show(3)
     //    res5.write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite).save("./temp/")
     //    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
-    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
-    res5.write.mode(SaveMode.Append).parquet("/")
+    //res5.write.format("csv").mode(SaveMode.Overwrite).save("/")
+    //res5.write.mode(SaveMode.Append).parquet("/")
   }
 
   protected def padto(ls: Array[String], columnNum: Int = 5): Array[String] = if (ls.length > columnNum) ls.dropRight(ls.length - columnNum) else ls.padTo(columnNum, "")

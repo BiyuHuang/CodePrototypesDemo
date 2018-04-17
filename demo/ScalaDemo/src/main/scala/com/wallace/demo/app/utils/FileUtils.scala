@@ -7,18 +7,21 @@ import java.nio.charset.Charset
 import java.nio.file.WatchService
 import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
-import javax.xml.parsers.{SAXParser, SAXParserFactory}
 
-import com.wallace.demo.app.common.Using
-import com.wallace.demo.app.parsexml.MROSax
+import com.typesafe.config.{Config, ConfigFactory}
+import com.wallace.demo.app.common._
+import com.wallace.demo.app.parsexml.{MROSax, SaxHandler}
+import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
 import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
-import org.xml.sax.helpers.DefaultHandler
+import org.apache.commons.compress.utils.IOUtils
 
+import scala.collection.immutable
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
+import scala.xml.{Node, NodeSeq, XML}
 
 object FileUtils extends Using {
 
@@ -113,10 +116,10 @@ object FileUtils extends Using {
     //    log.info(s"CostTime2: $costTime2 ms.")
 
     // TODO READ TAR.GZ FILE
-    //    val costTime3 = runtimeDuration {
-    //      readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
-    //    }
-    //    log.info(s"CostTime3: $costTime3 ms.")
+    val costTime3 = runtimeDuration {
+      readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
+    }
+    log.info(s"CostTime3: $costTime3 ms.")
 
     //    // TODO Run test for filenamePrefixFromOffset
     //    val offset = filenamePrefixFromOffset(100L)
@@ -146,25 +149,64 @@ object FileUtils extends Using {
     //    betterFilesFunc()
 
     // TODO recursiveDelDirsAndFiles
-    val f: File = new File("./demo/ScalaDemo/src/main/resources/temp/")
-    recursiveDelDirsAndFiles(f)
+    //    val f: File = new File("./demo/ScalaDemo/src/main/resources/temp/")
+    //    recursiveDelDirsAndFiles(f)
+    //
+    //    val a = Array("test", "test/test1", "test/test1/test2", "test33/")
+    //    a.groupBy(x => x.length).filterNot(x => x._1 == 1)
 
+    // TODO GetTotalLines
+    val srcFileName = "./demo/ScalaDemo/src/main/resources/testingData.csv"
+    val srcFile = new File(srcFileName)
+    val startTime = System.currentTimeMillis()
+    //    val totalLines = getTotalLines(testFile)
+    val totalLines = getTotalLines(srcFile)
+    val endTime = System.currentTimeMillis()
+    log.info(s"[$srcFileName]TotalLines: $totalLines, CostTime: ${endTime - startTime} ms.")
 
-    val a = Array("test", "test/test1", "test/test1/test2", "test33/")
-    a.groupBy(x => x.length).filterNot(x => x._1 == 1)
-    f.lastModified()
-    System.currentTimeMillis()
+    // TODO Read readZipArchiveFile
+    //val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335110_20180403101500.zip"
+    val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335112_20180403101500.xml.zip"
+    //val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ZTE_OMC1_637784_20170522204500.zip"
+    val costTime4: Double = runtimeDuration(readZipArchiveFile(fileName))
+    log.info(s"CostTime3: $costTime4 ms.")
+  }
 
+  private def getTotalLines(srcFile: File): Int = {
+    val reader = new LineNumberReader(new FileReader(srcFile))
+    reader.skip(srcFile.length())
+    val totalLines = reader.getLineNumber
+    reader.close()
+    totalLines
+    //    using(new LineNumberReader(new FileReader(srcFile))) {
+    //      reader =>
+    //        //        var totalLines = 0
+    //        //        var strLine = reader.readLine
+    //        //        while (strLine != null) {
+    //        //          totalLines += 1
+    //        //          strLine = reader.readLine
+    //        //        }
+    //        //
+    //        //        totalLines
+    //
+    //        reader.skip(srcFile.length())
+    //        reader.getLineNumber
+    //    }
+  }
+
+  private def getTotalLines(fileName: String): Int = {
+    val srcFile = new File(fileName)
+    getTotalLines(srcFile)
   }
 
   def readFileByByteBuffer(srcFile: File, destPath: String): Unit = {
     usingWithErrMsg(new FileInputStream(srcFile), s"Failed to read ${srcFile.getName}.") {
       in =>
-        val outPutDestPath: File = appendOrRollFile(destPath)
+        val outPutDestPath = appendOrRollFile(destPath)
         using(new FileOutputStream(outPutDestPath, true)) {
           out =>
-            val fcIn: FileChannel = in.getChannel
-            val fcOut: FileChannel = out.getChannel
+            val fcIn = in.getChannel
+            val fcOut = out.getChannel
             writeToFileByByte(in, fcIn, fcOut)
         }
     }
@@ -265,7 +307,7 @@ object FileUtils extends Using {
                         var cnt: Long = 1
                         while (br.ready() && (cnt <= size)) {
                           val line = br.readLine()
-                          line.length
+                          log.info(s"${line.length}")
                           //log.info(s"$cnt: $line")
                           cnt += 1
                         }
@@ -280,10 +322,6 @@ object FileUtils extends Using {
     }
   }
 
-  def readMultiZipArchiveFile(fileName: String): Unit = {
-
-  }
-
   private def readZipArchiveFile(fileName: String): Unit = {
     import java.util.zip.ZipFile
     val f = new ZipFile(fileName)
@@ -292,17 +330,25 @@ object FileUtils extends Using {
       inputStream =>
         using(new ZipArchiveInputStream(inputStream, "UTF-8")) {
           zipIns =>
-            while (zipIns.canReadEntryData(zipIns.getNextZipEntry)) {
-              val entry: ZipArchiveEntry = zipIns.getNextZipEntry
+            var entry: ZipArchiveEntry = zipIns.getNextZipEntry
+            while (zipIns.canReadEntryData(entry) && entry != null) {
               val size = entry.getSize
-              val context = new Array[Byte](size.toInt)
-              var offset = 0
-              while (zipIns.available() > 0) {
-                offset += zipIns.read(context, offset, 40960)
+              log.info(s"Entry Name: ${entry.getName}, Entry Size: $size.")
+              val defaultSize: Long = Math.min(Runtime.getRuntime.freeMemory(), Int.MaxValue)
+              log.debug(s"FreeMemory: ${Runtime.getRuntime.freeMemory() / (1024 * 1024)} MB. Default Bytes Size: $defaultSize Bytes")
+              val currentSize: Long = if (size < 0) defaultSize else size
+              val bos = new ByteArrayOutputStream(currentSize.toInt)
+              IOUtils.copy(zipIns, bos, 40960)
+              val res: ByteArrayInputStream = new ByteArrayInputStream(bos.toByteArray)
+              using(new BufferedReader(new InputStreamReader(res))) {
+                br =>
+                  while (br.ready()) {
+                    log.info(br.readLine())
+                  }
               }
-
-              val res: ByteArrayInputStream = new ByteArrayInputStream(context)
-
+              bos.flush()
+              bos.close()
+              entry = zipIns.getNextZipEntry
             }
         }
     }
@@ -346,9 +392,9 @@ object FileUtils extends Using {
             xmlInputStream =>
               val handle: MROSax = new MROSax
               val saxParser: SAXParser = SAXParserFactory.newInstance().newSAXParser()
-              val res: Option[DefaultHandler] = parseXML(saxParser, handle, xmlInputStream, entryName)
+              val res: Option[SaxHandler] = parseXML(saxParser, handle, xmlInputStream, entryName)
               if (res.isDefined) {
-                val mrRecords = res.get.asInstanceOf[MROSax].getMRO
+                val mrRecords = res.get.getResult
                 val eNBId: String = mrRecords.geteNB()
                 log.info(s"[$cnt]$entryName => EnodeBID: $eNBId")
               } else {
@@ -359,7 +405,7 @@ object FileUtils extends Using {
     }
   }
 
-  protected def parseXML(parser: SAXParser, handle: DefaultHandler, ins: InputStream, entryName: String): Option[DefaultHandler] = {
+  protected def parseXML(parser: SAXParser, handle: SaxHandler, ins: InputStream, entryName: String): Option[SaxHandler] = {
     Try {
       parser.parse(ins, handle)
       handle
@@ -373,6 +419,99 @@ object FileUtils extends Using {
   }
 
 
+  // TODO Recursive List Files
+  def recursiveListFiles(rootFile: File): Array[File] = {
+    if (rootFile.isFile) {
+      Array(rootFile)
+    } else {
+      rootFile.listFiles().flatMap(recursiveListFiles)
+    }
+  }
+
+  private def load(fileName: String): Config = {
+    val projectConfigFile = fileName
+    val udfConfigFile: Array[File] = Array(new File(SystemEnvUtils.getUserDir + "../conf/" + fileName))
+    if (udfConfigFile.nonEmpty) {
+      log.debug(s"loading file[${udfConfigFile.head.getPath}] and resource[$projectConfigFile]")
+      ConfigFactory.parseFile(udfConfigFile.head).withFallback(ConfigFactory.load(projectConfigFile))
+    } else {
+      log.debug(s"loading resource[$projectConfigFile]")
+      ConfigFactory.load(projectConfigFile)
+    }
+  }
+
+  private def getAttrValue(node: Node, key: String, defaultValue: String = ""): String = node.attribute(key) match {
+    case Some(res) => res.mkString.trim.toLowerCase
+    case None => defaultValue
+  }
+
+  private def getNodeSeqText(nodeSeq: NodeSeq, defaultValue: String = ""): String = nodeSeq.text match {
+    case v: String => v.trim.toLowerCase
+    case _ => defaultValue
+  }
+
+  def readXMLConfigFile(algPath: String): Map[String, AlgMetaData] = {
+    val pluginParentFile: File = new File(algPath)
+    val adapters: Array[File] = if (pluginParentFile.exists()) {
+      recursiveListFiles(pluginParentFile).filter(_.getName.endsWith(".xml"))
+    } else {
+      Array.empty
+    }
+    if (adapters.isEmpty) {
+      Map.empty
+    } else {
+      val res: Array[immutable.Seq[(String, Config, String, String,
+        immutable.Seq[(String, String, String, String, Map[String, MethodMetaData])])]] = adapters.map {
+        f =>
+          val algXml = XML.loadFile(f)
+          (algXml \ "algorithm").map {
+            rootNode =>
+              val pluginConfFileName: String = getAttrValue(rootNode, "confPath")
+              val algorithmArgs: Config = if (pluginConfFileName.nonEmpty) load(pluginConfFileName) else ConfigFactory.empty()
+              val dataType: String = getAttrValue(rootNode, "dataType")
+              val fieldsSep: String = getAttrValue(rootNode, "fieldSeparator")
+              val algorithmID = getAttrValue(rootNode, "id")
+              assert(algorithmID.nonEmpty, "algorithmID must be nonEmpty.")
+              val algorithmInfo: immutable.Seq[(String, String, String, String,
+                Map[String, MethodMetaData])] = (rootNode \ "algorithminfo").map {
+                treeNode =>
+                  val className: String = getNodeSeqText(treeNode \ "className")
+                  val target: String = getAttrValue(treeNode, "target")
+                  val regionID: String = getAttrValue(treeNode, "regionid")
+                  val algorithmKey: String = if (regionID.nonEmpty) target + "_" + regionID else target
+                  val inputFields: String = getNodeSeqText(treeNode \ "inputFields")
+                  val outputFields: String = getNodeSeqText(treeNode \ "outputFields")
+                  val parsersInfo: Map[String, MethodMetaData] = (treeNode \ "fieldsProcess" \ "process").flatMap {
+                    procNode =>
+                      val method: String = getAttrValue(procNode, "method")
+                      val pInputFields: String = getNodeSeqText(procNode \ "inputFields")
+                      val pOutputFields: String = getNodeSeqText(procNode \ "outputFields")
+                      val conf: Map[String, String] = (procNode \ "conf" \ "item").flatMap {
+                        iNode =>
+                          val key = getAttrValue(iNode, "name")
+                          val value = getNodeSeqText(iNode)
+                          Map(key -> value)
+                      }.toMap
+                      Map(method -> MethodMetaData(pInputFields, pOutputFields, conf))
+                  }.toMap
+                  (algorithmKey, className, inputFields, outputFields, parsersInfo)
+              }
+              (algorithmID, algorithmArgs, dataType, fieldsSep, algorithmInfo)
+          }
+      }
+      res.flatMap {
+        algID =>
+          algID.flatMap {
+            adaptor =>
+              adaptor._5.map {
+                algInfo =>
+                  (algInfo._1, AlgMetaData(adaptor._2, algInfo._2, ParserMetaData(adaptor._3, adaptor._4, algInfo._3, algInfo._4, algInfo._5)))
+              }
+          }
+      }.toMap
+    }
+  }
+
   // TODO Delete file
   def deleteFile(file: File): Boolean = {
     var delState = false
@@ -381,7 +520,9 @@ object FileUtils extends Using {
         if (file.delete()) {
           delState = true
         } else {
-          log.error(s"Failed to delete ${file.getCanonicalPath}.")
+          log.error(s"Failed to delete ${
+            file.getCanonicalPath
+          }.")
           delState = false
         }
       } else {
@@ -389,16 +530,22 @@ object FileUtils extends Using {
           if (file.delete()) {
             delState = true
           } else {
-            log.error(s"Failed to delete ${file.getCanonicalPath}.")
+            log.error(s"Failed to delete ${
+              file.getCanonicalPath
+            }.")
             delState = false
           }
         } else {
-          log.warn(s"Failed to set executable for ${file.getName}")
+          log.warn(s"Failed to set executable for ${
+            file.getName
+          }")
           file.deleteOnExit()
         }
       }
     } else {
-      log.warn(s"${file.getName} doesn't exist or has no execute permission.")
+      log.warn(s"${
+        file.getName
+      } doesn't exist or has no execute permission.")
     }
     delState
   }
@@ -418,7 +565,9 @@ object FileUtils extends Using {
             }
         }
       } else {
-        log.debug(s"${rootFile.getName} is an empty directory, just delete it.")
+        log.debug(s"${
+          rootFile.getName
+        } is an empty directory, just delete it.")
       }
       delState = deleteFile(rootFile)
     } else {

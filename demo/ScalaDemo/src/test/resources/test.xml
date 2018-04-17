@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adapter>
+    <algorithm id="test1" confPath="udf_test.conf">
+        <algorithminfo target="t1" regionid="1000001">
+            <className>com.walla.demo1</className>
+        </algorithminfo>
+        <algorithminfo target="t2" regionid="1000002">
+            <className>com.wallace.demo2</className>
+        </algorithminfo>
+    </algorithm>
+
+    <algorithm id="test2">
+        <algorithminfo target="t3" regionid="1000003">
+            <className>com.wallace.demo3</className>
+        </algorithminfo>
+        <algorithminfo target="t4" regionid="1000004">
+            <className>com.wallace.demo4</className>
+        </algorithminfo>
+    </algorithm>
+
+    <algorithm id="test3" confPath="test3.conf" dataType="structured " fieldSeparator=",">
+        <algorithminfo target="t5" regionid="1000005">
+            <className>com.wallace.demo5</className>
+            <inputFields>A,B,C,D,E,F,G,H,I,J</inputFields>
+            <outputFields>D,E,F,G,H,I,J,K</outputFields>
+            <fieldsProcess>
+                <process method="concat">
+                    <inputFields>a,b,c</inputFields>
+                    <outputFields>d</outputFields>
+                    <conf>
+                        <item name="separator">$</item>
+                    </conf>
+                </process>
+                <process method="subString">
+                    <inputFields>e</inputFields>
+                    <outputFields>e</outputFields>
+                    <conf>
+                        <item name="startIndex">1</item>
+                        <item name="endIndex">10</item>
+                    </conf>
+                </process>
+                <process method="replaceString">
+                    <inputFields>f</inputFields>
+                    <outputFields>f</outputFields>
+                    <conf>
+                        <item name="source">,</item>
+                        <item name="target">$</item>
+                    </conf>
+                </process>
+                <process method="split">
+                    <inputFields>g</inputFields>
+                    <outputFields>g,h</outputFields>
+                    <conf>
+                        <item name="separator">,</item>
+                    </conf>
+                </process>
+                <process method="addTimestamp">
+                    <inputFields></inputFields>
+                    <outputFields>k</outputFields>
+                    <conf>
+                        <item name="index">1</item>
+                        <item name="length">14</item>
+                    </conf>
+                </process>
+                <process method="compute">
+                    <inputFields>j</inputFields>
+                    <outputFields>j</outputFields>
+                    <conf>
+                        <item name="inputSystem">H</item>
+                        <item name="outputSystem">D</item>
+                        <item name="operator">+</item>
+                        <item name="operand">5</item>
+                    </conf>
+                </process>
+            </fieldsProcess>
+        </algorithminfo>
+    </algorithm>
+
+    <algorithm id="test4" confPath="test4.conf" dataType="structured " fieldSeparator=",">
+        <algorithminfo target="t6" regionid="1000006">
+            <className>com.wallace.demo5</className>
+            <inputFields>o,p,q,r,s,t</inputFields>
+            <outputFields>x,p,q,r,s,y,z</outputFields>
+            <fieldsProcess>
+                <process method="split">
+                    <inputFields>t</inputFields>
+                    <outputFields>x,y,z</outputFields>
+                    <conf>
+                        <item name="separator">#</item>
+                    </conf>
+                </process>
+            </fieldsProcess>
+        </algorithminfo>
+    </algorithm>
+</adapter>

@@ -8,4 +8,10 @@ import org.scalatest.{FlatSpec, ShouldMatchers}
   */
 trait UnitSpec extends FlatSpec with ShouldMatchers with LogSupport {
   protected val teamID = "Wallace Huang"
+
+  def runTest(utMsg: String)(testFunc: => Any): Unit = {
+    teamID should s"do $utMsg" in {
+      testFunc
+    }
+  }
 }

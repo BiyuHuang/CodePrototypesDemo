@@ -8,13 +8,13 @@ import org.apache.spark.sql.SparkSession
   */
 trait CreateSparkSession extends FuncRunDuration with LogSupport {
   def createSparkSession(appName: String, master: String = "local[*]"): SparkSession = {
-    val warehouseLocation = System.getProperty("user.dir") + "/" + "spark-warehouse"
+    val warehouseLocation = System.getProperty("user.dir").replaceAll("\\\\", "/") + "/" + "spark-warehouse"
     val spark: SparkSession = SparkSession
       .builder()
       .master("local[*]")
       .appName(appName)
       .config("spark.sql.warehouse.dir", warehouseLocation)
-      .enableHiveSupport()
+      //.enableHiveSupport()
       .getOrCreate()
 
     spark
