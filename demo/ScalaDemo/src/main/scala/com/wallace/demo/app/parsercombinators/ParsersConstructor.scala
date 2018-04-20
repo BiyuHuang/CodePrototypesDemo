@@ -6,6 +6,7 @@ import com.wallace.demo.app.common._
 import com.wallace.demo.app.parsercombinators.parsers._
 
 import scala.collection.JavaConverters._
+import scala.collection.immutable.HashMap
 import scala.util.Try
 
 /**
@@ -27,8 +28,7 @@ object ParsersConstructor extends Using {
         val parsers: Map[String, MethodMetaData] = parserMetaData.parsers
         val m_Parsers: util.HashMap[String, AbstractParser] = new util.HashMap[String, AbstractParser]()
         val m_fieldsSep = Try(parserMetaData.fieldsSep).getOrElse(FieldsSep.DEFAULT_SEP)
-        val m_SrcColumnsFields: util.HashMap[String, Int] = new util.HashMap[String, Int]()
-        m_SrcColumnsFields.putAll(srcColumnsFields.asJava)
+        val m_SrcColumnsFields: HashMap[String, Int] = new HashMap[String, Int]().++(srcColumnsFields)
         val m_TgtColumnsFields: Array[FieldInfo] = if (tgtColumnsFields.nonEmpty) {
           val specialFields: Map[String, String] = Try(parsers.map {
             parser =>
@@ -64,7 +64,7 @@ object ParsersConstructor extends Using {
           MethodMetaData(parserMetaData.inputFields, parserMetaData.outputFields, Map.empty)))
         m_Parsers.put(MethodKeyType.default, extractFieldsParser)
 
-        val parserChain: ParserChain = new ParserChain(rawDataMetaData, m_Parsers)
+        val parserChain: ParserChain = new ParserChain(rawDataMetaData, m_Parsers.asScala.toMap)
         parserChain.initialize()
         (targetKey, parserChain)
       } else {

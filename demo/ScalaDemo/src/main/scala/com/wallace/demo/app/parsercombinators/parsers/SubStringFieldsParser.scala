@@ -17,8 +17,8 @@ class SubStringFieldsParser extends AbstractParser {
     * @return single numeric field
     */
   override def parse(record: Array[String], field: FieldInfo): String = {
-    if (m_SrcColumnsFields.containsKey(field.name)) {
-      val value: String = record(m_SrcColumnsFields.get(field.name))
+    if (m_SrcFieldsInfo.contains(field.name)) {
+      val value: String = record(m_SrcFieldsInfo(field.name))
       val len: Int = value.length
       if (len == 0) {
         ""
