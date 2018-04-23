@@ -3,18 +3,21 @@ package com.wallace.demo.app.parsercombinators.parsers
 import java.util
 
 import scala.collection.JavaConverters._
+import scala.collection.immutable.HashMap
 
 /**
   * Created by 10192057 on 2018/4/12 0012.
   */
 class ConcatFieldsParser extends AbstractParser {
-  private val m_ConcatColumnsFields: util.HashMap[String, Array[String]] = new util.HashMap[String, Array[String]]()
+  private val _concatColumnsFields: util.HashMap[String, Array[String]] = new util.HashMap[String, Array[String]]()
   private var concat_sep: String = ""
 
+  private lazy val m_ConcatColumnsFields: HashMap[String, Array[String]] = new HashMap[String, Array[String]]().++(_concatColumnsFields.asScala)
+
   override def parse(record: Array[String], fieldInfo: FieldInfo): String = {
-    if (m_ConcatColumnsFields.containsKey(fieldInfo.name)) {
-      m_ConcatColumnsFields.get(fieldInfo.name)
-        .map(k => if (m_SrcColumnsFields.containsKey(k)) record(m_SrcColumnsFields.get(k)) else "")
+    if (m_ConcatColumnsFields.contains(fieldInfo.name)) {
+      m_ConcatColumnsFields(fieldInfo.name)
+        .map(k => if (m_SrcFieldsInfo.contains(k)) record(m_SrcFieldsInfo(k)) else "")
         .mkString(concat_sep)
     } else {
       ""
@@ -28,7 +31,7 @@ class ConcatFieldsParser extends AbstractParser {
       Map(key -> value)
     }
 
-    m_ConcatColumnsFields.putAll(concatColumnsFields.asJava)
+    _concatColumnsFields.putAll(concatColumnsFields.asJava)
     concat_sep = context.methodMetaData.conf("separator")
     if (concat_sep.isEmpty) {
       log.warn(s"Concat Sep[$concat_sep] is empty.")

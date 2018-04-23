@@ -14,8 +14,8 @@ class ReplaceStrFieldsParser extends AbstractParser {
     * @return single numeric field
     */
   override def parse(record: Array[String], field: FieldInfo): String = {
-    if (m_SrcColumnsFields.containsKey(field.name)) {
-      record(m_SrcColumnsFields.get(field.name)).replaceAll(regex, replacement)
+    if (m_SrcFieldsInfo.contains(field.name)) {
+      record(m_SrcFieldsInfo(field.name)).replaceAll(regex, replacement)
     } else {
       ""
     }

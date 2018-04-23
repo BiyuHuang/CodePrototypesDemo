@@ -5,8 +5,8 @@ package com.wallace.demo.app.parsercombinators.parsers
   */
 class ExtractFieldsParser extends AbstractParser {
   override def parse(record: Array[String], field: FieldInfo): String = {
-    if (m_SrcColumnsFields.containsKey(field.name)) {
-      record(m_SrcColumnsFields.get(field.name))
+    if (m_SrcFieldsInfo.contains(field.name)) {
+      record(m_SrcFieldsInfo(field.name))
     } else {
       ""
     }
