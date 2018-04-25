@@ -16,8 +16,7 @@ object Builds extends Build {
 
   lazy val scalaDemo: Project = project.in(file("demo/ScalaDemo")).settings(name := NamePrefix + "ScalaDemo").
     settings(Common.settings: _*).
-    settings(libraryDependencies ++= Dependencies.commonDependencies).
-    settings(libraryDependencies ++= Dependencies.hdfsDependencies).
+    settings(libraryDependencies ++= Dependencies.scalaDemoDependencies).
     settings(assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)).
     settings(assemblyJarName in assembly := s"${NamePrefix}ScalaDemo_0.0.1.jar")
 
