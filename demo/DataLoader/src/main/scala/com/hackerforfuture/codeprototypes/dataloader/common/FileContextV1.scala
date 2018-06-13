@@ -38,9 +38,9 @@ sealed trait Persist extends Serializable {
 
 @DeveloperApi
 sealed trait ContextV2 extends Serializable {
-  def source: _ <: Source
+  def source: Source
 
-  def persist: _ <: Persist
+  def persist: Persist
 }
 
 @DeveloperApi
