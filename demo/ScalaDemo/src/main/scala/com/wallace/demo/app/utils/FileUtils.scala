@@ -7,11 +7,11 @@ import java.nio.charset.Charset
 import java.nio.file.WatchService
 import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
+import javax.xml.parsers.{SAXParser, SAXParserFactory}
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.wallace.demo.app.common._
 import com.wallace.demo.app.parsexml.{MROSax, SaxHandler}
-import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
 import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
