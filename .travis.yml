@@ -8,11 +8,13 @@ cache:
 
 language: scala
 
-script: 
+script:
+  - "travis_wait 30 sleep 1800 &"
+  - curl -s https://raw.githubusercontent.com/xeon-zolt/arch-travis/master/arch-travis.sh | bash
   - sbt ++$TRAVIS_SCALA_VERSION compile test:compile
   - sbt ++$TRAVIS_SCALA_VERSION -Dakka.test.timefactor=1.5 'set concurrentRestrictions in Global += Tags.limit(Tags.Test, 1)' test
   - sbt ++$TRAVIS_SCALA_VERSION assembly
-  - sbt clean coverage test coverageReport
+  - travis_wait 30 sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
   - find $HOME/.sbt -name "*.lock" | xargs rm
 
 after_success:
