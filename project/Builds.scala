@@ -1,10 +1,8 @@
 import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
-import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 object Builds extends Build {
-  coverallsToken := Some("ca099e9689c74275a6ea7aede47b029e")
   
   //----------------------------------------
   // modules in common
