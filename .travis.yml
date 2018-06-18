@@ -14,6 +14,10 @@ script:
   - sbt ++$TRAVIS_SCALA_VERSION assembly
   # Trick to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
+  - sbt clean coverage test coverageReport
+
+after_success:
+    - bash <(curl -s https://codecov.io/bash)
 
 scala:
   - 2.11.8

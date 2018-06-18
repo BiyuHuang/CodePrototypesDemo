@@ -11,8 +11,8 @@ package com.hackerforfuture.codeprototypes.dataloader.common
 /**
   * Created by wallace on 2018/5/31.
   */
-object WorkMode extends Enumeration {
-  type WorkMode = Value
+object PersistMode extends Enumeration {
+  type PersistMode = Value
   val local, kafka, hdfs, ftp = Value
 }
 

@@ -4,7 +4,7 @@ import java.io.File
 
 import com.hackerforfuture.codeprototypes.dataloader.DeveloperApi
 import com.hackerforfuture.codeprototypes.dataloader.common.DataType.DataType
-import com.hackerforfuture.codeprototypes.dataloader.common.WorkMode.WorkMode
+import com.hackerforfuture.codeprototypes.dataloader.common.PersistMode.PersistMode
 import com.typesafe.config.Config
 
 import scala.collection.immutable.HashMap
@@ -20,7 +20,7 @@ sealed trait Source extends Serializable {
 
   def sKey: String
 
-  def sMode: WorkMode
+  def sMode: PersistMode
 
   def sConf: SourceConfiguration
 }
@@ -31,7 +31,7 @@ sealed trait Persist extends Serializable {
 
   def pKey: String
 
-  def pMode: WorkMode
+  def pMode: PersistMode
 
   def pConf: PersistConfiguration
 }
@@ -50,9 +50,9 @@ case class SourceConfiguration(sKey: String, sConfItemsMap: HashMap[String, AnyR
 
 case class PersistConfiguration(pKey: String, pConfItemsMap: HashMap[String, AnyRef]) extends Configuration
 
-case class FileSource(sType: DataType = DataType.file, sKey: String, sMode: WorkMode, sConf: SourceConfiguration) extends Source
+case class FileSource(sType: DataType = DataType.file, sKey: String, sMode: PersistMode, sConf: SourceConfiguration) extends Source
 
-case class FilePersist(pType: DataType = DataType.file, pKey: String, pMode: WorkMode, pConf: PersistConfiguration) extends Persist
+case class FilePersist(pType: DataType = DataType.file, pKey: String, pMode: PersistMode, pConf: PersistConfiguration) extends Persist
 
 case class FilesContextV2(source: FileSource, persist: FilePersist) extends ContextV2
 
