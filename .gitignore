@@ -21,3 +21,4 @@ sh.exe.stackdump
 resources/*.csv
 temp/
 resources/test/
+demo/ScalaDemo/.DS_Store

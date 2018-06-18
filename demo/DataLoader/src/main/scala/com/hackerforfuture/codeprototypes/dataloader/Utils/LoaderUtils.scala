@@ -3,7 +3,7 @@ package com.hackerforfuture.codeprototypes.dataloader.Utils
 import java.io.File
 import java.util
 
-import com.hackerforfuture.codeprototypes.dataloader.common.{FileContext, PathInfo}
+import com.hackerforfuture.codeprototypes.dataloader.common.{FileContextV1, PathInfo}
 
 import scala.util.matching.Regex
 
@@ -37,7 +37,7 @@ object LoaderUtils {
     }
   }
 
-  def genFileContext(file: File, sep: String = "/"): FileContext = {
+  def genFileContext(file: File, sep: String = "/"): FileContextV1 = {
     val fileName = file.getName
     val filePath = file.getPath.replaceAll("""\\""", sep)
     val fileParentPath = file.getParentFile.getParent.replaceAll("""\\""", sep)
@@ -63,9 +63,12 @@ object LoaderUtils {
           errorPath,
           tempDestPath,
           destPath)
-        FileContext(file, fileName, targetKey, handleMode, pathInfo)
+        FileContextV1(file, fileName, targetKey, handleMode, pathInfo)
       case _ =>
-        FileContext(file, file.getName, "", "", PathInfo(filePath, errorPath, "", ""))
+        FileContextV1(file, file.getName, "", "", PathInfo(filePath, errorPath, "", ""))
     }
   }
+
+
+  StringBuilder
 }

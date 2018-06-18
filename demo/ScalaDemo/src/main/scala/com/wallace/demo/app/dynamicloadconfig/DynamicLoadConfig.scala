@@ -20,7 +20,7 @@ import scala.util.control.NonFatal
   * Created by wallace on 2017/10/28.
   */
 class DynamicLoadConfig(props: Properties, prefixPath: String, configFiles: String*) extends TimerTask with LogSupport {
-
+//TODO 使用better file 监控文件的修改
   private val projectRootPath = SystemEnvUtils.getUserDir
 
   private val fileSep = SystemEnvUtils.getFileSeparator

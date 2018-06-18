@@ -1,10 +1,8 @@
 import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
-import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 object Builds extends Build {
-  coverallsToken := Some("ca099e9689c74275a6ea7aede47b029e")
   
   //----------------------------------------
   // modules in common
@@ -18,8 +16,7 @@ object Builds extends Build {
 
   lazy val scalaDemo: Project = project.in(file("demo/ScalaDemo")).settings(name := NamePrefix + "ScalaDemo").
     settings(Common.settings: _*).
-    settings(libraryDependencies ++= Dependencies.commonDependencies).
-    settings(libraryDependencies ++= Dependencies.hdfsDependencies).
+    settings(libraryDependencies ++= Dependencies.scalaDemoDependencies).
     settings(assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)).
     settings(assemblyJarName in assembly := s"${NamePrefix}ScalaDemo_0.0.1.jar")
 
