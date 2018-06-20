@@ -57,6 +57,7 @@ class Master(val host: String, val port: Int) extends Actor {
       if (id2WorkInfo.contains(workerId)) {
         id2WorkInfo(workerId).updateLastHeartBeatTime()
       } else {
+        println(s"注册表已丢失Worker#$workerId, 重新注册Worker信息.")
         sender() ! RegisterWorker(workerId, -1, -1)
       }
     case CheckTimeOutWorker => //定时检测是否有超时的worker并进行处理
