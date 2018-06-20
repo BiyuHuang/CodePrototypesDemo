@@ -9,7 +9,8 @@ object Dependencies {
     "org.slf4j" % "slf4j-api" % "1.7.7",
     "ch.qos.logback" % "logback-core" % "1.1.2",
     "ch.qos.logback" % "logback-classic" % "1.1.2",
-    "com.typesafe.akka" % "akka-actor_2.11" % "2.5.3",
+    "com.typesafe.akka" %% "akka-actor" % "2.5.3",
+    "com.typesafe.akka" %% "akka-remote" % "2.5.3",
     "com.github.pathikrit" %% "better-files" % "3.4.0",
     "com.github.pathikrit" %% "better-files-akka" % "3.4.0",
     "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0"
