@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -93,7 +93,7 @@ object Master {
          |akka.actor.warn-about-java-serializer-usage = "false"
        """.stripMargin
     //通过工厂方法获得一个config对象
-    val conf = ConfigFactory.parseString(confStr)
+    val conf: Config = ConfigFactory.parseString(confStr)
     //初始化一个ActorSystem，其名为MasterSystem
     val actorSystem: ActorSystem = ActorSystem("MasterSystem", conf)
     //使用actorSystem实例化一个名为Master的actor,注意这个名称在Worker连接Master时会用到
