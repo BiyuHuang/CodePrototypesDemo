@@ -1,4 +1,4 @@
-package com.wallace.spark.SparkDemo.rdddemo
+package com.wallace.spark.sparkdemo.rdddemo
 
 import com.wallace.common.Using
 import com.wallace.spark.CreateSparkSession

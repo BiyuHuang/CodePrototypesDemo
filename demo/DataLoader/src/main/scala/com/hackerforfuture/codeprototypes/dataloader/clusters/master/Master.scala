@@ -6,17 +6,21 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package scala.com.wallace.spark.sparkdemo.rdddemo
+package com.hackerforfuture.codeprototypes.dataloader.clusters.master
 
-import com.wallace.UnitSpec
-import com.wallace.spark.sparkdemo.rdddemo.RddDemo
+import akka.actor.Actor
 
 /**
-  * com.wallace.spark.sparkdemo.rdddemo
-  * Created by 10192057 on 2017/12/19 0019.
+  * Created by wallace on 2018/6/23.
   */
-class RddDemoUnitSpec extends UnitSpec {
-  runTest("unit test for readTextFile") {
-    RddDemo.readTextFile(filePath = RddDemo.path)
+class Master(host: String, port: Int) extends Actor {
+
+  // TODO Cluster : Manager Node , Controll Node
+  override def receive: Receive = {
+    //TODO Message Handler
+    case 0 =>
+    case 1 =>
+    case 2 =>
+
   }
 }

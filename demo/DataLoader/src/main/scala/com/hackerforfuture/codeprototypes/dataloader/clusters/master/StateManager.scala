@@ -6,17 +6,15 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package scala.com.wallace.spark.sparkdemo.rdddemo
+package com.hackerforfuture.codeprototypes.dataloader.clusters.master
 
-import com.wallace.UnitSpec
-import com.wallace.spark.sparkdemo.rdddemo.RddDemo
+import com.typesafe.config.Config
 
 /**
-  * com.wallace.spark.sparkdemo.rdddemo
-  * Created by 10192057 on 2017/12/19 0019.
+  * Created by wallace on 2018/6/24.
   */
-class RddDemoUnitSpec extends UnitSpec {
-  runTest("unit test for readTextFile") {
-    RddDemo.readTextFile(filePath = RddDemo.path)
+class StateManager(conf: Config) extends Runnable {
+  override def run(): Unit = {
+    //TODO State manager
   }
 }

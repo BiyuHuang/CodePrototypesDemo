@@ -1,6 +1,5 @@
 package com.wallace.spark.sparkdemo.dataframedemo
 
-import com.wallace.common.LogSupport
 import com.wallace.common.timeformat.TimePara
 import com.wallace.spark.CreateSparkSession
 import com.wallace.spark.sparkdemo.dataframedemo.PersonInfo._
@@ -9,7 +8,9 @@ import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
+import org.apache.spark.storage.StorageLevel
 
+import scala.collection.mutable
 import scala.util.Try
 
 /**
@@ -35,6 +36,36 @@ object DataFrameDemo extends CreateSparkSession {
     val spark = createSparkSession("DataFrameDemo")
     spark.conf.set("spark.driver.memory", "3g")
     sqlDemo(spark)
+
+    joinDemo(spark)
+
+  }
+
+  private def joinDemo(spark: SparkSession): Unit = {
+    val rddA: RDD[(String, Int)] = spark.sparkContext.parallelize(Array("wallace 2", "Lina 3", "Lucy,4")).flatMap(x => x.split(" "))
+      .map(p => (p(0).toString, p(1).toInt)).reduceByKey(_ + _)
+    val rddB: RDD[(String, Int)] = spark.sparkContext.parallelize(Array("wallace 2", "Lina 3", "Lucy,4", "Sofia 10", "Anna 103")).flatMap(x => x.split(" "))
+      .map(p => (p(0).toString, p(1).toInt)).reduceByKey(_ + _)
+
+
+    rddB.persist(StorageLevel.MEMORY_ONLY_SER_2)
+    var temp: Int = 0
+    val hashSet = mutable.HashSet[String]()
+    val rdd: RDD[(String, Int)] = rddA.leftOuterJoin(rddB).map {
+      p =>
+        p._2._2 match {
+          case Some(_) => hashSet.+=(p._1)
+          case None => temp = 0
+        }
+
+        temp = temp * p._2._1
+        (p._1, temp)
+    }
+
+    val rddB1: RDD[(String, Int)] = rddB.filter(p => !hashSet.contains(p._1)).map(p => (p._1, p._2 * p._2))
+
+    rdd.saveAsTextFile("/test/")
+    rddB1.saveAsTextFile("/test/")
   }
 
   protected def udfFuncDemo(spark: SparkSession): Unit = {
