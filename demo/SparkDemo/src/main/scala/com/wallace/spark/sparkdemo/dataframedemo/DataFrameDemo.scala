@@ -10,7 +10,6 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.types._
 import org.apache.spark.storage.StorageLevel
 
-import scala.collection.mutable
 import scala.util.Try
 
 /**
@@ -33,39 +32,46 @@ object DataFrameDemo extends CreateSparkSession {
     StructField("index", IntegerType, nullable = true)))
 
   def main(args: Array[String]): Unit = {
-    val spark = createSparkSession("DataFrameDemo")
+    val spark: SparkSession = createSparkSession("DataFrameDemo")
     spark.conf.set("spark.driver.memory", "3g")
-    sqlDemo(spark)
+    spark.conf.set("spark.hadoop.validateOutputSpecs", "false")
+    // sqlDemo(spark)
 
     joinDemo(spark)
 
   }
 
   private def joinDemo(spark: SparkSession): Unit = {
-    val rddA: RDD[(String, Int)] = spark.sparkContext.parallelize(Array("wallace 2", "Lina 3", "Lucy,4")).flatMap(x => x.split(" "))
-      .map(p => (p(0).toString, p(1).toInt)).reduceByKey(_ + _)
-    val rddB: RDD[(String, Int)] = spark.sparkContext.parallelize(Array("wallace 2", "Lina 3", "Lucy,4", "Sofia 10", "Anna 103")).flatMap(x => x.split(" "))
-      .map(p => (p(0).toString, p(1).toInt)).reduceByKey(_ + _)
-
+    //TODO A FullJoin B, A(K,V) B(K,V), A < B  =>  A leftJoin B  +  B.filter(p => !hashSet.contains(p._1))
+    val rddA: RDD[(String, Int)] = spark.sparkContext.makeRDD(Array("wallace 2", "Lina 3", "Lucy 4")).map(x => x.split(""" """))
+      .map(p => (p(0), p(1).toInt)).reduceByKey(_ + _)
+    val rddB: RDD[(String, Int)] = spark.sparkContext.makeRDD(Array("wallace 5", "Lina 2", "Lucy 9", "Sofia 10", "Anna 103", "David 9", "Mary 19"))
+      .map(x => x.split(""" """))
+      .map(p => (p(0), p(1).toInt)).reduceByKey(_ + _)
 
     rddB.persist(StorageLevel.MEMORY_ONLY_SER_2)
-    var temp: Int = 0
-    val hashSet = mutable.HashSet[String]()
-    val rdd: RDD[(String, Int)] = rddA.leftOuterJoin(rddB).map {
+
+    val tempRDD = rddA.leftOuterJoin(rddB)
+    val hashSet: Set[String] = tempRDD.filter(_._2._2.isDefined).map(_._1).collect().toSet
+
+    val rdd: RDD[(String, Int)] = tempRDD.map {
       p =>
-        p._2._2 match {
-          case Some(_) => hashSet.+=(p._1)
-          case None => temp = 0
+        val temp = p._2._2 match {
+          case Some(value) => value
+          case None => 0
         }
 
-        temp = temp * p._2._1
-        (p._1, temp)
+        val res = temp * p._2._1
+        (p._1, res)
     }
+
 
     val rddB1: RDD[(String, Int)] = rddB.filter(p => !hashSet.contains(p._1)).map(p => (p._1, p._2 * p._2))
 
-    rdd.saveAsTextFile("/test/")
-    rddB1.saveAsTextFile("/test/")
+    val res1: Array[(String, Int)] = rdd.collect()
+    val res2: Array[(String, Int)] = rddB1.collect()
+    res1 ++ res2 foreach println
+    println(s"HashSet Size: ${hashSet.size}, HashSet: ${hashSet.mkString("#")}")
   }
 
   protected def udfFuncDemo(spark: SparkSession): Unit = {
