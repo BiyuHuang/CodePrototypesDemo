@@ -34,11 +34,8 @@ object DataFrameDemo extends CreateSparkSession {
   def main(args: Array[String]): Unit = {
     val spark: SparkSession = createSparkSession("DataFrameDemo")
     spark.conf.set("spark.driver.memory", "3g")
-    spark.conf.set("spark.hadoop.validateOutputSpecs", "false")
-    // sqlDemo(spark)
-
+    sqlDemo(spark)
     joinDemo(spark)
-
   }
 
   private def joinDemo(spark: SparkSession): Unit = {
