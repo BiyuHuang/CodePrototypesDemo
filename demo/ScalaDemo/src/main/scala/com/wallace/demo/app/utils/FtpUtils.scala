@@ -39,7 +39,9 @@ class FtpUtils(ftpMetadata: FtpMetaData) extends Using {
         log.debug("opening channel")
         Try {
           session.connect()
-          session.openChannel(ftpMetadata.ftpType).asInstanceOf[ChannelSftp]
+          val channel = session.openChannel(ftpMetadata.ftpType).asInstanceOf[ChannelSftp]
+          channel.connect()
+          channel
         }
     }
   } match {
