@@ -14,9 +14,8 @@ object Dependencies {
     "com.github.pathikrit" %% "better-files" % "3.4.0",
     "com.github.pathikrit" %% "better-files-akka" % "3.4.0",
     "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0",
-    "com.yammer.metrics" % "metrics-core" % "2.2.0"
-
-
+    "com.yammer.metrics" % "metrics-core" % "2.2.0",
+    "com.jcraft" % "jsch" % "0.1.54"
   )
 
   val httpDependencies: Seq[ModuleID] = Seq(
