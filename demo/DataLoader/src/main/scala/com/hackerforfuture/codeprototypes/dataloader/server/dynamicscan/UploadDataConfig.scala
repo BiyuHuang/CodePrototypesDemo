@@ -6,7 +6,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.hackerforfuture.codeprototypes.dataloader.entities.dynamicscan
+package com.hackerforfuture.codeprototypes.dataloader.server.dynamicscan
 
 import com.typesafe.config.Config
 

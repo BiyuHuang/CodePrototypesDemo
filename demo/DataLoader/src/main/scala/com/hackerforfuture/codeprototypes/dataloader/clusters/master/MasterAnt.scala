@@ -8,6 +8,7 @@
 
 package com.hackerforfuture.codeprototypes.dataloader.clusters.master
 
+import com.hackerforfuture.codeprototypes.dataloader.schedule.AntScheduler
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.mutable

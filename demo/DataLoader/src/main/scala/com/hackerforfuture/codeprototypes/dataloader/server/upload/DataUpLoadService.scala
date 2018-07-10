@@ -6,15 +6,14 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.hackerforfuture.codeprototypes.dataloader.services
-
-import java.util.Timer
+package com.hackerforfuture.codeprototypes.dataloader.server.upload
 
 /**
   * Created by wallace on 2018/1/20.
   */
-object DataScanService {
-  def execute(): Unit = {
-    val timer = new Timer
+class DataUpLoadService extends Runnable {
+
+  override def run(): Unit = {
+
   }
 }

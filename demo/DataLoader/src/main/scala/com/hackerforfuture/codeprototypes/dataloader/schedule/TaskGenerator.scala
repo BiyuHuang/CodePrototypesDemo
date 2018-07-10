@@ -6,15 +6,12 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.hackerforfuture.codeprototypes.dataloader.entities.download
-
-import com.hackerforfuture.codeprototypes.dataloader.common.Using
+package com.hackerforfuture.codeprototypes.dataloader.schedule
 
 /**
-  * Created by wallace on 2018/1/20.
+  * Created by wallace on 2018/7/11.
   */
-class DataDownLoadProcess extends Runnable with Using {
-  override def run(): Unit = {
+class TaskGenerator {
+  //TODO Generate Task Queue
 
-  }
 }

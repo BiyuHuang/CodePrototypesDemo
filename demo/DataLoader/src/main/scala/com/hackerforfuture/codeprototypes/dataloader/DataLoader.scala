@@ -11,7 +11,7 @@ package com.hackerforfuture.codeprototypes.dataloader
 import java.io.File
 
 import com.hackerforfuture.codeprototypes.dataloader.common.LogSupport
-import com.hackerforfuture.codeprototypes.dataloader.services.DataLoaderServer
+import com.hackerforfuture.codeprototypes.dataloader.server.DataLoaderServer
 
 import scala.util.control.NonFatal
 

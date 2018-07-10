@@ -6,13 +6,13 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.hackerforfuture.codeprototypes.dataloader.services
+package com.hackerforfuture.codeprototypes.dataloader.server.download
 
 /**
   * Created by wallace on 2018/1/20.
   */
-object DataDownLoadService {
-  def execute(): Unit = {
+class DataDownLoadService extends Runnable {
+  override def run(): Unit = {
 
   }
 }

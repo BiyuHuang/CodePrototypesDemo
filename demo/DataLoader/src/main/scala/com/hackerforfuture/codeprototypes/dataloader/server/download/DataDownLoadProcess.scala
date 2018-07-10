@@ -6,17 +6,15 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.hackerforfuture.codeprototypes.dataloader.services
+package com.hackerforfuture.codeprototypes.dataloader.server.download
 
-import com.hackerforfuture.codeprototypes.dataloader.common.LogSupport
+import com.hackerforfuture.codeprototypes.dataloader.common.Using
 
 /**
   * Created by wallace on 2018/1/20.
   */
-object DataLoaderServer extends LogSupport {
-  def run(): Unit = {
-    DataScanService.execute()
-    DataUpLoadService.execute()
-    DataDownLoadService.execute()
+class DataDownLoadProcess extends Runnable with Using {
+  override def run(): Unit = {
+
   }
 }

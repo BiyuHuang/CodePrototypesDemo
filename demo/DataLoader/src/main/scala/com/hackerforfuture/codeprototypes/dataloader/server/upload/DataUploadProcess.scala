@@ -6,13 +6,15 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.hackerforfuture.codeprototypes.dataloader.services
+package com.hackerforfuture.codeprototypes.dataloader.server.upload
+
+import com.hackerforfuture.codeprototypes.dataloader.common.Using
 
 /**
   * Created by wallace on 2018/1/20.
   */
-object DataUpLoadService {
-  def execute(): Unit = {
+class DataUploadProcess extends Runnable with Using {
+  override def run(): Unit = {
 
   }
 }
