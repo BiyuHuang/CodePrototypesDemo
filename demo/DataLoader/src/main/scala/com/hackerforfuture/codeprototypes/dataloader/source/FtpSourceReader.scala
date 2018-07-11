@@ -8,19 +8,19 @@
 
 package com.hackerforfuture.codeprototypes.dataloader.source
 
-import java.io.OutputStream
+import java.io.{File, FileOutputStream, OutputStream}
 
 import com.hackerforfuture.codeprototypes.dataloader.common.source.SourceReader
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 
 /**
   * Created by wallace on 2018/7/10.
   */
 class FtpSourceReader extends SourceReader[OutputStream] {
 
-  override def read(): Future[OutputStream] = {
-    ???
+  override def read(): Future[OutputStream] = Future {
+    new FileOutputStream(new File(""))
   }
 }

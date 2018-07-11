@@ -17,6 +17,7 @@ import scala.concurrent.Future
   * Created by wallace on 2018/7/11.
   */
 class FtpPersistWriter extends PersistWriter {
+  override def configure(func: () => State): State = super.configure(func)
   override def write(): Future[State] = {
     ???
   }

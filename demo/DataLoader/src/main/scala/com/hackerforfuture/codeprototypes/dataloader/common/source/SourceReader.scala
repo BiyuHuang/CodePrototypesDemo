@@ -8,9 +8,10 @@
 
 package com.hackerforfuture.codeprototypes.dataloader.common.source
 
-import java.util.concurrent.Future
 
 import com.hackerforfuture.codeprototypes.dataloader.common.Configure
+
+import scala.concurrent.Future
 
 
 /**
