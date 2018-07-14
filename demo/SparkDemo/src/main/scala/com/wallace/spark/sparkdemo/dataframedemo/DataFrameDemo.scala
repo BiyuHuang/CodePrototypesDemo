@@ -1,9 +1,9 @@
-package com.wallace.spark.sparkdemo.dataframedemo
+package com.wallace.spark.SparkDemo.dataframedemo
 
+import com.wallace.common.CreateSparkSession
 import com.wallace.common.timeformat.TimePara
-import com.wallace.spark.CreateSparkSession
-import com.wallace.spark.sparkdemo.dataframedemo.PersonInfo._
-import com.wallace.spark.sparkdemo.dataframedemo.SpendingInfo.{Id, Spending, Time}
+import com.wallace.spark.SparkDemo.dataframedemo.PersonInfo._
+import com.wallace.spark.SparkDemo.dataframedemo.SpendingInfo.{Id, Spending, Time}
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
@@ -128,7 +128,7 @@ object DataFrameDemo extends CreateSparkSession {
     val res4: DataFrame = res3.filter(res3.col("Time") >= "2016-05-23 09:00:00")
     res4.show(3)
     /** select */
-    val res5: DataFrame = res4.select("NAME", "Id", "Time", "Spending")
+    val res5: DataFrame = res4.select("NAME", "Id", "Time", "Spending").groupBy("Name").avg()
     res5.show(3)
     //    res5.write.format("com.databricks.spark.csv").mode(SaveMode.Overwrite).save("./temp/")
     //    res5.write.format("csv").mode(SaveMode.Overwrite).save("/")

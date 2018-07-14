@@ -1,9 +1,44 @@
 package com.wallace.demo.app.utils
 
+import java.nio.ByteBuffer
+
 /**
   * Created by 10192057 on 2018/4/17 0017.
   */
 object MathUtils {
+  def byteArrayToInt(byteArray: Array[Byte]): Int = {
+    // ByteOrder.LITTLE_ENDIAN
+    assert(byteArray.length == 4, "Int value must be 32 bits / 4 Bytes")
+    byteArray(3) & 0xFF |
+      (byteArray(2) & 0xFF) << 8 |
+      (byteArray(1) & 0xFF) << 16 |
+      (byteArray(0) & 0xFF) << 24
+  }
+
+  def intToByteArray(value: Int): Array[Byte] = {
+    assert(value <= Int.MaxValue, s"Int value must be less than ${Int.MaxValue}.")
+    Array[Byte](
+      ((value >> 24) & 0xFF).toByte,
+      ((value >> 16) & 0xFF).toByte,
+      ((value >> 8) & 0xFF).toByte,
+      (value & 0xFF).toByte)
+  }
+
+  def longToByteArray(value: Long): Array[Byte] = {
+    assert(value <= Long.MaxValue, s"Long value must be less than ${Long.MaxValue}.")
+    val buffer: ByteBuffer = ByteBuffer.allocate(8)
+    buffer.putLong(0, value)
+    buffer.array()
+  }
+
+  def byteArrayToLong(byteArray: Array[Byte]): Long = {
+    assert(byteArray.length == 8, "Long value must be 64 bits / 8 Bytes")
+    val buffer: ByteBuffer = ByteBuffer.allocate(8)
+    buffer.put(byteArray)
+    buffer.flip()
+    buffer.getLong
+  }
+
   def parseInt(in: String, radio: String): Int = {
     radio match {
       case "d" => parseInt(in, 10)
@@ -47,4 +82,7 @@ object MathUtils {
       case "%" => if (operand != 0) value % operand else value
     }
   }
+
+
+
 }

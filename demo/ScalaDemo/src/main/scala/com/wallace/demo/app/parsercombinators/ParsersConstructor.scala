@@ -34,13 +34,12 @@ object ParsersConstructor extends Using {
             parser =>
               (parser._2.outputFields, parser._1)
           }).getOrElse(Map.empty)
-          val keys: String = specialFields.map(_._1.trim).mkString("|")
           tgtColumnsFields.zipWithIndex.map {
             elem =>
               val name = elem._1
               val index = elem._2
-              val methodType = if (keys.contains(name)) {
-                specialFields.map(item => if (item._1.contains(name)) item._2 else "").filter(_.nonEmpty).head
+              val methodType: String = if (specialFields.contains(name)) {
+                specialFields(name)
               } else {
                 MethodKeyType.default
               }

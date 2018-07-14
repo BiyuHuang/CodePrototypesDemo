@@ -12,10 +12,10 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % "2.5.3",
     "com.typesafe.akka" %% "akka-remote" % "2.5.3",
     "com.github.pathikrit" %% "better-files" % "3.4.0",
-    "com.github.pathikrit" %% "better-files-akka" % "3.4.0",
     "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0",
     "com.yammer.metrics" % "metrics-core" % "2.2.0",
-    "com.jcraft" % "jsch" % "0.1.54"
+    "com.jcraft" % "jsch" % "0.1.54",
+    "com.github.pathikrit" %% "better-files-akka" % "3.4.0" exclude("com.typesafe.akka", "akka-actor")
   )
 
   val httpDependencies: Seq[ModuleID] = Seq(
@@ -42,6 +42,6 @@ object Dependencies {
   )
 
   val sparkAppDependencies: Seq[ModuleID] = commonDependencies ++ hdfsDependencies ++ sparkDependencies
-  val scalaDemoDependencies: Seq[ModuleID] = commonDependencies ++ httpDependencies ++ hdfsDependencies
+  val scalaDemoDependencies: Seq[ModuleID] = commonDependencies ++ httpDependencies ++ hdfsDependencies ++ sparkDependencies
   val dataLoaderDependencies: Seq[ModuleID] = commonDependencies ++ hdfsDependencies
 }

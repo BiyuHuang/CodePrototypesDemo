@@ -1,4 +1,4 @@
-package com.hackerforfuture.codeprototypes.dataloader.Utils
+package com.hackerforfuture.codeprototypes.dataloader.utils
 
 import java.io.File
 import java.util

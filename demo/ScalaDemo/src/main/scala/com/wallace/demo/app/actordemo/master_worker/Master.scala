@@ -8,99 +8,163 @@
 
 package com.wallace.demo.app.actordemo.master_worker
 
-
-import java.util.concurrent.TimeUnit
+import java.util
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.{ConcurrentHashMap, LinkedBlockingQueue}
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorRef, ActorSelection, ActorSystem, Props, UnhandledMessage}
 import com.typesafe.config.{Config, ConfigFactory}
+import sun.misc.{Signal, SignalHandler}
 
-import scala.concurrent.Await
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 import scala.concurrent.duration._
 
 /**
-  * Created by wallace on 2018/6/20.
+  * Created by 10192057 on 2018/6/20 0020.
   */
 class Master(val host: String, val port: Int) extends Actor {
-  //workerId->workerInfo
-  val id2WorkInfo = new scala.collection.mutable.HashMap[String, WorkerInfo]
-
-  //为了便于一些额外的逻辑，比如按Worker的剩余可用memory进行排序
-  val workers = new scala.collection.mutable.HashSet[WorkerInfo]
-
-  //检查worker是否超时的时间间隔
-  val CHECK_INTERVAL = 10000
-
-  //统计worker个数
-  val cnt: AtomicLong = new AtomicLong(0L)
+  val id2WorkInfo = new mutable.HashMap[String, WorkerInfo]()
+  val workers = new mutable.HashSet[WorkerInfo]()
+  val workerActors: mutable.HashSet[ActorSelection] = new mutable.HashSet[ActorSelection]()
+  private val SHIFT: AtomicLong = new AtomicLong(0)
+  val CHECK_INTERVAL: Long = 6000L
 
   override def preStart(): Unit = {
-    //使用schedule必须导入该扩展的隐式变量
-    //millis是毫秒的单位，其在包scala.concurrent.duration下
     import context.dispatcher
     context.system.scheduler.schedule(0 millis, CHECK_INTERVAL millis, self, CheckTimeOutWorker)
+    context.system.scheduler.schedule(0 millis, CHECK_INTERVAL millis, self, ScheduleJob)
   }
 
-  override def receive: Receive = {
-    case RegisterWorker(id, memory, cores) =>
-      //把Worker的注册消息封装到类WorkerInfo中
+  //  override def postStop(): Unit = {
+  //    workerActors.foreach {
+  //      worker =>
+  //        println(s"Shutdown worker#${worker.pathString}")
+  //        worker.tell(ShutdownNow, context.system.deadLetters)
+  //    }
+  //  }
+
+  override def receive: PartialFunction[Any, Unit] = {
+    case RegisterWorker(id, memory, cores, workerUrl) =>
       if (!id2WorkInfo.contains(id)) {
-        //当前workerId没有注册
-        val workerInfo = WorkerInfo(id, memory, cores)
+        val workerInfo: WorkerInfo = WorkerInfo(id, memory, cores, workerUrl)
         id2WorkInfo.put(id, workerInfo)
         workers += workerInfo
-        //这里简单发生Master的url通知worker注册成功
-        cnt.getAndIncrement()
-        sender ! RegisteredWorker(s"akka.tcp://MasterSystem@$host:$port/user/Master")
-      }
-    case HeartBeat(workerId) => //处理Worker的心跳
-      if (id2WorkInfo.contains(workerId)) {
-        id2WorkInfo(workerId).updateLastHeartBeatTime()
+        workerActors += context.actorSelection(workerUrl)
+        sender() ! RegisteredWorker(s"akka.tcp://MasterSystem@$host:$port/user/Master")
       } else {
-        println(s"注册表已丢失Worker#$workerId, 重新注册Worker信息.")
-        sender() ! RegisterWorker(workerId, -1, -1)
+        println(s"Worker $id registered.")
       }
-    case CheckTimeOutWorker => //定时检测是否有超时的worker并进行处理
-      val cur = System.currentTimeMillis
-      //过滤出超时的worker
-      val deadWorker = workers.filter(x => cur - x.lastHeartBeatTime.get() > CHECK_INTERVAL)
-      //从记录删除删除超时的worker
+    case HeartBeat(workerId) =>
+      if (id2WorkInfo.contains(workerId)) {
+        id2WorkInfo(workerId).updateLastHeatTime()
+      } else {
+        println(s"注册表已丢失Worker#$workerId, 重新注册Worker信息")
+        sender() ! RegisterWorker(workerId, -1, -1, "")
+      }
+    case CheckTimeOutWorker =>
+      val cur: Long = System.currentTimeMillis()
+      val deadWorker: mutable.HashSet[WorkerInfo] = workers.filter(x => cur - x.lastHeartBeatTime.get() > CHECK_INTERVAL)
       for (w <- deadWorker) {
         id2WorkInfo -= w.id
         workers -= w
-        cnt.getAndDecrement()
+        workerActors -= context.actorSelection(w.workerUrl)
       }
-      if (workers.size <= 0) {
-        println("Warning: No workers.")
+      println(s"Worker总数: ${workers.size}")
+      println(s"Job总数: ${Master.mQueue.size()}")
+      println(s"ScheduleJob总数: ${Master.scheduleQueue.size()}")
+    case ScheduleJob =>
+      println(s"Start to schedule job.")
+      val wActors: Array[ActorSelection] = workerActors.toArray
+      val scheduleJob: util.ArrayList[String] = new util.ArrayList[String]()
+      Master.mQueue.drainTo(scheduleJob, 15 * wActors.length)
+      scheduleJob.addAll(Master.scheduleQueue.values())
+      if (wActors.length > 0) {
+        if (scheduleJob.size() > 0) {
+          scheduleJob.asScala.zipWithIndex.foreach {
+            case (s, index) =>
+              val job: PersistJob = PersistJob(s)
+              wActors((index + SHIFT.get().toInt) % wActors.length) ! job
+          }
+        } else {
+          println("There is no any job.")
+          SHIFT.set(0L)
+        }
       } else {
-        println(s"Worker总数： ${cnt.get()}")
-        workers.map(x => x.id).zipWithIndex.foreach(println)
+        println("There is no any worker.")
       }
-
+    case ReceivedJob(job) =>
+      Master.scheduleQueue.remove(job)
+      if (SHIFT.get() > workerActors.size) {
+        SHIFT.set(0L)
+      }
+    case FailedReceiveJob(job) =>
+      if (Master.scheduleQueue.contains(job)) {
+        println(s"$job waiting to be scheduled.")
+        SHIFT.getAndIncrement()
+      } else {
+        Master.scheduleQueue.put(job, job)
+      }
+    case msg: UnhandledMessage => println(msg.message)
   }
 }
 
 object Master {
+  val mQueue: LinkedBlockingQueue[String] = new LinkedBlockingQueue[String]()
+
+  val scheduleQueue: ConcurrentHashMap[String, String] = new ConcurrentHashMap[String, String]()
+
+  private def registerLoggingSignalHandler(): Unit = {
+    val jvmSignalHandlers = new ConcurrentHashMap[String, SignalHandler]().asScala
+    val handler = new SignalHandler() {
+      override def handle(signal: Signal): Unit = {
+        println(s"Terminating process due to signal $signal")
+        jvmSignalHandlers.get(signal.getName).foreach(_.handle(signal))
+      }
+    }
+
+    def registerHandler(signalName: String): Unit = {
+      val oldHandler = Signal.handle(new Signal(signalName), handler)
+      if (oldHandler != null) jvmSignalHandlers.put(signalName, oldHandler)
+    }
+
+    if (!System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("windows")) {
+      registerHandler("TERM")
+      registerHandler("INT")
+      registerHandler("HUP")
+    }
+  }
+
   def main(args: Array[String]): Unit = {
-    val host = args(0)
-    val port = args(1).toInt
-    //构造配置参数值，使用3个双引号可以多行，使用s可以在字符串中使用类似Shell的变量
-    val confStr =
+    if (args.length < 2) {
+      System.exit(1)
+    }
+    registerLoggingSignalHandler()
+    (0 until 15).foreach {
+      i =>
+        mQueue.add(s"job_$i")
+    }
+    val host: String = args(0)
+    val port: Int = args(1).toInt
+    val confStr: String =
       s"""
          |akka.actor.provider = "akka.remote.RemoteActorRefProvider"
          |akka.remote.netty.tcp.hostname = "$host"
          |akka.remote.netty.tcp.port = "$port"
          |akka.actor.warn-about-java-serializer-usage = "false"
        """.stripMargin
-    //通过工厂方法获得一个config对象
     val conf: Config = ConfigFactory.parseString(confStr)
-    //初始化一个ActorSystem，其名为MasterSystem
+    //val executionContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(5))
+    //val actorSystem: ActorSystem = ActorSystem("MasterSystem", Option(conf), None, Option(executionContext))
     val actorSystem: ActorSystem = ActorSystem("MasterSystem", conf)
-    //使用actorSystem实例化一个名为Master的actor,注意这个名称在Worker连接Master时会用到
     val master: ActorRef = actorSystem.actorOf(Props(new Master(host, port)), "Master")
-    //阻塞当前线程直到系统关闭退出
-    //    actorSystem.awaitTermination
-    //actorSystem.terminate()
-    Await.ready(actorSystem.whenTerminated, Duration(365, TimeUnit.DAYS))
+    Runtime.getRuntime.addShutdownHook(new Thread("Master-Shutdown-Hook") {
+      override def run(): Unit = {
+        actorSystem.stop(master)
+        actorSystem.terminate()
+      }
+    })
+    //Await.ready(actorSystem.whenTerminated, Duration(365, TimeUnit.DAYS))
   }
 }

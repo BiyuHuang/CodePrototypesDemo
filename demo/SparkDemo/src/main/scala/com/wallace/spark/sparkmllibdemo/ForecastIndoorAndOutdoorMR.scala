@@ -8,7 +8,7 @@
 
 package com.wallace.spark.sparkmllibdemo
 
-import com.wallace.spark.CreateSparkSession
+import com.wallace.common.CreateSparkSession
 import org.apache.spark.mllib.classification.{LogisticRegressionWithLBFGS, NaiveBayes, SVMWithSGD}
 import org.apache.spark.mllib.evaluation.{BinaryClassificationMetrics, MulticlassMetrics}
 import org.apache.spark.mllib.linalg.Vectors

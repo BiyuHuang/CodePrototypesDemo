@@ -1,6 +1,5 @@
-package com.wallace.spark
+package com.wallace.common
 
-import com.wallace.common.{FuncRunDuration, LogSupport}
 import org.apache.spark.sql.SparkSession
 
 /**
@@ -11,7 +10,7 @@ trait CreateSparkSession extends FuncRunDuration with LogSupport {
     val warehouseLocation = System.getProperty("user.dir").replaceAll("\\\\", "/") + "/" + "spark-warehouse"
     val spark: SparkSession = SparkSession
       .builder()
-      .master("local[*]")
+      .master(master)
       .appName(appName)
       .config("spark.sql.warehouse.dir", warehouseLocation)
       //.enableHiveSupport()

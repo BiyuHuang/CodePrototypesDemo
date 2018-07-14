@@ -50,6 +50,6 @@ object ExprParserCombinators {
     assert(parser.parse("1 + 2 * 7 + 3 / 4") == 15.75, "Failed to parse input source.")
     assert(parser.parse("1 + 2 * (7 + 3) / 4") == 6.0, "Failed to parse input source.")
     assert(parser.parse("1 + 2 / 0") == Double.PositiveInfinity, "Failed to parse input source.")
-    assert(parser.parse("3 % 4 + 10 / 5") == 5, "Failed to parse input source.")
+    assert(parser.parse("3 % 4 + 10 / 5") == 5.0, "Failed to parse input source.")
   }
 }

@@ -185,7 +185,7 @@ object StringFuncUtils extends Using {
       log.info(s"UniqueIndex: ${_uniqueIndex}")
     }, 10)
 
-    log.info(formatString("16"))
+    log.info(formatString("16.1"))
     val str0 = """1,2,3,4,"a=1,b=2,c=3","e=1.2,f=32.1,g=1.3",7,8,9"""
     val str1 = """1,2,3,"4,"a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
     val str2 = """1,2,3,4","a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
@@ -227,12 +227,13 @@ object StringFuncUtils extends Using {
       case "" => ""
       case _: String =>
         val a = "%1$s-%2$s-%3$s".format("scala", "StringLike", "format")
-        val b = "%d%%".format(s.toInt)
+        val b = "%d%%".format(s.toDouble.toInt)
         val c = "%8.3f".format(s.toDouble)
         val d = "%08.3f".format(s.toDouble)
-        val e = "%09d".format(s.toInt)
+        val e = "%09d".format(s.toDouble.toInt)
         val f = "%.2f".format(s.toDouble)
-        val g = f"${s.toDouble}%.2f"
+        val g = "%.0f".format(s.toDouble)
+        val h = f"${s.toDouble}%.2f"
 
         s"""
            |$a
@@ -242,6 +243,7 @@ object StringFuncUtils extends Using {
            |$e
            |$f
            |$g
+           |$h
          """.stripMargin
       case _ =>
         ""

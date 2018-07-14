@@ -1,6 +1,6 @@
 package com.wallace.spark.sparkmllibdemo
 
-import com.wallace.spark.CreateSparkSession
+import com.wallace.common.CreateSparkSession
 import org.apache.spark.ml.feature._
 import org.apache.spark.sql.SparkSession
 

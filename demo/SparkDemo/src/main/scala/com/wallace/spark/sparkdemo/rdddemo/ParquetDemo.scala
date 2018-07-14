@@ -8,8 +8,7 @@
 
 package com.wallace.spark.sparkdemo.rdddemo
 
-import com.wallace.common.Using
-import com.wallace.spark.CreateSparkSession
+import com.wallace.common.{CreateSparkSession, Using}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SaveMode, SparkSession}
 

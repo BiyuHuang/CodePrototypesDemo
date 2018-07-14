@@ -2,7 +2,7 @@
 //
 //import java.net.ConnectException
 //
-//import com.wallace.spark.CreateSparkSession
+//import com.wallace.common.CreateSparkSession
 //import kafka.serializer.StringDecoder
 //import org.apache.spark.sql.SparkSession
 //import org.apache.spark.streaming.kafka.KafkaManager
