@@ -24,13 +24,13 @@ public class ParquetIOUtils {
 
     public static void main(String[] args) throws Exception {
         //parquetWriter("test\\parquet-out2", "input.txt");
-        parquetReaderV2("test\\parquet-out2");
+        parquetReaderV2();
     }
 
 
-    static void parquetReaderV2(String inPath) throws Exception {
+    private static void parquetReaderV2() throws Exception {
         GroupReadSupport readSupport = new GroupReadSupport();
-        ParquetReader.Builder<Group> reader = ParquetReader.builder(readSupport, new Path(inPath));
+        ParquetReader.Builder<Group> reader = ParquetReader.builder(readSupport, new Path("test\\parquet-out2"));
         ParquetReader<Group> build = reader.build();
         Group line = null;
         while ((line = build.read()) != null) {
@@ -81,7 +81,7 @@ public class ParquetIOUtils {
         Path path = new Path(outPath);
         Configuration configuration = new Configuration();
         GroupWriteSupport writeSupport = new GroupWriteSupport();
-        writeSupport.setSchema(schema, configuration);
+        GroupWriteSupport.setSchema(schema, configuration);
         ParquetWriter<Group> writer = new ParquetWriter<>(path, configuration, writeSupport);
         //把本地文件读取进去，用来生成parquet格式文件
         BufferedReader br = new BufferedReader(new FileReader(new File(inPath)));

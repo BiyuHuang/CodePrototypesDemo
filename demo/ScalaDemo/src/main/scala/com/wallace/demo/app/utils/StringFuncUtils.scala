@@ -8,7 +8,7 @@ import com.wallace.demo.app.utils.stringutils.StringUtils
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
-import scala.util.Properties
+import scala.util.{Properties, Try}
 
 /**
   * Created by Wallace on 2017/1/11.
@@ -171,9 +171,7 @@ object StringFuncUtils extends Using {
     str.substring(str1.indexOf("post_"), str1.length)
   }
 
-  def stringConventToBytes(str: String, charsetName: String = "UTF-8"): Array[Byte] = try {
-    str.getBytes(charsetName)
-  }
+  def stringConventToBytes(str: String, charsetName: String = "UTF-8"): Array[Byte] = Try(str.getBytes(charsetName)).getOrElse(Array.emptyByteArray)
 
   def bytesCoventToString(bytes: Array[Byte], charsetName: String = "UTF-8"): String = new String(bytes, charsetName)
 

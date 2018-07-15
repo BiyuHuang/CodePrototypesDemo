@@ -68,7 +68,4 @@ object LoaderUtils {
         FileContextV1(file, file.getName, "", "", PathInfo(filePath, errorPath, "", ""))
     }
   }
-
-
-  StringBuilder
 }

@@ -143,6 +143,7 @@ object DataFrameDemo extends CreateSparkSession {
     resDF.filter(resDF.col("col_name") === "Location:").rdd.map(x => x.getString(1)).take(1).head
   }
 
+  @Deprecated
   protected def explodeFunc(srcDF: DataFrame): DataFrame = {
     val temp: DataFrame = srcDF.filter(srcDF.col("num") > 0).explode(srcDF.col("col2"), srcDF.col("col3"), srcDF.col("col4"), srcDF.col("col5")) {
       row: Row =>
