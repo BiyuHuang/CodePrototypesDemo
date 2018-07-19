@@ -30,20 +30,20 @@ object ParsersConstructor extends Using {
         val m_fieldsSep = Try(parserMetaData.fieldsSep).getOrElse(FieldsSep.DEFAULT_SEP)
         val m_SrcColumnsFields: HashMap[String, Int] = new HashMap[String, Int]().++(srcColumnsFields)
         val m_TgtColumnsFields: Array[FieldInfo] = if (tgtColumnsFields.nonEmpty) {
-          val specialFields: Map[String, String] = Try(parsers.map {
-            parser =>
-              (parser._2.outputFields, parser._1)
-          }).getOrElse(Map.empty)
-          val keys: String = specialFields.map(_._1.trim).mkString("|")
+          val specialFields: Map[String, String] = Try {
+            parsers.map(p => (p._2.outputFields, p._1)).flatMap {
+              elem =>
+                val fieldKeys: Array[String] = elem._1.split(",| +")
+                val methodType: String = elem._2
+                fieldKeys.map(k => (k, methodType))
+            }
+          }.getOrElse(Map.empty)
+
           tgtColumnsFields.zipWithIndex.map {
             elem =>
               val name = elem._1
               val index = elem._2
-              val methodType = if (keys.contains(name)) {
-                specialFields.map(item => if (item._1.contains(name)) item._2 else "").filter(_.nonEmpty).head
-              } else {
-                MethodKeyType.default
-              }
+              val methodType: String = Try(specialFields(name)).getOrElse(MethodKeyType.default)
               FieldInfo(name, index, methodType)
           }
         } else {
@@ -67,8 +67,11 @@ object ParsersConstructor extends Using {
         val parserChain: ParserChain = new ParserChain(rawDataMetaData, m_Parsers.asScala.toMap)
         parserChain.initialize()
         (targetKey, parserChain)
-      } else {
+      }
+
+      else {
         (targetKey, null)
       }
   }
+
 }

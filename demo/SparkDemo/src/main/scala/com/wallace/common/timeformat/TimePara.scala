@@ -131,8 +131,9 @@ object TimePara {
       case _ => None
     }
 
+    val timeZoneOffset: Int = -(Calendar.getInstance().get(Calendar.ZONE_OFFSET) + Calendar.getInstance().get(Calendar.DST_OFFSET)) / (60 * 1000)
     if (s.isDefined) {
-      sdf.format(new Date(s.get * 1000 + new Date().getTimezoneOffset * 60 * 1000))
+      sdf.format(new Date(s.get * 1000 + timeZoneOffset * 60 * 1000))
     } else {
       ""
     }

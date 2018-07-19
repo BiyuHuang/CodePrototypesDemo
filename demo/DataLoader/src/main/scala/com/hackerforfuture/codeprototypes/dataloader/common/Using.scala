@@ -25,7 +25,7 @@ trait Using extends LogSupport {
     }
   }
 
-  protected def using[A <: {def close() : Unit}, B](param: A)(f: A => B): B = {
+  protected def using[P <: {def close() : Unit}, R](param: P)(f: P => R): R = {
     try {
       f(param)
     } finally {

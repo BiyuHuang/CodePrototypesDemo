@@ -58,7 +58,7 @@ object MessageConsumer {
     scc.checkpoint("./")
     val topics = Set("kafka-spark-demo")
     val kafkaParams = Map[String, Object](
-      "bootstrap.servers" -> "localhost:9092,anotherhost:9092",
+      "bootstrap.servers" -> "10.9.234.31:9092",
       "key.deserializer" -> classOf[StringDeserializer],
       "value.deserializer" -> classOf[StringDeserializer],
       "group.id" -> "wallace_temp",

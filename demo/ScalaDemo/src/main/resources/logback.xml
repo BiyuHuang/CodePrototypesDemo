@@ -13,6 +13,7 @@
     </appender>
 
     <appender name="FILE_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_dir}/CodePrototypesDemo.warn.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>WARN</level>
             <onMatch>ACCEPT</onMatch>
@@ -20,8 +21,12 @@
         </filter>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/CodePrototypesDemo.warn.log</fileNamePattern>
+            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/CodePrototypesDemo.warn.%i.log.gz</fileNamePattern>
             <maxHistory>${maxHistory}</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>128MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
 
         <encoder>
@@ -31,6 +36,7 @@
 
 
     <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_dir}/CodePrototypesDemo.info.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
@@ -38,16 +44,22 @@
         </filter>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/CodePrototypesDemo.info.log</fileNamePattern>
+            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/CodePrototypesDemo.info.%i.log.gz</fileNamePattern>
             <maxHistory>${maxHistory}</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>128MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
 
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} |-[%thread]-[%level]-[%logger{35}.%method:%line] - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
     <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_dir}/CodePrototypesDemo.debug.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>DEBUG</level>
             <onMatch>ACCEPT</onMatch>
@@ -55,8 +67,12 @@
         </filter>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/CodePrototypesDemo.debug.log</fileNamePattern>
+            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/CodePrototypesDemo.debug.%i.log.gz</fileNamePattern>
             <maxHistory>${maxHistory}</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>128MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
 
         <encoder>
@@ -66,6 +82,7 @@
 
 
     <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_dir}/CodePrototypesDemo.error.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
@@ -73,8 +90,12 @@
         </filter>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/CodePrototypesDemo.error.log</fileNamePattern>
+            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/CodePrototypesDemo.error.%i.log.gz</fileNamePattern>
             <maxHistory>${maxHistory}</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>128MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
 
         <encoder>

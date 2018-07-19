@@ -6,6 +6,10 @@
 [![codecov](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo/branch/master/graph/badge.svg)](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo)
 
     All of this are my private coding prototypes demo. Including scala demo/spark demo.
+    Please use SBT build this repo:
+    $ cd code_source_path
+    $ sbt update gen-idea
+    $ sbt clean assembly
 
 
 

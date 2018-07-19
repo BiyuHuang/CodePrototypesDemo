@@ -20,7 +20,7 @@ class SplitFieldsParser extends AbstractParser {
   override def parse(record: Array[String], fieldInfo: FieldInfo): String = {
     Try {
       val keyWithIndex: (String, Int) = m_SplitColumnsFields(fieldInfo.name)
-      record(m_SrcFieldsInfo(keyWithIndex._1)).split(split_sep, -1)(keyWithIndex._2)
+      record(m_SrcFieldsInfo(keyWithIndex._1)).split(s"""\\$split_sep""", -1)(keyWithIndex._2)
     }.getOrElse("")
   }
 

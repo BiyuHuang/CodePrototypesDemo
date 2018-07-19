@@ -11,6 +11,7 @@ package com.wallace.demo.app.dynamicloadconfig
 import java.io.{File, FileInputStream}
 import java.util.{Properties, Timer, TimerTask}
 
+import com.typesafe.config.ConfigFactory
 import com.wallace.demo.app.common.LogSupport
 import com.wallace.demo.app.utils.SystemEnvUtils
 
@@ -20,7 +21,7 @@ import scala.util.control.NonFatal
   * Created by wallace on 2017/10/28.
   */
 class DynamicLoadConfig(props: Properties, prefixPath: String, configFiles: String*) extends TimerTask with LogSupport {
-//TODO 使用better file 监控文件的修改
+  //TODO 使用better file 监控文件的修改
   private val projectRootPath = SystemEnvUtils.getUserDir
 
   private val fileSep = SystemEnvUtils.getFileSeparator
@@ -50,7 +51,8 @@ object DynamicLoadConfig extends LogSupport {
     val props: Properties = new Properties()
     val timer = new Timer
     timer.schedule(new DynamicLoadConfig(props, "conf", "test.conf", "test1.conf"), 1000L, 10000L)
-
+    val eConf = ConfigFactory.empty("")
+    println("###### " + eConf.toString)
     var cnt: Int = 0
     while (cnt < 10) {
       Thread.sleep(10000L)

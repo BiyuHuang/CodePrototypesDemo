@@ -1,7 +1,6 @@
 package com.wallace.spark.sparkdemo.rdddemo
 
-import com.wallace.common.Using
-import com.wallace.spark.CreateSparkSession
+import com.wallace.common.{CreateSparkSession, Using}
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD

@@ -2,6 +2,10 @@ package com.wallace.demo.app.functionaldemo
 
 import com.wallace.demo.app.common.{LogSupport, UserDefineFunc}
 
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+import scala.util.{Failure, Success, Try}
+
 /**
   * Created by Wallace on 2016/11/6.
   */
@@ -12,6 +16,12 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
 
   //    util.Properties.setProp("scala.time", "true")  //继承App, 统计运行时间
   def main(args: Array[String]): Unit = {
+    tryFlatMap("b")
+
+    futureFlatMap("a")
+
+    futureFlatMap("c")
+
     val a: Int = 3
     val b: BigInt = toBigInt(a)
     log.info(s"${Int.MaxValue}, ${Int.MinValue}, ${b.pow(a)}")
@@ -49,6 +59,49 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
     case v if math.abs(v / 90) == 3 => "South"
     case _ => "East"
   }
+
+  def tryFlatMap(key: String): Unit = {
+    val m1: Map[String, Int] = Map("a" -> 1, "b" -> 2, "e" -> 5)
+    val m2: Map[Int, String] = Map(1 -> "west", 2 -> "east", 3 -> "north", 4 -> "south")
+    val m3: Map[String, String] = Map("west" -> "left", "east" -> "right", "north" -> "up", "south" -> "down")
+
+    Try(m1(key)).flatMap(x => Try(m2(x)).flatMap(y => Try(m3(y)))).getOrElse("")
+
+    val recoverRes: Try[Object] = Try(m1(key)).flatMap(x => Try(m2(x)).flatMap(y => Try(m3(y)))).recover {
+      case _: NoSuchElementException => Try(m2(key.toInt))
+    }
+
+    println(recoverRes.get)
+
+    m1.get(key).flatMap(x => m2.get(x).flatMap(y => m3.get(y))) match {
+      case Some(res) => res
+      case None => throw new NoSuchElementException
+    }
+    Try(m1(key)).flatMap(x => Try(m2(x)).flatMap(y => Try(m3(y)))) match {
+      case Success(res) => println(key, res)
+      case Failure(e) => println(e)
+    }
+  }
+
+  def futureFlatMap(key: String): Unit = {
+    val m1: Map[String, Int] = Map("a" -> 1, "b" -> 2, "e" -> 5)
+    val m2: Map[Int, String] = Map(1 -> "west", 2 -> "east", 3 -> "north", 4 -> "south")
+    val m3: Map[String, String] = Map("west" -> "left", "east" -> "right", "north" -> "up", "south" -> "down")
+    import scala.concurrent.ExecutionContext.Implicits.global
+    val futureTask: Future[String] = Future(m1(key)).flatMap(x => Future(m2(x)).flatMap(y => Future(m3(y))))
+
+    futureTask.onFailure {
+      case t: Throwable => println(t)
+    }
+    println(key, Await.result(futureTask, Duration.Inf))
+
+    val inc: Int => Int = (a: Int) => a + 1
+    val dec: Int => Int = (b: Int) => b - 2
+    val pipeline: Int => Int = Function.chain(Seq(inc, dec))
+    pipeline.apply(12)
+    pipeline(13)
+  }
+
 
   /**
     * Lambda表达式, 匿名函数

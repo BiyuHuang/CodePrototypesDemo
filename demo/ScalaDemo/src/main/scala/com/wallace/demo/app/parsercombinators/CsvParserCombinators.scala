@@ -25,8 +25,6 @@ class CsvParserCombinators extends RegexParsers {
 
   def txt: Regex = "[^\",\r\n]".r
 
-  def file: Parser[List[List[String]]] = repsep(record, crlf) <~ opt(crlf)
-
   def record: Parser[List[String]] = rep1sep(field, comma)
 
   def field: Parser[String] = escaped | nonEscaped
@@ -34,6 +32,8 @@ class CsvParserCombinators extends RegexParsers {
   def escaped: Parser[String] = (dQuote ~> ((txt | comma | cr | lf | dQuote2) *) <~ dQuote) ^^ (ls => ls.mkString("").trim)
 
   def nonEscaped: Parser[String] = (txt *) ^^ (ls => ls.mkString("").trim)
+
+  def file: Parser[List[List[String]]] = repsep(record, crlf) <~ opt(crlf)
 
   def parse(s: String): List[List[String]] = parseAll(file, s) match {
     case Success(res, _) => res

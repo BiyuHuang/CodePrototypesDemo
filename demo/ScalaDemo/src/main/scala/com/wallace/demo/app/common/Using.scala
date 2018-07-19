@@ -24,3 +24,9 @@ trait Using extends FuncRuntimeDur {
     }
   }
 }
+
+trait Formatter[T] {
+  def toString(obj: T): String
+
+  def fromString(sObj: String): Option[T]
+}

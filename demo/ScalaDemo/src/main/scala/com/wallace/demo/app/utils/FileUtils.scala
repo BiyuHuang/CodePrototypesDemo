@@ -16,11 +16,18 @@ import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInp
 import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.utils.IOUtils
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.Path
+import org.apache.parquet.example.data.Group
+import org.apache.parquet.example.data.simple.SimpleGroupFactory
+import org.apache.parquet.hadoop.ParquetWriter
+import org.apache.parquet.hadoop.example.GroupWriteSupport
+import org.apache.parquet.schema.{MessageType, MessageTypeParser}
 
 import scala.collection.immutable
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Random, Success, Try}
 import scala.xml.{Node, NodeSeq, XML}
 
 object FileUtils extends Using {
@@ -169,7 +176,19 @@ object FileUtils extends Using {
     val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335112_20180403101500.xml.zip"
     //val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ZTE_OMC1_637784_20170522204500.zip"
     val costTime4: Double = runtimeDuration(readZipArchiveFile(fileName))
-    log.info(s"CostTime3: $costTime4 ms.")
+    log.info(s"CostTime4: $costTime4 ms.")
+
+    //TODO Get File Header
+    var res: Option[Array[(String, Array[Byte])]] = None
+    val costTime5 = runtimeDuration {
+      res = Some(getFileHeader("./demo/ScalaDemo/src/main/resources/"))
+    }
+    res.get.foreach{
+      elem =>
+        log.info(s"FileName: ${elem._1}, File Header Bytes: ${elem._2.take(3).mkString("_")}")
+    }
+    log.info(s"CostTime5: $costTime5 ms.")
+
   }
 
   private def getTotalLines(srcFile: File): Int = {
@@ -358,6 +377,10 @@ object FileUtils extends Using {
     cnt = 0
     usingWithErrMsg(new FileInputStream(fileName), s"Failed to get input stream for $fileName") {
       fin =>
+        val buf: Array[Byte] = new Array[Byte](8)
+        fin.read(buf, 0, 8)
+        val a = BigInt.apply(buf)
+        println(a)
         using(new GzipCompressorInputStream(fin)) {
           inputStream =>
             using(new TarArchiveInputStream(inputStream, "UTF-8")) {
@@ -366,6 +389,19 @@ object FileUtils extends Using {
                   processSingleEntry(tarInput, fileName.split("/").last)
                 }
             }
+        }
+    }
+  }
+
+  def getFileHeader(rootPath: String): Array[(String, Array[Byte])] = {
+    val file = new File(rootPath)
+    file.listFiles().filter(_.isFile).map {
+      f =>
+        using(new FileInputStream(f)) {
+          fin =>
+            val buf: Array[Byte] = new Array[Byte](10)
+            fin.read(buf, 0, 10)
+            f.getName -> buf
         }
     }
   }
@@ -448,6 +484,47 @@ object FileUtils extends Using {
   private def getNodeSeqText(nodeSeq: NodeSeq, defaultValue: String = ""): String = nodeSeq.text match {
     case v: String => v.trim.toLowerCase
     case _ => defaultValue
+  }
+
+  def parquetWriter(destPath: String, srcPath: String): Unit = {
+    val schema: MessageType = MessageTypeParser.parseMessageType(
+      """
+        |message Pair {
+        |OPTIONAL int32 id;
+        |OPTIONAL binary city (UTF8);
+        |OPTIONAL binary ip (UTF8);
+        |OPTIONAL group time(LIST){
+        |	 repeated group bag {
+        |     optional binary elem (UTF8);
+        |   }
+        | }
+        |}
+      """.stripMargin)
+    val conf: Configuration = HdfsManager.hdfsConf
+
+    val factory: SimpleGroupFactory = new SimpleGroupFactory(schema)
+    val destP: Path = new Path(destPath)
+    val writeSupport: GroupWriteSupport = new GroupWriteSupport()
+    GroupWriteSupport.setSchema(schema, conf)
+    //val recordWriter = new ParquetOutputFormat[Group]().getRecordWriter(conf, destP, CompressionCodecName.UNCOMPRESSED)
+    val values: Array[String] = "ShenZhen,192.168.0.1,2018-5-10 10:52:15".split(",")
+    using(new ParquetWriter[Group](destP, conf, writeSupport)) {
+      writer =>
+        val group = factory.newGroup()
+        if (values.length == 2) {
+          val r = new Random
+          values.indices.foreach {
+            i =>
+              group.append(schema.getFieldName(i), values(i))
+          }
+
+          val tmpG = group.addGroup("time")
+          tmpG.append("ttl", r.nextInt(9) + 1)
+          tmpG.append("ttl2", r.nextInt(9) + "_a")
+          log.info("Group String: " + tmpG.toString)
+          writer.write(group)
+        }
+    }
   }
 
   def readXMLConfigFile(algPath: String): Map[String, AlgMetaData] = {
