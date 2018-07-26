@@ -6,10 +6,9 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package scala.com.wallace.spark.sparkdemo.rdddemo
+package com.wallace.spark.sparkdemo.rdddemo
 
 import com.wallace.UnitSpec
-import com.wallace.spark.sparkdemo.rdddemo.RddDemo
 
 /**
   * com.wallace.spark.sparkdemo.rdddemo

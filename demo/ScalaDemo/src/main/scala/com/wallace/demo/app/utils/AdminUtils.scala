@@ -40,7 +40,7 @@ object AdminUtils {
 
 
   def main(args: Array[String]): Unit = {
-    val res: Map[Int, Seq[Int]] = assignReplicasToBrokersRackUnaware(10, 3, Seq(10000, 10001, 10002, 10003, 10004), 0, 0)
+    val res: Map[Int, Seq[Int]] = assignReplicasToBrokersRackUnaware(150, 2, 10000 to 10045, 0, 0)
 
     res.toArray.sortBy(_._1).foreach(println)
   }

@@ -1,4 +1,4 @@
-package com.wallace.spark.SparkDemo.dataframedemo
+package com.wallace.spark.sparkdemo.dataframedemo
 
 /**
   * Created by Wallace on 2016/6/1.
