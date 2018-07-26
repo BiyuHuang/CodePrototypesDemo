@@ -1,9 +1,9 @@
-package com.wallace.spark.SparkDemo.dataframedemo
+package com.wallace.spark.sparkdemo.dataframedemo
 
 import com.wallace.common.CreateSparkSession
 import com.wallace.common.timeformat.TimePara
-import com.wallace.spark.SparkDemo.dataframedemo.PersonInfo._
-import com.wallace.spark.SparkDemo.dataframedemo.SpendingInfo.{Id, Spending, Time}
+import com.wallace.spark.sparkdemo.dataframedemo.PersonInfo._
+import com.wallace.spark.sparkdemo.dataframedemo.SpendingInfo.{Id, Spending, Time}
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._

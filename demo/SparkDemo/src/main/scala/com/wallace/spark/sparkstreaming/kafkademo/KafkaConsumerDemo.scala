@@ -39,7 +39,7 @@ object KafkaConsumerDemo extends Using {
       consumer =>
         val p: TopicPartition = new TopicPartition(topics.head, "wallace_temp".hashCode % 30)
         consumer.assign(Set(p))
-        //consumer.seekToBeginning(parts)
+        //consumer.seekToBeginning(Set(p))
         // consumer.seekToEnd(parts)
         //        parts.foreach {
         //          p =>
@@ -50,7 +50,7 @@ object KafkaConsumerDemo extends Using {
           r =>
             val key: BaseKey = GroupMetadataManager.readMessageKey(r._1)
             val value: OffsetAndMetadata = GroupMetadataManager.readOffsetMessageValue(r._2)
-            println(key.toString, value.toString())
+            println(key, value)
         }
     }
 
