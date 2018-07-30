@@ -15,7 +15,8 @@ object Dependencies {
     "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0",
     "com.yammer.metrics" % "metrics-core" % "2.2.0",
     "com.jcraft" % "jsch" % "0.1.54",
-    "com.github.pathikrit" %% "better-files-akka" % "3.4.0" exclude("com.typesafe.akka", "akka-actor")
+    "com.github.pathikrit" %% "better-files-akka" % "3.4.0" exclude("com.typesafe.akka", "akka-actor"),
+    "net.minidev" % "json-smart" % "2.3"
   )
 
   val httpDependencies: Seq[ModuleID] = Seq(
