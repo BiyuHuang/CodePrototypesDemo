@@ -30,7 +30,7 @@ object KafkaSSConsumerDemo extends LogSupport {
 
     val topics: Set[String] = Set("test_hby")
     val kafkaParams: Map[String, Object] = Map[String, Object](
-      "bootstrap.servers" -> "10.9.234.31:9092",
+      "bootstrap.servers" -> "207.246.109.109:9092",
       "key.deserializer" -> classOf[StringDeserializer],
       "value.deserializer" -> classOf[StringDeserializer],
       "group.id" -> "wallace_temp",

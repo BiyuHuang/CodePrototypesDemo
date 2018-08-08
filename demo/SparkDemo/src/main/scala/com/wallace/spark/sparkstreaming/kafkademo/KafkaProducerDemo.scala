@@ -19,7 +19,7 @@ object KafkaProducerDemo extends LogSupport {
     //      log.error("Usage: KafkaWordCountProducer <metadataBrokerList> <topic> <messagesPerSec>")
     //      System.exit(1)
     //    }
-    val (brokers, topic, messagesPerSec) = ("10.9.234.31:9092", "test_hby", "1000")
+    val (brokers, topic, messagesPerSec) = ("207.246.109.109:9092", "test_hby", "1000")
     val timer = new Timer
     timer.schedule(new senderTimer(brokers, topic, messagesPerSec.toInt), 1000, 5000)
   }
