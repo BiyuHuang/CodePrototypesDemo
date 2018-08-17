@@ -13,19 +13,20 @@ object JsonFormatter {
     //import scala.util.parsing.json.JSON
     val jParser: JSONParser = new JSONParser(JSONParser.DEFAULT_PERMISSIVE_MODE)
     val jObj: JSONObject = jParser.parse(jsonStr).asInstanceOf[JSONObject]
-    getAllFields(jObj)
+    convertJsonToMap(jObj)
   }
 
-  def getAllFields(jsonObj: JSONObject, rootKey: String = ""): Map[String, String] = {
+  private def convertJsonToMap(jsonObj: JSONObject, rootKey: String = ""): Map[String, String] = {
     jsonObj.keySet().asScala.flatMap {
       key =>
         val tempVal: AnyRef = jsonObj.get(key)
+        val fieldKey: String = if (rootKey.nonEmpty) rootKey + "." + key else key
         tempVal match {
           case nObject: JSONObject =>
-            getAllFields(nObject, key)
+            if (nObject.isEmpty) Map(fieldKey -> "") else convertJsonToMap(nObject, fieldKey)
           case _ =>
-            val fieldKey: String = if (rootKey.nonEmpty) rootKey + "." + key else key
-            Map(fieldKey -> tempVal.toString)
+            val value: String = if (tempVal == null) "" else tempVal.toString
+            Map(fieldKey -> value)
         }
     }.toMap
   }
