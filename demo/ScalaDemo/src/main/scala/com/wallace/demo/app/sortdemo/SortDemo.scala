@@ -1,6 +1,6 @@
 package com.wallace.demo.app.sortdemo
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
   * Created by 10192057 on 2018/8/20 0020.
@@ -138,6 +138,100 @@ class ScalaSortDemo {
     source
   }
 
+  //TODO 计数排序
+  def countSort(inputData: ArrayBuffer[Int], k: Int): Array[Int] = {
+    //k表示有所输入数字都介于0到k之间
+    val temp = new Array[Int](k)
+    // 临时存储区
+    val outdata = new Array[Int](inputData.length)
+    val len = temp.length
+    for (i <- 0 until len) {
+      // 初始化
+      temp(i) = 0
+    }
+    for (i <- inputData.indices) {
+      temp(inputData(i)) = temp(inputData(i)) + 1
+    }
+    for (i <- 1 until len) {
+      temp(i) = temp(i) + temp(i - 1)
+    }
+    // 把输入数组中的元素放在输出数组中对应的位置上
+    var n = inputData.length - 1
+    while (n >= 0) {
+      // 从后往前遍历
+      outdata(temp(inputData(n)) - 1) = inputData(n)
+      temp(inputData(n)) = temp(inputData(n)) - 1
+      n = n - 1
+    }
+    outdata
+  }
+
+  //TODO 桶排序
+  def bucketSort(inputData: ArrayBuffer[Int], max: Int): ArrayBuffer[Int] = {
+    var buckets = new Array[Int](max)
+    for (i <- inputData.indices) //计数
+      buckets(inputData(i)) = buckets(inputData(i)) + 1
+    var j = 0
+    for (i <- 0 until max)
+      while (buckets(i) > 0) {
+        inputData(j) = i
+        j = j + 1
+        buckets(i) = buckets(i) - 1
+      }
+    buckets = null
+    inputData
+  }
+
+  //TODO 基数排序函数
+  /** B表示要排序的数组
+    * d表示每一位数字的范围（这里是10进制数，有0~9一共10种情况）
+    */
+  def radixSort(inputData: ArrayBuffer[Int], d: Int): ArrayBuffer[Int] = {
+    import scala.util.control.Breaks._
+    //n用来表示当前排序的是第几位
+    var n = 1
+    //hasNum用来表示数组中是否有至少一个数字存在第n位
+    var hasNum = false
+    /** 二维数组temp用来保存当前排序的数字
+      * 第一维d表示一共有d个桶
+      * 第二维B.length表示每个桶最多可能存放B.length个数字
+      */
+    val temp = Array.ofDim[Int](d, inputData.length)
+    val order = new Array[Int](d)
+    breakable {
+      while (true) {
+        //判断是否所有元素均无比更高位，因为第一遍一定要先排序一次，所以有n!=1的判断
+        if (n != 1 && !hasNum) {
+          break
+        }
+        hasNum = false
+        //遍历要排序的数组，将其存入temp数组中（按照第n位上的数字将数字放入桶中）
+        for (i <- inputData.indices) {
+          val x = inputData(i) / (n * 10)
+          if (x != 0) hasNum = true
+          val lsd = x % 10
+          temp(lsd)(order(lsd)) = inputData(i)
+          order(lsd) = order(lsd) + 1
+        }
+        //k用来将排序好的temp数组存入B数组（将桶中的数字倒出）
+        var k = 0
+        for (i <- 0 until d) {
+          if (order(i) != 0) {
+            var j = 0
+            while (j < order(i)) {
+              inputData(k) = temp(i)(j)
+              k = k + 1
+              j = j + 1
+            }
+          }
+          order(i) = 0
+        }
+        n = n + 1
+      }
+    }
+    inputData
+  }
+
 
   //TODO 希尔排序（shell sort）
   def shellSort(SortList: List[Int]): List[Int] = {
@@ -159,7 +253,6 @@ class ScalaSortDemo {
           cpSortList(minIndex) = temp
         }
       }
-
     }
     cpSortList.toList
   }
