@@ -159,6 +159,9 @@ object Master {
     //val actorSystem: ActorSystem = ActorSystem("MasterSystem", Option(conf), None, Option(executionContext))
     val actorSystem: ActorSystem = ActorSystem("MasterSystem", conf)
     val master: ActorRef = actorSystem.actorOf(Props(new Master(host, port)), "Master")
+
+
+    println(master.path.address.toString)
     Runtime.getRuntime.addShutdownHook(new Thread("Master-Shutdown-Hook") {
       override def run(): Unit = {
         actorSystem.stop(master)

@@ -76,5 +76,8 @@ class JsonFormatterUnitSpec extends UnitSpec {
 
     log.info(res.toString())
     res.isEmpty shouldBe false
+    res("test") shouldBe "1234567"
+    res("common.column.datetimeFormat") shouldBe "yyyy-MM-dd HH:mm:ss"
+    res("core.statistics.collector.plugin.maxDirtyNumber") shouldBe "10"
   }
 }

@@ -11,7 +11,7 @@ package com.wallace.demo.app.actordemo.master_worker
 import java.util.UUID
 import java.util.concurrent.{ConcurrentHashMap, LinkedBlockingQueue, TimeUnit}
 
-import akka.actor.{Actor, ActorSelection, ActorSystem, Props, UnhandledMessage}
+import akka.actor.{Actor, ActorRef, ActorSelection, ActorSystem, Props, UnhandledMessage}
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.Await
@@ -80,7 +80,8 @@ object Worker {
        """.stripMargin
     val conf: Config = ConfigFactory.parseString(confStr)
     val actorSystem: ActorSystem = ActorSystem("WorkerSystem", conf)
-    actorSystem.actorOf(Props(new Worker(host, port, masterHost, masterPort)), "Worker")
+    val workerActor: ActorRef = actorSystem.actorOf(Props(new Worker(host, port, masterHost, masterPort)), "Worker")
+    println(workerActor.path.toString)
     Await.ready(actorSystem.whenTerminated, Duration(365, TimeUnit.DAYS))
   }
 }
