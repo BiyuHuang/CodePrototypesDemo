@@ -36,5 +36,17 @@ object RddDemo extends CreateSparkSession with Using {
     log.warn(s"Count2: ${fileRdd.count()}")
     log.info(s"Last String: ${data.collect().last}")
     fileRdd.map(x => (x, 1)).reduceByKey(_ + _)
+    val tempRdd = fileRdd.repartition(10)
+    tempRdd.mapPartitionsWithIndex {
+      (index, iter) =>
+        val len = index.toString.length
+        iter.zipWithIndex.map {
+          elem =>
+            val k = s"${2018 % 9}0821164$index${s"%0${11 - len}d".format(elem._2)}".toLong
+            (k, elem._1)
+        }
+    }.collect.foreach(println)
+
+    println(tempRdd.partitions.length)
   }
 }
