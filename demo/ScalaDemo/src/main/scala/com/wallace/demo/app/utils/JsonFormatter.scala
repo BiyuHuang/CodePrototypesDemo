@@ -32,7 +32,12 @@ object JsonFormatter {
           case nArray: JSONArray =>
             nArray.asScala.flatMap {
               elem =>
-                convertJsonToMap(elem.asInstanceOf[JSONObject], fieldKey)
+                elem match {
+                  case eObject: JSONObject =>
+                    convertJsonToMap(eObject, fieldKey)
+                  case value: String =>
+                    Map(fieldKey -> value)
+                }
             }
           case _ =>
             val value: String = if (tempVal == null) "" else tempVal.toString
@@ -52,8 +57,12 @@ object JsonFormatter {
           case nArray: JSONArray =>
             nArray.asScala.flatMap {
               elem =>
-                val temp = elem.asInstanceOf[JSONObject]
-                convertJsonToArray(temp, fieldKey)
+                elem match {
+                  case eObject: JSONObject =>
+                    convertJsonToArray(eObject, fieldKey)
+                  case value: String =>
+                    Array(fieldKey -> value)
+                }
             }
           case _ =>
             val value: String = if (tempVal == null) "" else tempVal.toString
