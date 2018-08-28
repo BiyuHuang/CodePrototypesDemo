@@ -29,16 +29,6 @@ object JsonFormatter {
         tempVal match {
           case nObject: JSONObject =>
             if (nObject.isEmpty) Map(fieldKey -> "") else convertJsonToMap(nObject, fieldKey)
-          case nArray: JSONArray =>
-            nArray.asScala.flatMap {
-              elem =>
-                elem match {
-                  case eObject: JSONObject =>
-                    convertJsonToMap(eObject, fieldKey)
-                  case value: String =>
-                    Map(fieldKey -> value)
-                }
-            }
           case _ =>
             val value: String = if (tempVal == null) "" else tempVal.toString
             Map(fieldKey -> value)
