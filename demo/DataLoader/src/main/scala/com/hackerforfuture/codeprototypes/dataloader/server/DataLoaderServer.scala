@@ -32,7 +32,7 @@ object DataLoaderServer extends LogSupport {
   def startup(): Unit = {
     try {
       if (isShuttingDown.get) {
-        throw new IllegalStateException("Kafka server is still shutting down, cannot re-start!")
+        throw new IllegalStateException("DataLoaderServer is still shutting down, cannot re-start!")
       }
 
       val canStartup = isStartingUp.compareAndSet(false, true)
@@ -56,7 +56,7 @@ object DataLoaderServer extends LogSupport {
   def shutdown(): Unit = {
     try {
       if (isStartingUp.get) {
-        throw new IllegalStateException("server is still starting up, cannot shut down!")
+        throw new IllegalStateException("DataLoaderServer is still starting up, cannot shut down!")
       }
 
       if (shutdownLatch.getCount > 0 && isShuttingDown.compareAndSet(false, true)) {
@@ -68,7 +68,7 @@ object DataLoaderServer extends LogSupport {
 
     } catch {
       case NonFatal(e) =>
-        log.error("Fatal error during KafkaServer shutdown.", e)
+        log.error("Fatal error during DataLoaderServer shutdown.", e)
         isShuttingDown.set(false)
         throw e
     }

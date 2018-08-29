@@ -36,13 +36,12 @@ object DataLoader extends LogSupport {
       }
 
       // attach shutdown handler to catch terminating signals as well as normal termination
-      Runtime.getRuntime.addShutdownHook(new Thread("kafka-shutdown-hook") {
+      Runtime.getRuntime.addShutdownHook(new Thread("dataloader-shutdown-hook") {
         override def run(): Unit = DataLoaderServer.shutdown()
       })
 
       DataLoaderServer.startup()
       DataLoaderServer.awaitShutdown()
-
     } catch {
       case NonFatal(e) =>
         log.error("Failed to run DataLoader", e)
