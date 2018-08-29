@@ -14,6 +14,7 @@ import java.util.concurrent.{CountDownLatch, ExecutorService, Executors}
 import com.hackerforfuture.codeprototypes.dataloader.common.LogSupport
 import com.hackerforfuture.codeprototypes.dataloader.server.download.DataDownLoadService
 import com.hackerforfuture.codeprototypes.dataloader.server.dynamicscan.DataScanService
+import com.hackerforfuture.codeprototypes.dataloader.server.upload.DataUpLoadService
 
 import scala.util.control.NonFatal
 
@@ -39,7 +40,7 @@ object DataLoaderServer extends LogSupport {
       if (canStartup && !startupComplete.get) {
         threadPool.execute(new DataScanService())
         threadPool.execute(new DataDownLoadService())
-        threadPool.execute(new DataDownLoadService())
+        threadPool.execute(new DataUpLoadService())
         shutdownLatch = new CountDownLatch(1)
         startupComplete.set(true)
         isStartingUp.set(false)
