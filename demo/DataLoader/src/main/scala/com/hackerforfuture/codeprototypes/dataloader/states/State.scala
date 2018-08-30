@@ -52,7 +52,7 @@ case object ShuttingDown extends ByteStates {
 }
 
 case object UnKnowState extends ByteStates {
-  val state: Option[Byte] = Option(4)
+  val state: Option[Byte] = Option(5)
 }
 
 case class WorkAntState() {
