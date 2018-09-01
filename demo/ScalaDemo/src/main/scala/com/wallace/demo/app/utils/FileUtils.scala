@@ -1,14 +1,14 @@
 package com.wallace.demo.app.utils
 
 import java.io.{FileInputStream, FileOutputStream, _}
-import java.nio.ByteBuffer
+import java.nio.{ByteBuffer, MappedByteBuffer}
 import java.nio.channels.FileChannel
 import java.nio.charset.Charset
 import java.nio.file.WatchService
 import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
-import javax.xml.parsers.{SAXParser, SAXParserFactory}
 
+import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.wallace.demo.app.common._
 import com.wallace.demo.app.parsexml.{MROSax, SaxHandler}
@@ -33,6 +33,23 @@ import scala.xml.{Node, NodeSeq, XML}
 object FileUtils extends Using {
 
   case class FileMetadata(file: File, offset: Long)
+
+  def rwMappedByteBuffer(fileName: String, mode: String = "rw"): Unit = {
+    using(new RandomAccessFile(fileName, mode)) {
+      randomFile =>
+        assert(randomFile.length() <= Int.MaxValue, s"The length of $fileName is bigger than 2GB.")
+        val mappedBuffer: MappedByteBuffer = randomFile.getChannel.map(FileChannel.MapMode.READ_WRITE, 0, randomFile.length()).load()
+        val dest = new Array[Byte](randomFile.length().toInt)
+        mappedBuffer.get(dest)
+        using(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(dest)))) {
+          br =>
+            while (br.ready()) {
+              val line: String = br.readLine()
+              log.info(line)
+            }
+        }
+    }
+  }
 
   object FileSuffix {
     /** a csv file */
@@ -183,7 +200,7 @@ object FileUtils extends Using {
     val costTime5 = runtimeDuration {
       res = Some(getFileHeader("./demo/ScalaDemo/src/main/resources/"))
     }
-    res.get.foreach{
+    res.get.foreach {
       elem =>
         log.info(s"FileName: ${elem._1}, File Header Bytes: ${elem._2.take(3).mkString("_")}")
     }

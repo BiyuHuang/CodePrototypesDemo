@@ -8,9 +8,9 @@
 
 package com.hackerforfuture.codeprototypes.dataloader
 
-import java.io.File
+import java.util.Locale
 
-import com.hackerforfuture.codeprototypes.dataloader.common.LogSupport
+import com.hackerforfuture.codeprototypes.dataloader.common.{LogSupport, LoggingSignalHandler}
 import com.hackerforfuture.codeprototypes.dataloader.server.DataLoaderServer
 
 import scala.util.control.NonFatal
@@ -19,25 +19,34 @@ import scala.util.control.NonFatal
   * Created by wallace on 2018/1/20.
   */
 object DataLoader extends LogSupport {
-
-  private var stopSymbol: Boolean = false
-
-  private def awaitStopOrSleep(sleepTime: Long = 10000L): Unit = {
-    while (!stopSymbol) {
-      stopSymbol = new File("stop.txt").exists()
-      log.debug(s"StopSymbol: $stopSymbol, Thread sleep $sleepTime ms.")
-      Thread.sleep(sleepTime)
-    }
-    log.debug("DataLoader going to shut down right now ...")
-    sys.exit(0)
-  }
+  private val NAME: String = System.getProperty("os.name").toLowerCase(Locale.ROOT)
+  private val IS_WINDOWS: Boolean = NAME.startsWith("windows")
+  private val isIbmJdk = System.getProperty("java.vendor").contains("IBM")
 
   def main(args: Array[String]): Unit = {
     try {
-      DataLoaderServer.run()
-      awaitStopOrSleep()
+      try {
+        if (!IS_WINDOWS && !isIbmJdk) {
+          new LoggingSignalHandler().register()
+        }
+      } catch {
+        case e: ReflectiveOperationException =>
+          log.warn("Failed to register optional signal handler that logs a message when the process is terminated " +
+            s"by a signal. Reason for registration failure is: $e", e)
+      }
+
+      // attach shutdown handler to catch terminating signals as well as normal termination
+      Runtime.getRuntime.addShutdownHook(new Thread("dataloader-shutdown-hook") {
+        override def run(): Unit = DataLoaderServer.shutdown()
+      })
+
+      DataLoaderServer.startup()
+      DataLoaderServer.awaitShutdown()
     } catch {
-      case NonFatal(e) => log.error("Failed to execute DataLoader: ", e)
+      case NonFatal(e) =>
+        log.error("Failed to run DataLoader", e)
+        System.exit(1)
     }
+    System.exit(0)
   }
 }
