@@ -337,7 +337,7 @@ object SortDemo {
     println("归并排序:" + sortDemo.mergeSort(rdmList))
 
     sortDemo.buildHeap[Int](_ > _)(source, 0)
-    println("堆内数据：" + source.mkString(","))
+    println("堆内数据：" + source.toList)
     println("堆排序: " + sortDemo.heapSort[Int](_ > _)(source, source.length - 1))
     //排序前：List(3, 9, 8, 7, 0, 1, 4, 5, 6, 2)
     //简单选择排序：List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
