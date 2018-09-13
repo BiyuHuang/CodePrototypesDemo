@@ -47,6 +47,7 @@ class ScalaSortDemo {
   // 它的左右子结点下标分别为2 * i + 1和2 * i + 2。如第0个结点左右子结点下标分别为1和2。
   def buildHeap[T](comparator: (T, T) => Boolean)(source: ListBuffer[T], parent: Int): Unit = {
     if (left(parent) >= source.length) {
+
       return
     } else {
       buildHeap(comparator)(source, left(parent))
