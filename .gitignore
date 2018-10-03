@@ -17,7 +17,6 @@ metastore_db/
 checkpoint*
 receivedBlockMetadata/
 sh.exe.stackdump
-
 resources/*.csv
 temp/
 resources/test/
