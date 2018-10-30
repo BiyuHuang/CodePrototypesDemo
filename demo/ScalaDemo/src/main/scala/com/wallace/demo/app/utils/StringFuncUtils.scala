@@ -6,7 +6,6 @@ import com.wallace.demo.app.common.Using
 import com.wallace.demo.app.utils.stringutils.StringUtils
 
 import scala.collection.JavaConverters._
-import scala.collection.immutable
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
 import scala.util.control.Breaks.{break, breakable}
@@ -29,13 +28,13 @@ object StringFuncUtils extends Using {
   private val m_TgtColumnsFields: util.ArrayList[String] = new util.ArrayList[String]()
   tgtColumnsFields.foreach(m_TgtColumnsFields.add)
 
-  def getSubStrLen(str: String): immutable.IndexedSeq[(Int, Int)] = {
+  def getMaxSubStrLen(str: String): Int = {
     val strHashCode: Seq[Int] = str.intern().map(_.hashCode())
-    (0 until strHashCode.length - 1).map {
+    val tempRes: Seq[(Int, Int)] = (0 until strHashCode.length - 1).map {
       i =>
         var asc_len = 1
         var desc_len = 1
-        (i + 1 until strHashCode.length - 1).foreach {
+        (i until strHashCode.length - 1).foreach {
           j =>
             breakable {
               val cur = strHashCode(j)
@@ -48,7 +47,7 @@ object StringFuncUtils extends Using {
             }
         }
 
-        (i + 1 until strHashCode.length - 1).foreach {
+        (i until strHashCode.length - 1).foreach {
           j =>
             breakable {
               val cur = strHashCode(j)
@@ -62,6 +61,8 @@ object StringFuncUtils extends Using {
         }
         (asc_len, desc_len)
     }
+
+    Math.max(tempRes.map(_._1).max, tempRes.map(_._2).max)
   }
 
   private val splitColumnsFields: Map[String, (String, Int)] = {
