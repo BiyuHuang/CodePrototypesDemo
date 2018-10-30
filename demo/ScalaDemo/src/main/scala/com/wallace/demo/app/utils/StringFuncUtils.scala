@@ -6,8 +6,10 @@ import com.wallace.demo.app.common.Using
 import com.wallace.demo.app.utils.stringutils.StringUtils
 
 import scala.collection.JavaConverters._
+import scala.collection.immutable
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
+import scala.util.control.Breaks.{break, breakable}
 import scala.util.{Properties, Try}
 
 /**
@@ -27,6 +29,40 @@ object StringFuncUtils extends Using {
   private val m_TgtColumnsFields: util.ArrayList[String] = new util.ArrayList[String]()
   tgtColumnsFields.foreach(m_TgtColumnsFields.add)
 
+  def getSubStrLen(str: String): immutable.IndexedSeq[(Int, Int)] = {
+    val strHashCode: Seq[Int] = str.intern().map(_.hashCode())
+    (0 until strHashCode.length - 1).map {
+      i =>
+        var asc_len = 1
+        var desc_len = 1
+        (i + 1 until strHashCode.length - 1).foreach {
+          j =>
+            breakable {
+              val cur = strHashCode(j)
+              val next = strHashCode(j + 1)
+              if (next == cur + 1) {
+                asc_len += 1
+              } else {
+                break()
+              }
+            }
+        }
+
+        (i + 1 until strHashCode.length - 1).foreach {
+          j =>
+            breakable {
+              val cur = strHashCode(j)
+              val next = strHashCode(j + 1)
+              if (next == cur - 1) {
+                desc_len += 1
+              } else {
+                break()
+              }
+            }
+        }
+        (asc_len, desc_len)
+    }
+  }
 
   private val splitColumnsFields: Map[String, (String, Int)] = {
     val temp: Array[String] = "col1 = extra_col1,extra_col2".split("=", -1).map(_.trim)
