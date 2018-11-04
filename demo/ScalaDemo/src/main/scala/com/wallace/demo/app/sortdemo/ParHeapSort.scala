@@ -12,13 +12,15 @@ class ParHeapSort {
 
 }
 
+import com.wallace.demo.app.common.LogSupport
+
 import scala.collection.mutable
 
 /**
   * 实现并行堆排序算法
   *
   */
-class HeapSort[A, B, S <: Iterable[A]](f: A => B)(implicit ord: Ordering[B]) {
+class HeapSort[A, B, S <: Iterable[A]](f: A => B)(implicit ord: Ordering[B]) extends LogSupport {
   val combop: (List[Int], List[Int]) => List[Int] = (ls1: List[Int], ls2: List[Int]) => ls1.:::(ls2)
 
   val seqop: (List[Int], Int) => List[Int] = (ls: List[Int], value: Int) => ls.::(value)
@@ -120,7 +122,7 @@ class HeapSort[A, B, S <: Iterable[A]](f: A => B)(implicit ord: Ordering[B]) {
   def merge2SeqNM(seq: mutable.Seq[A], src: (Int, Int), dst: (Int, Int), desc: Boolean = true): (Int, Int) = HeapSort.merge2SeqNM(f)(seq, src, dst, desc)
 }
 
-object HeapSort {
+object HeapSort extends LogSupport {
   def sort[A, B, S <: Iterable[A]](f: A => B)(iterator: S, top: Int = 0, desc: Boolean = true)(implicit ord: Ordering[B]): mutable.Seq[A] = {
     val bf = iterator.toBuffer
     sortMutable(f)(bf, top, desc)
@@ -432,7 +434,7 @@ object HeapSort {
     val rnd = new java.util.Random()
     val l = Array.tabulate[Int](40)((x: Int) => rnd.nextInt(x + 100))
     for (i <- 0 to 0) {
-      println("==============time ", i, "=================")
+      log.info("==============time ", i, "=================")
       val s = l.toBuffer[Int]
       println("=========> s: " + s)
       val t1: Long = System.currentTimeMillis

@@ -78,8 +78,8 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
       case None => throw new NoSuchElementException
     }
     Try(m1(key)).flatMap(x => Try(m2(x)).flatMap(y => Try(m3(y)))) match {
-      case Success(res) => println(key, res)
-      case Failure(e) => println(e)
+      case Success(res) => log.info(key, res)
+      case Failure(e) => log.error(s"$e")
     }
   }
 
@@ -93,7 +93,7 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
     futureTask.onFailure {
       case t: Throwable => println(t)
     }
-    println(key, Await.result(futureTask, Duration.Inf))
+    log.info(key, Await.result(futureTask, Duration.Inf))
 
     val inc: Int => Int = (a: Int) => a + 1
     val dec: Int => Int = (b: Int) => b - 2
