@@ -5,6 +5,7 @@ import java.lang.management.ManagementFactory
 
 import com.wallace.demo.app.common.LogSupport
 
+import scala.collection.immutable
 import scala.concurrent.duration.TimeUnit
 import scala.util.control.Breaks._
 import scala.util.control.NonFatal
@@ -14,6 +15,7 @@ import scala.util.control.NonFatal
   */
 object Boot extends LogSupport {
   def convert(time: Long, unit: TimeUnit): Long = unit.convert(time, unit)
+
 
   def main(args: Array[String]): Unit = {
     util.Properties.setProp("scala.time", "true")

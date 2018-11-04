@@ -9,18 +9,24 @@
 package com.hackerforfuture.codeprototypes.dataloader.clusters.master
 
 import akka.actor.Actor
+import com.hackerforfuture.codeprototypes.dataloader.metadata.EventType
+import com.hackerforfuture.codeprototypes.dataloader.metadata.EventType.EventType
+import com.hackerforfuture.codeprototypes.dataloader.metadata.message.HeartBeat
 
 /**
   * Created by wallace on 2018/6/23.
   */
 class Master(host: String, port: Int) extends Actor {
 
-  // TODO Cluster : Manager Node , Controll Node
+  // TODO Cluster : Manager Node , Controller Node
   override def receive: Receive = {
     //TODO Message Handler
-    case 0 =>
-    case 1 =>
-    case 2 =>
+    case HeartBeat("") => handleHeartBeatEvent(EventType.HeartBeatEvent)
+    case EventType.ControlEvent =>
+    case EventType.ScheduleEvent =>
+  }
 
+  def handleHeartBeatEvent(eventType: EventType): Unit = {
+    //TODO handle Heart Beat Event
   }
 }

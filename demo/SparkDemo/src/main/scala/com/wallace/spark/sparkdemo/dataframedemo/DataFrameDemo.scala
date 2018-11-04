@@ -173,7 +173,7 @@ object DataFrameDemo extends CreateSparkSession {
             } else {
               index.map {
                 i =>
-                  if (col5(i) == "") {
+                  if (col5(i).nonEmpty) {
                     Seq.empty
                   } else {
                     Seq(i, col2(i), col3(i), col4(i), col5(i), row.getInt(5))
