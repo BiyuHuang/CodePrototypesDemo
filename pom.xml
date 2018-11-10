@@ -29,7 +29,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <project.path>/Users/wallace/DevCode/privateCode/CodePrototypesDemo</project.path>
+        <project.path>${project.basedir}</project.path>
     </properties>
 
     <dependencyManagement>
