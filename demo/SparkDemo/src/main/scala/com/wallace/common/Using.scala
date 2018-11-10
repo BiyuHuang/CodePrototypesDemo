@@ -2,6 +2,7 @@ package com.wallace.common
 
 import java.io.IOException
 
+import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
 
 /**

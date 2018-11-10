@@ -50,7 +50,7 @@ object KafkaConsumerDemo extends Using {
           r =>
             val key: BaseKey = GroupMetadataManager.readMessageKey(r._1)
             val value: OffsetAndMetadata = GroupMetadataManager.readOffsetMessageValue(r._2)
-            println(key, value)
+            log.info(s"$key, $value")
         }
     }
 

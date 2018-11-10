@@ -72,7 +72,8 @@ object StringFuncUtils extends Using {
 
     keyWithIndex.flatMap {
       ki =>
-        Map(ki._1 -> (value, ki._2))
+        val v: (String, Int) = (value, ki._2)
+        Map(ki._1 -> v)
     }.toMap
   }
   private val m_SplitColumnsFields: util.HashMap[String, (String, Int)] = new util.HashMap[String, (String, Int)]()
