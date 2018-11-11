@@ -20,7 +20,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % "2.5.16",
     "com.typesafe.akka" %% "akka-remote" % "2.5.16",
     "com.github.pathikrit" %% "better-files" % "3.4.0",
-    "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0",
+    "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
     "com.yammer.metrics" % "metrics-core" % "2.2.0",
     "com.jcraft" % "jsch" % "0.1.54",
     "com.github.pathikrit" %% "better-files-akka" % "3.4.0" exclude("com.typesafe.akka", "akka-actor"),
@@ -35,7 +35,7 @@ object Dependencies {
   val hdfsDependencies: Seq[ModuleID] = Seq(
     "org.apache.hadoop" % "hadoop-common" % "2.7.2",
     "org.apache.hadoop" % "hadoop-hdfs" % "2.7.2",
-    "org.apache.commons" % "commons-compress" % "1.15",
+    "org.apache.commons" % "commons-compress" % "1.18",
     "org.apache.parquet" % "parquet-hadoop" % "1.8.1"
   )
 
