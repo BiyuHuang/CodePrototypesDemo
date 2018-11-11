@@ -46,6 +46,7 @@ object Common {
       case PathList(ps@_*) if ps.last endsWith ".xsd" => MergeStrategy.first
       case PathList(ps@_*) if ps.last endsWith ".dtd" => MergeStrategy.first
       case PathList(ps@_*) if ps.last endsWith ".css" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".html" => MergeStrategy.first
       //      case PathList(ps@_*) if ps.last endsWith ".txt" => MergeStrategy.first
       //      case PathList(ps@_*) if ps.last endsWith ".jar" => MergeStrategy.first
       //      case PathList(ps@_*) if ps.last endsWith ".providers" => MergeStrategy.first
