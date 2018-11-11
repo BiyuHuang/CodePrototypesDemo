@@ -32,6 +32,7 @@ object Common {
     scalaVersion := "2.11.12",
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8"),
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
+    logLevel := Level.Warn,
     unmanagedBase := baseDirectory.value / "../../lib",
     resolvers += Opts.resolver.mavenLocalFile,
     copyDepTask,

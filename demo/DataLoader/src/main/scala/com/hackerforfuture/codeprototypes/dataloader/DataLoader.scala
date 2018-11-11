@@ -49,5 +49,5 @@ object DataLoader extends LogSupport {
     }
     System.exit(0)
   }
-  
+
 }
