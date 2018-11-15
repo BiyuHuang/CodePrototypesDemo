@@ -73,7 +73,10 @@ object WindowExprDemo extends CreateSparkSession {
     // +-------------------------------------------------------------------------------+
 
     val we: WindowSpec = Window.partitionBy("cookieid").orderBy("createtime")
-    df.select('*, ntile(2) over we as "rn1", ntile(3) over we as "rn2", ntile(4) over we as "rn3").toJSON.show(200, truncate = false)
+    df.select('*,
+      ntile(2) over we as "rn1",
+      ntile(3) over we as "rn2",
+      ntile(4) over we as "rn3").toJSON.show(200, truncate = false)
     // +-------------------------------------------------------------------------------+
     // |value                                                                          |
     // +-------------------------------------------------------------------------------+
