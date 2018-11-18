@@ -27,74 +27,31 @@ object WindowExprDemo extends CreateSparkSession {
     import spark.implicits._
     val rdd: Dataset[String] = spark.read.format("csv").textFile("./demo/SparkDemo/src/main/resources/spark_sql_data")
     val df: DataFrame = rdd.map(_.split(",")).map(x => Cookie(x(0), x(1), x(2).toInt)).toDF
-    df.show
-    // +--------+----------+---+
-    // |cookieid|createtime| pv|
-    // +--------+----------+---+
-    // | cookie1|2015-04-10|  1|
-    // | cookie1|2015-04-11|  5|
-    // | cookie1|2015-04-12|  7|
-    // | cookie1|2015-04-13|  3|
-    // | cookie1|2015-04-14|  2|
-    // | cookie1|2015-04-15|  4|
-    // | cookie1|2015-04-16|  4|
-    // | cookie2|2015-04-10|  2|
-    // | cookie2|2015-04-11|  3|
-    // | cookie2|2015-04-12|  5|
-    // | cookie2|2015-04-13|  6|
-    // | cookie2|2015-04-14|  3|
-    // | cookie2|2015-04-15|  9|
-    // | cookie2|2015-04-16|  7|
-    // +--------+----------+---+
-
+    df.show(100, false)
 
     df.selectExpr("*",
       "NTILE(2) OVER(PARTITION BY cookieid ORDER BY createtime) AS rn1",
       "NTILE(3) OVER(PARTITION BY cookieid ORDER BY createtime) AS rn2",
       "NTILE(4) OVER(ORDER BY createtime) AS rn3").toJSON.show(200, truncate = false)
-    // 18/11/15 23:39:48 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
-    // +-------------------------------------------------------------------------------+
-    // |value                                                                          |
-    // +-------------------------------------------------------------------------------+
-    // |{"cookieid":"cookie1","createtime":"2015-04-10","pv":1,"rn1":1,"rn2":1,"rn3":1}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-10","pv":2,"rn1":1,"rn2":1,"rn3":1}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-11","pv":5,"rn1":1,"rn2":1,"rn3":1}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-11","pv":3,"rn1":1,"rn2":1,"rn3":1}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-12","pv":7,"rn1":1,"rn2":1,"rn3":2}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-12","pv":5,"rn1":1,"rn2":1,"rn3":2}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-13","pv":3,"rn1":1,"rn2":2,"rn3":2}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-13","pv":6,"rn1":1,"rn2":2,"rn3":2}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-14","pv":2,"rn1":2,"rn2":2,"rn3":3}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-14","pv":3,"rn1":2,"rn2":2,"rn3":3}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-15","pv":4,"rn1":2,"rn2":3,"rn3":3}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-15","pv":9,"rn1":2,"rn2":3,"rn3":4}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-16","pv":4,"rn1":2,"rn2":3,"rn3":4}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-16","pv":7,"rn1":2,"rn2":3,"rn3":4}|
-    // +-------------------------------------------------------------------------------+
+    // WARN WindowExec: No Partition Defined for Window operation!
+    // Moving all data to a single partition, this can cause serious performance degradation.
 
     val we: WindowSpec = Window.partitionBy("cookieid").orderBy("createtime")
     df.select('*,
-      ntile(2) over we as "rn1",
-      ntile(3) over we as "rn2",
-      ntile(4) over we as "rn3").toJSON.show(200, truncate = false)
-    // +-------------------------------------------------------------------------------+
-    // |value                                                                          |
-    // +-------------------------------------------------------------------------------+
-    // |{"cookieid":"cookie1","createtime":"2015-04-10","pv":1,"rn1":1,"rn2":1,"rn3":1}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-11","pv":5,"rn1":1,"rn2":1,"rn3":1}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-12","pv":7,"rn1":1,"rn2":1,"rn3":2}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-13","pv":3,"rn1":1,"rn2":2,"rn3":2}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-14","pv":2,"rn1":2,"rn2":2,"rn3":3}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-15","pv":4,"rn1":2,"rn2":3,"rn3":3}|
-    // |{"cookieid":"cookie1","createtime":"2015-04-16","pv":4,"rn1":2,"rn2":3,"rn3":4}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-10","pv":2,"rn1":1,"rn2":1,"rn3":1}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-11","pv":3,"rn1":1,"rn2":1,"rn3":1}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-12","pv":5,"rn1":1,"rn2":1,"rn3":2}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-13","pv":6,"rn1":1,"rn2":2,"rn3":2}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-14","pv":3,"rn1":2,"rn2":2,"rn3":3}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-15","pv":9,"rn1":2,"rn2":3,"rn3":3}|
-    // |{"cookieid":"cookie2","createtime":"2015-04-16","pv":7,"rn1":2,"rn2":3,"rn3":4}|
-    // +-------------------------------------------------------------------------------+
+      ntile(2) over we as 'rn1,
+      ntile(3) over we as 'rn2,
+      ntile(4) over we as 'rn3,
+      row_number() over we as 'rn4,
+      rank() over we as 'rn5,
+      lag('createtime, 1, "1970-01-01") over we as 'last_1_time,
+      lag('createtime, 2) over we as 'last_2_time,
+      lead('createtime, 1, "1970-01-01") over we as 'lead_1_time,
+      lead('createtime, 2) over we as 'lead_2_time
+    )
+      //.toJSON
+      .show(200, truncate = false)
+
+    spark.stop()
   }
 
 
