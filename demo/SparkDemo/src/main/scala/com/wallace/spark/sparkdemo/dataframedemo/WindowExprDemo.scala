@@ -27,7 +27,7 @@ object WindowExprDemo extends CreateSparkSession {
     import spark.implicits._
     val rdd: Dataset[String] = spark.read.format("csv").textFile("./demo/SparkDemo/src/main/resources/spark_sql_data")
     val df: DataFrame = rdd.map(_.split(",")).map(x => Cookie(x(0), x(1), x(2).toInt)).toDF
-    df.show(100, false)
+    df.show(100, truncate = false)
 
     df.selectExpr("*",
       "NTILE(2) OVER(PARTITION BY cookieid ORDER BY createtime) AS rn1",
