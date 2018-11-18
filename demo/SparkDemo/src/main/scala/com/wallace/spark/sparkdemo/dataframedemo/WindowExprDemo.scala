@@ -23,6 +23,8 @@ object WindowExprDemo extends CreateSparkSession {
 
   def main(args: Array[String]): Unit = {
     val spark: SparkSession = createSparkSession("WindowExprDemo")
+    spark.conf.set("spark.sql.shuffle.partitions", "10")
+    spark.conf.set("spark.default.parallelism", "10")
 
     import spark.implicits._
     val rdd: Dataset[String] = spark.read.format("csv").textFile("./demo/SparkDemo/src/main/resources/spark_sql_data")
