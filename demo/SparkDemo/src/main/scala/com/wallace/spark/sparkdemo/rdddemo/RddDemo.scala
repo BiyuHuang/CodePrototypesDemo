@@ -4,7 +4,8 @@ import com.wallace.common.{CreateSparkSession, Using}
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.hive.HiveContext
 
 
 /**
@@ -48,5 +49,24 @@ object RddDemo extends CreateSparkSession with Using {
     }.collect.foreach(println)
 
     println(tempRdd.partitions.length)
+  }
+
+  def main(args: Array[String]): Unit = {
+    val sc = _spark.sparkContext
+    val hc = new HiveContext(sc)
+    import hc.implicits._
+
+    val rdd: RDD[String] = sc.parallelize(Array("hello world", "hello", "world", "hello world world"), 2)
+
+    val res: RDD[(String, Int)] = rdd.flatMap(line => line.split("\\s+"))
+      .map(y => (y, 1))
+      .reduceByKey(_ + _)
+
+    val df: DataFrame = res.toDF("id", "cnt")
+
+    df.write.format("orc").mode(SaveMode.Overwrite).save("./temp/")
+
+    res.collect.foreach(println)
+
   }
 }
