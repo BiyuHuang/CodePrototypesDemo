@@ -8,8 +8,6 @@
 
 package com.hackerforfuture.codeprototypes.dataloader.metadata.message
 
-import com.hackerforfuture.codeprototypes.dataloader.metadata.EventType.EventType
-
 /**
   * Created by wallace on 2018/10/8.
   */
