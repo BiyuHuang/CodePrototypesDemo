@@ -17,6 +17,7 @@ import scala.util.control.NonFatal
   * Created by Wallace on 2016/11/3.
   */
 trait Using extends LogSupport {
+  protected val projectBootPath: String = System.getProperty("user.dir")
   protected def using[A <: {def close() : Unit}, B](param: A)(f: A => B): B = {
     try {
       f(param)
