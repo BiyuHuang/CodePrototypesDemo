@@ -98,18 +98,18 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>true</skipTests>
-                    <includes>
-                        <include>**/*Test*.*</include>
-                        <include>**/*Suite*.*</include>
-                        <include>**/*UnitSpec*.*</include>
-                    </includes>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-surefire-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<skipTests>true</skipTests>-->
+            <!--<includes>-->
+            <!--<include>**/*Test*.*</include>-->
+            <!--<include>**/*Suite*.*</include>-->
+            <!--<include>**/*UnitSpec*.*</include>-->
+            <!--</includes>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
 
             <plugin>
                 <groupId>org.scalatest</groupId>

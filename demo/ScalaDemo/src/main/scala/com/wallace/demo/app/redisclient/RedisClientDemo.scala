@@ -9,6 +9,9 @@
 package com.wallace.demo.app.redisclient
 
 import com.wallace.demo.app.common.Using
+import redis.clients.jedis.Jedis
+
+import scala.collection.JavaConverters._
 
 /**
   * Created by wallace on 2018/12/27.
@@ -23,6 +26,5 @@ object RedisClientDemo extends Using {
         redisCli.lpush("site-list", "Taobao")
         redisCli.keys("*").asScala.foreach(println)
     }
-
   }
 }

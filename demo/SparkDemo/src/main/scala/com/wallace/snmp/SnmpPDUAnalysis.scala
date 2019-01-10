@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
 package com.wallace.snmp
 
 import java.io.PrintWriter
@@ -97,16 +105,15 @@ class SnmpPDUAnalysis(path: String) extends LogSupport {
   }
 
   def process(): List[String] = {
-    val alarmTableData: List[String] = alarmTableList.result()
     try {
       beforeProcess()
       updateProcess()
       afterProcess()
-      alarmTableData
+      alarmTableList.result()
     } catch {
       case e: Throwable =>
         log.error("[Throw new exception]", e)
-        alarmTableData
+        alarmTableList.result()
     } finally {
       fileReader.close()
       fileWrite.close()

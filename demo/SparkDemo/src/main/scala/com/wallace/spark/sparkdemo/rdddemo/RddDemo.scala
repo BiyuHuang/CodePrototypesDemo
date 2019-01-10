@@ -1,11 +1,19 @@
+/*
+ * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
 package com.wallace.spark.sparkdemo.rdddemo
 
 import com.wallace.common.{CreateSparkSession, Using}
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 
 /**
@@ -14,7 +22,6 @@ import org.apache.spark.sql.hive.HiveContext
   */
 object RddDemo extends CreateSparkSession with Using {
   private val _spark: SparkSession = createSparkSession("RddDemo")
-  val path: String = "./demo/SparkDemo/src/main/resources/trainingData.csv.gz"
   val minPartitions: Int = Math.min(Runtime.getRuntime.availableProcessors(), 10)
 
   def readTextFile(filePath: String): Unit = {
