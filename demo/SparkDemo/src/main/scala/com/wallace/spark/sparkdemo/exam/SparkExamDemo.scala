@@ -45,10 +45,10 @@ object SparkExamDemo extends CreateSparkSession with Using {
 
     srcData.persist()
 
-    println("On the past 60 days: " + srcData.count())
-    println("On the past 30 days: " + srcData.filter(_ >= startDate30).count())
-    println("On the past 20 days: " + srcData.filter(_ >= startDate20).count())
-    println("On the past 10 days: " + srcData.filter(_ >= startDate10).count())
+    println("On the past 60 days: " + srcData.count() + " records.")
+    println("On the past 30 days: " + srcData.filter(_ >= startDate30).count() + " records.")
+    println("On the past 20 days: " + srcData.filter(_ >= startDate20).count() + " records.")
+    println("On the past 10 days: " + srcData.filter(_ >= startDate10).count() + " records.")
   }
 
   def exam2(hc: HiveContext, srcTab: String, endDate: String, nDays: Int = 30): Unit = {
