@@ -12,7 +12,7 @@ import com.wallace.common.{CreateSparkSession, Using}
 import com.wallace.utils.DateUtils
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.sql.SQLContext
 
 import scala.util.Try
 
@@ -23,7 +23,7 @@ object SparkExamDemo extends CreateSparkSession with Using {
   def main(args: Array[String]): Unit = {
     usingSpark(createSparkSession("SparkExamDemo")) {
       spark =>
-        val hc: HiveContext = new HiveContext(spark.sparkContext)
+        val hc: SQLContext = spark.sqlContext
         exam1(hc, "test_table_1", "2019-01-28")
         exam2(hc, "test_table_2", "2019-01-28")
         exam3(hc, "test_table_3")
@@ -32,7 +32,7 @@ object SparkExamDemo extends CreateSparkSession with Using {
     }
   }
 
-  def exam1(hc: HiveContext, srcTab: String, endDate: String, nDays: Int = 60): Unit = {
+  def exam1(hc: SQLContext, srcTab: String, endDate: String, nDays: Int = 60): Unit = {
     // tab1
     val startDate10 = DateUtils.addDate(endDate, -10)
     val startDate20 = DateUtils.addDate(endDate, -20)
@@ -55,7 +55,7 @@ object SparkExamDemo extends CreateSparkSession with Using {
     println("On the past 10 days: " + srcData.filter(_ >= startDate10).count() + " records.")
   }
 
-  def exam2(hc: HiveContext, srcTab: String, endDate: String, nDays: Int = 30): Unit = {
+  def exam2(hc: SQLContext, srcTab: String, endDate: String, nDays: Int = 30): Unit = {
     val startDate30: String = DateUtils.addDate(endDate, -nDays)
 
     val srcData: RDD[String] = hc.sql(
@@ -73,7 +73,7 @@ object SparkExamDemo extends CreateSparkSession with Using {
     resData.saveAsTextFile("/temp/result_exam2/")
   }
 
-  def exam3(hc: HiveContext, srcTab: String): Unit = {
+  def exam3(hc: SQLContext, srcTab: String): Unit = {
     val srcData: RDD[(String, String)] = hc.sql(s"""select epass_no,activity_type from $srcTab""".stripMargin)
       .rdd.map(row => (Try(row.getString(0)).getOrElse(""), Try(row.getString(1)).getOrElse("")))
 
@@ -91,7 +91,7 @@ object SparkExamDemo extends CreateSparkSession with Using {
   }
 
 
-  def exam4(hc: HiveContext, srcTab1: String, srcTab2: String): Unit = {
+  def exam4(hc: SQLContext, srcTab1: String, srcTab2: String): Unit = {
     val joinData: Map[String, Int] = hc.sql(s"""select client_id from $srcTab1 where model_type = 'JGJ_PRE'""".stripMargin)
       .rdd.map(row => Try(row.getString(0)).getOrElse("")).map(x => (x, 1)).collectAsMap().toMap
 
@@ -120,7 +120,7 @@ object SparkExamDemo extends CreateSparkSession with Using {
     resData.saveAsTextFile("/temp/result_exam4/")
   }
 
-  def exam5(hc: HiveContext, srcTab1: String, srcTab2: String): Unit = {
+  def exam5(hc: SQLContext, srcTab1: String, srcTab2: String): Unit = {
     val leftData: RDD[((String, String), Int)] = hc.sql(s"""select mobile_no, action_menu from $srcTab1""").rdd
       .map {
         row =>
