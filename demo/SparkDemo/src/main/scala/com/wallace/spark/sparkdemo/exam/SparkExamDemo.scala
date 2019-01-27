@@ -92,16 +92,16 @@ object SparkExamDemo extends CreateSparkSession with Using {
 
 
   def exam4(hc: HiveContext, srcTab1: String, srcTab2: String): Unit = {
-    val joinData: Array[String] = hc.sql(s"""select client_id from $srcTab1 where model_type = 'JGJ_PRE'""".stripMargin)
-      .rdd.map(row => Try(row.getString(0)).getOrElse("")).collect()
+    val joinData: Map[String, Int] = hc.sql(s"""select client_id from $srcTab1 where model_type = 'JGJ_PRE'""".stripMargin)
+      .rdd.map(row => Try(row.getString(0)).getOrElse("")).map(x => (x, 1)).collectAsMap().toMap
 
-    val joinDataBC: Broadcast[Array[String]] = hc.sparkContext.broadcast(joinData)
+    val joinDataBC: Broadcast[Map[String, Int]] = hc.sparkContext.broadcast(joinData)
 
     val resData: RDD[(String, String)] = hc.sql(s"""select phone_no,is_zn from $srcTab2""")
       .rdd.map(row => (Try(row.getString(0)).getOrElse(""), Try(row.getString(1)).getOrElse("")))
       .mapPartitions {
         iter =>
-          val joinData: Array[String] = joinDataBC.value
+          val joinData: Map[String, Int] = joinDataBC.value
           iter.map {
             line =>
               val (key, value) = (line._1, line._2)
@@ -112,10 +112,10 @@ object SparkExamDemo extends CreateSparkSession with Using {
               if (joinData.contains(key)) {
                 (key, preProduct)
               } else {
-                (null, preProduct)
+                ("", preProduct)
               }
           }
-      }
+      }.filter(_._1.nonEmpty).repartition(50)
 
     resData.saveAsTextFile("/temp/result_exam4/")
   }
