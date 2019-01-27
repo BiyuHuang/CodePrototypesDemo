@@ -10,6 +10,7 @@ package com.wallace.spark.sparkdemo.exam
 
 import com.wallace.common.{CreateSparkSession, Using}
 import com.wallace.utils.DateUtils
+import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
 
@@ -25,6 +26,9 @@ object SparkExamDemo extends CreateSparkSession with Using {
         val hc: HiveContext = new HiveContext(spark.sparkContext)
         exam1(hc, "test_table_1", "2019-01-28")
         exam2(hc, "test_table_2", "2019-01-28")
+        exam3(hc, "test_table_3")
+        exam4(hc, "test_table_4", "test_table_5")
+        exam5(hc, "test_table_6", "test_table_7")
     }
   }
 
@@ -63,8 +67,81 @@ object SparkExamDemo extends CreateSparkSession with Using {
        """.stripMargin)
       .rdd.map(row => Try(row.getString(0).split(" ", -1).head).getOrElse(""))
 
-    srcData.map(x => (x, 1))
+    val resData: RDD[(String, Int)] = srcData
+      .map(x => (x, 1))
       .reduceByKey(_ + _)
-      .saveAsTextFile("/temp/result_exam2/")
+    resData.saveAsTextFile("/temp/result_exam2/")
+  }
+
+  def exam3(hc: HiveContext, srcTab: String): Unit = {
+    val srcData: RDD[(String, String)] = hc.sql(s"""select epass_no,activity_type from $srcTab""".stripMargin)
+      .rdd.map(row => (Try(row.getString(0)).getOrElse(""), Try(row.getString(1)).getOrElse("")))
+
+    val resData: RDD[(String, Int)] = srcData.map {
+      line =>
+        line._2 match {
+          case "长期高频" => ("优质用户", 1)
+          case "长期低频" => ("普通用户", 1)
+          case "短期高频" => ("普通用户", 1)
+          case _ => ("其他用户", 1)
+        }
+    }.reduceByKey(_ + _)
+
+    resData.saveAsTextFile("/temp/result_exam3")
+  }
+
+
+  def exam4(hc: HiveContext, srcTab1: String, srcTab2: String): Unit = {
+    val joinData: Array[String] = hc.sql(s"""select client_id from $srcTab1 where model_type = 'JGJ_PRE'""".stripMargin)
+      .rdd.map(row => Try(row.getString(0)).getOrElse("")).collect()
+
+    val joinDataBC: Broadcast[Array[String]] = hc.sparkContext.broadcast(joinData)
+
+    val resData: RDD[(String, String)] = hc.sql(s"""select phone_no,is_zn from $srcTab2""")
+      .rdd.map(row => (Try(row.getString(0)).getOrElse(""), Try(row.getString(1)).getOrElse("")))
+      .mapPartitions {
+        iter =>
+          val joinData: Array[String] = joinDataBC.value
+          iter.map {
+            line =>
+              val (key, value) = (line._1, line._2)
+              val preProduct: String = value match {
+                case "1" => s"${value.toInt + 100}"
+                case _ => "PF"
+              }
+              if (joinData.contains(key)) {
+                (key, preProduct)
+              } else {
+                (null, preProduct)
+              }
+          }
+      }
+
+    resData.saveAsTextFile("/temp/result_exam4/")
+  }
+
+  def exam5(hc: HiveContext, srcTab1: String, srcTab2: String): Unit = {
+    val leftData: RDD[((String, String), Int)] = hc.sql(s"""select mobile_no, action_menu from $srcTab1""").rdd
+      .map {
+        row =>
+          val key: (String, String) = (Try(row.getString(0)).getOrElse(""), Try(row.getString(1)).getOrElse(""))
+          (key, 1)
+      }
+
+    val rightData = hc.sql(s"select mobile_no,action_menu,total_action_cnt,total_action_duration from $srcTab2").rdd.map {
+      row =>
+        val key: (String, String) = (Try(row.getString(0)).getOrElse(""), Try(row.getString(1)).getOrElse(""))
+        val value: (String, String) = (Try(row.getString(2)).getOrElse(""), Try(row.getString(3)).getOrElse(""))
+        (key, value)
+    }
+
+    val resData: RDD[(String, String, String, String, String)] = leftData.leftOuterJoin(rightData).map {
+      row =>
+        val key: (String, String) = row._1
+        val tempVal: (String, String) = row._2._2.getOrElse((null, null))
+        ("2019-01-25", key._1, key._2, tempVal._1, tempVal._2)
+    }
+
+    resData.saveAsTextFile("/temp/result_exam5/")
   }
 }
