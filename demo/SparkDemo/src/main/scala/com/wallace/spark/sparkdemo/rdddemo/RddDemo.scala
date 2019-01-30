@@ -10,6 +10,7 @@ package com.wallace.spark.sparkdemo.rdddemo
 
 import com.wallace.common.{CreateSparkSession, Using}
 import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.FileSystem
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.hive.HiveContext
@@ -62,7 +63,8 @@ object RddDemo extends CreateSparkSession with Using {
     val sc = _spark.sparkContext
     val hc = new HiveContext(sc)
     import hc.implicits._
-
+    val fs: FileSystem = FileSystem.get(sc.hadoopConfiguration)
+    println(s"Home Directory: ${fs.getHomeDirectory}")
     val rdd: RDD[String] = sc.parallelize(Array("hello world", "hello", "world", "hello world world"), 2)
 
     val res: RDD[(String, Int)] = rdd.flatMap(line => line.split("\\s+"))
