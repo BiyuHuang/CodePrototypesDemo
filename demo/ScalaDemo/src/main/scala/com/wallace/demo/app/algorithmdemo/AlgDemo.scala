@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
  * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
  * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
@@ -8,12 +8,14 @@
 
 package com.wallace.demo.app.algorithmdemo
 
+import com.wallace.demo.app.common.LogSupport
+
 import scala.reflect.ClassTag
 
 /**
   * Created by wallace on 2018/8/26.
   */
-object AlgDemo {
+object AlgDemo extends LogSupport {
 
   def trailingZerosV2(n: Long, factor: Double = Math.log(5)): Long = {
     if (n <= 5) {
@@ -59,7 +61,27 @@ object AlgDemo {
   }
 
   def main(args: Array[String]): Unit = {
+    //TODO 1 TriangleCount
+    val tCnt: Int = triangleCount(Array(3, 4, 6, 7, 8, 9))
+    log.info(s"Triangle Count: $tCnt")
+  }
 
+  def triangleCount(s: Array[Int]): Int = {
+    (0 until s.length - 2).flatMap {
+      i =>
+        (i + 1 until s.length - 1).flatMap {
+          j =>
+            (j + 1 until s.length).map {
+              k =>
+                if (s(i) + s(j) > s(k) && s(i) + s(k) > s(k) && s(j) + s(k) > s(i)) {
+                  println(s"Triangle: ${s(i)} ${s(j)} ${s(k)}")
+                  1
+                } else {
+                  0
+                }
+            }
+        }
+    }.sum
   }
 
 }
