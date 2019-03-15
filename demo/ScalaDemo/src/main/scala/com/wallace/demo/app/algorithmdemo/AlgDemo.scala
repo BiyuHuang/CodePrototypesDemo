@@ -60,12 +60,6 @@ object AlgDemo extends LogSupport {
     }
   }
 
-  def main(args: Array[String]): Unit = {
-    //TODO 1 TriangleCount
-    val tCnt: Int = triangleCount(Array(3, 4, 6, 7, 8, 9))
-    log.info(s"Triangle Count: $tCnt")
-  }
-
   def triangleCount(s: Array[Int]): Int = {
     (0 until s.length - 2).flatMap {
       i =>
@@ -83,5 +77,12 @@ object AlgDemo extends LogSupport {
         }
     }.sum
   }
+
+  def main(args: Array[String]): Unit = {
+    //TODO 1 TriangleCount
+    val tCnt: Int = triangleCount(Array(3, 4, 6, 7, 8, 9))
+    log.info(s"Triangle Count: $tCnt")
+  }
+
 
 }
