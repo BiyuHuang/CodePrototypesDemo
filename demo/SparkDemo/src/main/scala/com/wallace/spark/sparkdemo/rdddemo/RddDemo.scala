@@ -1,10 +1,20 @@
+/*
+ * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
 package com.wallace.spark.sparkdemo.rdddemo
 
 import com.wallace.common.{CreateSparkSession, Using}
 import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.FileSystem
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.hive.HiveContext
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 
 /**
@@ -13,7 +23,6 @@ import org.apache.spark.sql.SparkSession
   */
 object RddDemo extends CreateSparkSession with Using {
   private val _spark: SparkSession = createSparkSession("RddDemo")
-  val path: String = "./demo/SparkDemo/src/main/resources/trainingData.csv.gz"
   val minPartitions: Int = Math.min(Runtime.getRuntime.availableProcessors(), 10)
 
   def readTextFile(filePath: String): Unit = {
@@ -48,5 +57,25 @@ object RddDemo extends CreateSparkSession with Using {
     }.collect.foreach(println)
 
     println(tempRdd.partitions.length)
+  }
+
+  def main(args: Array[String]): Unit = {
+    val sc = _spark.sparkContext
+    val hc = new HiveContext(sc)
+    import hc.implicits._
+    val fs: FileSystem = FileSystem.get(sc.hadoopConfiguration)
+    println(s"Home Directory: ${fs.getHomeDirectory}")
+    val rdd: RDD[String] = sc.parallelize(Array("hello world", "hello", "world", "hello world world"), 2)
+
+    val res: RDD[(String, Int)] = rdd.flatMap(line => line.split("\\s+"))
+      .map(y => (y, 1))
+      .reduceByKey(_ + _)
+
+    val df: DataFrame = res.toDF("id", "cnt")
+
+    df.write.format("orc").mode(SaveMode.Overwrite).save("./temp/")
+
+    res.collect.foreach(println)
+
   }
 }

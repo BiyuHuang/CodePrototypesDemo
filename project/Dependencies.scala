@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
  * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
  * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
@@ -24,7 +24,8 @@ object Dependencies {
     "com.yammer.metrics" % "metrics-core" % "2.2.0",
     "com.jcraft" % "jsch" % "0.1.54",
     "com.github.pathikrit" %% "better-files-akka" % "3.4.0" exclude("com.typesafe.akka", "akka-actor"),
-    "net.minidev" % "json-smart" % "2.3"
+    "net.minidev" % "json-smart" % "2.3",
+    "redis.clients" % "jedis" % "2.9.0"
   )
 
   val httpDependencies: Seq[ModuleID] = Seq(
