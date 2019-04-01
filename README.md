@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/BiyuHuang/CodePrototypesDemo.svg?branch=master)](https://travis-ci.org/BiyuHuang/)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/BiyuHuang/CodePrototypesDemo/blob/master/LICENSE)
 [![codecov](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo/branch/master/graph/badge.svg)](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo)
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
     All of this are my private coding prototypes demo. Including scala demo/spark demo.
     Please use SBT build this repo:
