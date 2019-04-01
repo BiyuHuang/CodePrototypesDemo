@@ -8,6 +8,8 @@
 
 package com.wallace.demo.app.parsercombinators
 
+import java.io.File
+
 import com.wallace.demo.app.UnitSpec
 import com.wallace.demo.app.common.AlgMetaData
 import com.wallace.demo.app.parsercombinators.parsers.ParserChain
@@ -17,7 +19,11 @@ import com.wallace.demo.app.utils.FileUtils
   * Created by 10192057 on 2018/4/13 0013.
   */
 class ParsersConstructorUnitSpec extends UnitSpec {
-  val fileName = s"${System.getProperty("user.dir")}/src/test/resources/test.xml"
+  val fileName: String = if (new File(s"${System.getProperty("user.dir")}/src/test/resources/test.xml").exists()) {
+    s"${System.getProperty("user.dir")}/src/test/resources/test.xml"
+  } else {
+    s"${System.getProperty("user.dir")}/demo/ScalaDemo/src/test/resources/test.xml"
+  }
   val parsersConfig: Map[String, AlgMetaData] = FileUtils.readXMLConfigFile(fileName)
   teamID should "do unit test for ParsersConstructor.generateParsers" in {
     val parsers: Map[String, ParserChain] = ParsersConstructor.generateParsers(parsersConfig)

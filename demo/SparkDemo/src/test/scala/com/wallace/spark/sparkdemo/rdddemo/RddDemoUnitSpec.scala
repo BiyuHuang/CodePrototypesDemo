@@ -8,6 +8,8 @@
 
 package com.wallace.spark.sparkdemo.rdddemo
 
+import java.io.File
+
 import com.wallace.UnitSpec
 
 /**
@@ -16,6 +18,13 @@ import com.wallace.UnitSpec
   */
 class RddDemoUnitSpec extends UnitSpec {
   runTest("unit test for readTextFile") {
-    RddDemo.readTextFile(s"${System.getProperty("user.dir")}/src/test/resources/trainingData.csv.gz")
+
+    val srcFile: String = if (new File(s"${System.getProperty("user.dir")}/src/test/resources/trainingData.csv.gz").exists()) {
+      s"${System.getProperty("user.dir")}/src/test/resources/trainingData.csv.gz"
+    } else {
+      s"${System.getProperty("user.dir")}/demo/SparkDemo/src/test/resources/trainingData.csv.gz"
+    }
+
+    RddDemo.readTextFile(srcFile)
   }
 }

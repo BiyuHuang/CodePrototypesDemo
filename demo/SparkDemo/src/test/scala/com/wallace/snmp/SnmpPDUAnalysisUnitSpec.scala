@@ -8,16 +8,24 @@
 
 package com.wallace.snmp
 
+import java.io.File
+
 import com.wallace.UnitSpec
 
 /**
   * Created by wallacehuang on 2017/7/26.
   */
 class SnmpPDUAnalysisUnitSpec extends UnitSpec {
+  val fileName: String = if (new File(s"${System.getProperty("user.dir")}/src/test/resources/currentAlarmTable.csv").exists()) {
+    s"${System.getProperty("user.dir")}/src/test/resources/currentAlarmTable.csv"
+  } else {
+    s"${System.getProperty("user.dir")}/demo/SparkDemo/src/test/resources/currentAlarmTable.csv"
+  }
+
   teamID should "do unit test for SnmpPDUAnalysis" in {
     val startTime = System.currentTimeMillis()
     log.info(s"Start time: $startTime")
-    val res: List[String] = new SnmpPDUAnalysis(s"${System.getProperty("user.dir")}/src/test/resources/currentAlarmTable.csv").process()
+    val res: List[String] = new SnmpPDUAnalysis(fileName).process()
     val endTime = System.currentTimeMillis()
     log.info(s"End time: $endTime, and cost time : ${(endTime - startTime) * 1.0 / 1000} s.")
 
