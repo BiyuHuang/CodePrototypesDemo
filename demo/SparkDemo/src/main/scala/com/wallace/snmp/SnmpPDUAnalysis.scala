@@ -8,8 +8,6 @@
 
 package com.wallace.snmp
 
-import java.io.PrintWriter
-
 import com.wallace.common.LogSupport
 import com.wallace.demo.EncodingParser
 
@@ -32,7 +30,7 @@ class SnmpPDUAnalysis(path: String) extends LogSupport {
   private val alarmText: ListBuffer[Map[Int, String]] = new ListBuffer[Map[Int, String]]
   private val alarmInfo: ListBuffer[Map[Int, String]] = new ListBuffer[Map[Int, String]]
   private val alarmIterator: ListBuffer[Int] = new ListBuffer[Int]()
-  val fileWriter = new PrintWriter("AlarmTable.csv", "UTF-8")
+  //  val fileWriter = new PrintWriter("AlarmTable.csv", "UTF-8")
   val alarmTableList = new ListBuffer[String]
   val fileReader: BufferedSource = fromFile(this._path, "UTF-8")
   val fileLines: Array[String] = fileReader.getLines().toArray
@@ -64,7 +62,7 @@ class SnmpPDUAnalysis(path: String) extends LogSupport {
         alarmTableList.result()
     } finally {
       fileReader.close()
-      fileWriter.close()
+      //      fileWriter.close()
     }
   }
 
