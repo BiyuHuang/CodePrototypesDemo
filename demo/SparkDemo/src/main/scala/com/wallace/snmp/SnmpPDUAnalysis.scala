@@ -32,7 +32,7 @@ class SnmpPDUAnalysis(path: String) extends LogSupport {
   private val alarmText: ListBuffer[Map[Int, String]] = new ListBuffer[Map[Int, String]]
   private val alarmInfo: ListBuffer[Map[Int, String]] = new ListBuffer[Map[Int, String]]
   private val alarmIterator: ListBuffer[Int] = new ListBuffer[Int]()
-  val fileWrite = new PrintWriter("AlarmTable.csv", "UTF-8")
+  val fileWriter = new PrintWriter("AlarmTable.csv", "UTF-8")
   val alarmTableList = new ListBuffer[String]
   val fileReader: BufferedSource = fromFile(this._path, "UTF-8")
   val fileLines: Array[String] = fileReader.getLines().toArray
@@ -52,21 +52,19 @@ class SnmpPDUAnalysis(path: String) extends LogSupport {
     (0 until List(alarmId.size, alarmCode.size, alarmText.size, alarmInfo.size).max).foreach(x => alarmIterator.append(x))
   }
 
-  protected def afterProcess(): Unit = {
-    val keyIterator = alarmIterator.result()
-    keyIterator.indices.foreach { i =>
-      var col1 = ""
-      var col2 = ""
-      var col3 = ""
-      var col4 = ""
-      col1 = alarmId(i).getOrElse(keyIterator(i), "")
-      col2 = alarmCode(i).getOrElse(keyIterator(i), "")
-      col3 = alarmText(i).getOrElse(keyIterator(i), "")
-      col4 = alarmInfo(i).getOrElse(keyIterator(i), "")
-      val record = s"$col1|$col2|$col3|$col4"
-      alarmTableList.append(record)
-      fileWrite.write(record + "\n")
-      fileWrite.flush()
+  def process(): List[String] = {
+    try {
+      beforeProcess()
+      updateProcess()
+      afterProcess()
+      alarmTableList.result()
+    } catch {
+      case e: Throwable =>
+        log.error("[Throw new exception]", e)
+        alarmTableList.result()
+    } finally {
+      fileReader.close()
+      fileWriter.close()
     }
   }
 
@@ -104,19 +102,21 @@ class SnmpPDUAnalysis(path: String) extends LogSupport {
     }
   }
 
-  def process(): List[String] = {
-    try {
-      beforeProcess()
-      updateProcess()
-      afterProcess()
-      alarmTableList.result()
-    } catch {
-      case e: Throwable =>
-        log.error("[Throw new exception]", e)
-        alarmTableList.result()
-    } finally {
-      fileReader.close()
-      fileWrite.close()
+  protected def afterProcess(): Unit = {
+    val keyIterator = alarmIterator.result()
+    keyIterator.indices.foreach { i =>
+      var col1 = ""
+      var col2 = ""
+      var col3 = ""
+      var col4 = ""
+      col1 = alarmId(i).getOrElse(keyIterator(i), "")
+      col2 = alarmCode(i).getOrElse(keyIterator(i), "")
+      col3 = alarmText(i).getOrElse(keyIterator(i), "")
+      col4 = alarmInfo(i).getOrElse(keyIterator(i), "")
+      val record = s"$col1|$col2|$col3|$col4"
+      alarmTableList.append(record)
+      //fileWriter.write(record + "\n")
+      //fileWriter.flush()
     }
   }
 }
