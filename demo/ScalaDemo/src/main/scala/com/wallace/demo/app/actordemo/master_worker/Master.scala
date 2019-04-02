@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
  * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
  * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
@@ -13,7 +13,7 @@ import java.util.Locale
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.{ConcurrentHashMap, LinkedBlockingQueue}
 
-import akka.actor.{Actor, ActorRef, ActorSelection, ActorSystem, Props, UnhandledMessage}
+import akka.actor.{Actor, ActorRef, ActorSelection, ActorSystem, DeadLetter, Props, UnhandledMessage}
 import com.typesafe.config.{Config, ConfigFactory}
 import sun.misc.{Signal, SignalHandler}
 
@@ -107,6 +107,8 @@ class Master(val host: String, val port: Int) extends Actor {
         Master.scheduleQueue.put(job, job)
       }
     case msg: UnhandledMessage => println(msg.message)
+
+    case DeadLetter(msg, from, to) => to.tell(msg, from)
   }
 }
 

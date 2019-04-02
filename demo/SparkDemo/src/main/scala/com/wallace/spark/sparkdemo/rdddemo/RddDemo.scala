@@ -54,7 +54,7 @@ object RddDemo extends CreateSparkSession with Using {
             val k = s"${2018 % 9}0821164$index${s"%0${11 - len}d".format(elem._2)}".toLong
             (k, elem._1)
         }
-    }.collect.foreach(println)
+    }.collect.take(10).foreach(println)
 
     println(tempRdd.partitions.length)
   }
