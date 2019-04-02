@@ -28,7 +28,7 @@ class SnmpPDUAnalysisUnitSpec extends UnitSpec {
     val res: List[String] = new SnmpPDUAnalysis(fileName).process()
     val endTime = System.currentTimeMillis()
     log.info(s"End time: $endTime, and cost time : ${(endTime - startTime) * 1.0 / 1000} s.")
-    
+
 
     //    res.foreach(x => log.info(x))
     res.size shouldBe 27
