@@ -15,6 +15,12 @@ import org.apache.spark.util.StatCounter
 
 /**
   * Created by wallace on 2019/5/30.
+  * Calc mean/variance/max/min/count And there's no need to collect data by single column.
+  * Demo Result:
+  * K1	=>	(count: 4, mean: 27.000000, stdev: 42.154478, max: 100.000000, min: 2.000000) , (count: 4, mean: 28.250000, stdev: 41.432928, max: 100.000000, min: 3.000000)
+  * K4	=>	(count: 3, mean: 6.333333, stdev: 0.942809, max: 7.000000, min: 5.000000) , (count: 3, mean: 6.666667, stdev: 0.942809, max: 8.000000, min: 6.000000)
+  * K7	=>	(count: 1, mean: 8.000000, stdev: 0.000000, max: 8.000000, min: 8.000000) , (count: 1, mean: 9.000000, stdev: 0.000000, max: 9.000000, min: 9.000000)
+  * K10	=>	(count: 5, mean: 9.400000, stdev: 4.270831, max: 13.000000, min: 1.000000) , (count: 5, mean: 6.400000, stdev: 5.425864, max: 14.000000, min: 2.000000)
   */
 object RddStaticsDemo extends CreateSparkSession with Using {
   private val _spark: SparkSession = createSparkSession("RddStaticsDemo")
