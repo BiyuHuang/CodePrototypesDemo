@@ -9,6 +9,7 @@
 package com.wallace.spark.sparkmllibdemo
 
 import com.wallace.common.{CreateSparkSession, Using}
+import org.apache.hadoop.fs.FileSystem
 import org.apache.spark.mllib.linalg
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.stat.Statistics
@@ -24,6 +25,14 @@ object ChiSqLearning extends CreateSparkSession with Using {
         val vd: linalg.Vector = Vectors.dense(1, 2, 2, 3, 3, 3, 4, 4, 5)
         val vdRes: ChiSqTestResult = Statistics.chiSqTest(vd)
         log.info(s"$vdRes")
+
+        val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
+        log.info(
+          s"""
+             |[Capacity ]: ${"%.3f".format(fs.getStatus().getCapacity / 1024.0 / 1024.0 / 1024.0)} GB
+             |[Used     ]: ${"%.3f".format(fs.getStatus().getUsed / 1024.0 / 1024.0 / 1024.0)} GB
+             |[Remaining]: ${"%.3f".format(fs.getStatus().getRemaining / 1024.0 / 1024.0 / 1024.0)} GB
+           """.stripMargin)
     }
   }
 }
