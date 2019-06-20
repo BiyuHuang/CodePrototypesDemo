@@ -10,6 +10,7 @@ package com.wallace.demo.app.algorithmdemo
 
 import com.wallace.demo.app.common.LogSupport
 
+import scala.collection.mutable
 import scala.reflect.ClassTag
 
 /**
@@ -82,7 +83,20 @@ object AlgDemo extends LogSupport {
     //TODO 1 TriangleCount
     val tCnt: Int = triangleCount(Array(3, 4, 6, 7, 8, 9))
     log.info(s"Triangle Count: $tCnt")
+
+    //TODO 2 Two Sum: (1, 3)
+    twoSum(Array(11, 2, 1, 7, 15), 9)
   }
 
-
+  def twoSum(d: Array[Int], target: Int): Unit = {
+    val hMap: mutable.HashMap[Int, Int] = new mutable.HashMap[Int, Int]()
+    d.zipWithIndex.foreach {
+      x =>
+        if (hMap.contains(x._1)) {
+          println(hMap(x._1), x._2)
+        } else {
+          hMap.put(target - x._1, x._2)
+        }
+    }
+  }
 }
