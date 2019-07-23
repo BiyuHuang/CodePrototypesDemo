@@ -1,21 +1,24 @@
 package com.wallace.spark.sparkmllibdemo
 
-import com.wallace.common.CreateSparkSession
+import com.wallace.common.{CreateSparkSession, Using}
 import org.apache.spark.ml.feature._
 import org.apache.spark.sql.SparkSession
 
 /**
   * Created by Wallace on 2016/11/10.
+  * Extraction Transformation Selection
   */
-object Extraction_Transformation_Selection extends CreateSparkSession {
+object ETS extends CreateSparkSession with Using {
   def main(args: Array[String]): Unit = {
-    val spark = createSparkSession("Extraction_Transformation_Selection_Demo")
-    //    hashingTF(spark)
-    //    word2Vec(spark)
-    //    countVectorizer(spark)
-    //    tokenizer(spark)
-    //    binarizer(spark)
-    pca(spark)
+    usingSpark(createSparkSession("Extraction_Transformation_Selection_Demo")) {
+      spark =>
+        //    hashingTF(spark)
+        //    word2Vec(spark)
+        //    countVectorizer(spark)
+        //    tokenizer(spark)
+        //    binarizer(spark)
+        pca(spark)
+    }
   }
 
   def pca(spark: SparkSession): Unit = {

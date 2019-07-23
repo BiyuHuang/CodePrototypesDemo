@@ -30,16 +30,16 @@ object PipelinesDemo extends FuncRunDuration {
       .getOrCreate()
     val sc = spark.sparkContext
 
-    MLDemo1(spark, lr)
+    mlDemo1(spark, lr)
 
-    PipeLineFunc(spark, lr)
+    pipeLineFunc(spark, lr)
   }
 
   /**
     * Demo
     **/
 
-  def MLDemo1(spark: SparkSession, lr: LogisticRegression) = {
+  def mlDemo1(spark: SparkSession, lr: LogisticRegression): Unit = {
     // Prepare training data from a list of (label, features) tuples.
     val training = spark.createDataFrame(Seq(
       (1.0, Vectors.dense(0.0, 1.1, 0.1)),
@@ -101,8 +101,8 @@ object PipelinesDemo extends FuncRunDuration {
     * @param spark SparkSession
     * @param lr    LogisticRegression
     * @return Unit
-    * */
-  def PipeLineFunc(spark: SparkSession, lr: LogisticRegression): Unit = {
+    **/
+  def pipeLineFunc(spark: SparkSession, lr: LogisticRegression): Unit = {
     val training = spark.createDataFrame(Seq(
       (0L, "a b c d e spark", 1.0),
       (1L, "b d", 0.0),
@@ -128,7 +128,7 @@ object PipelinesDemo extends FuncRunDuration {
       (6L, "spark f g h spark f g h spark f g h"),
       (7L, "hadoop apache"),
       (8L, "a b c d e F spark"),
-      (9L," spark")
+      (9L, " spark")
     )).toDF("id", "text")
 
     model.transform(test).select("id", "text", "probability", "prediction")

@@ -5,11 +5,16 @@
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/BiyuHuang/CodePrototypesDemo/blob/master/LICENSE)
 [![codecov](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo/branch/master/graph/badge.svg)](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo)
 
-    All of this are my private coding prototypes demo. Including scala demo/spark demo.
-    Please use SBT build this repo:
+    Code prototypes demo, include ScalaDemo/SparkDemo/DataLoader etc.
+    Build project with sbt:
     $ cd code_source_path
     $ sbt update gen-idea
     $ sbt clean assembly
+    
+    Build project with maven:
+    $ cd code_source_path
+    $ mvn clean install -DskipTests
+    $ mvn clean package -DskipTests
 
 
 

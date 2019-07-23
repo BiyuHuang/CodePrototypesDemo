@@ -93,7 +93,7 @@ object AlgDemo extends LogSupport {
     d.zipWithIndex.foreach {
       x =>
         if (hMap.contains(x._1)) {
-          println(hMap(x._1), x._2)
+          println(s"${hMap(x._1)}, ${x._2}")
         } else {
           hMap.put(target - x._1, x._2)
         }
