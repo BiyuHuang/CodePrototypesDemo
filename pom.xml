@@ -32,6 +32,13 @@
         <project.path>${project.basedir}</project.path>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>Maven</id>
+            <url>https://dl.bintray.com/spark-packages/maven/</url>
+        </repository>
+    </repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -200,11 +207,11 @@
                 <version>2.2.0</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-clients</artifactId>
-                <version>0.8.2.1</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.apache.kafka</groupId>-->
+                <!--<artifactId>kafka-clients</artifactId>-->
+                <!--<version>0.8.2.1</version>-->
+            <!--</dependency>-->
 
             <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
             <dependency>
@@ -261,7 +268,7 @@
                 <version>7.4.1</version>
                 <scope>system</scope>
                 <!--<systemPath>${project.path}/lib/loader.jar</systemPath>-->
-                <systemPath>${project.basedir}/lib/loader.jar</systemPath>
+                <systemPath>${pom.basedir}/lib/loader.jar</systemPath>
             </dependency>
 
             <!-- required by scalatest-maven-plugin to generate HTML report -->
@@ -279,6 +286,12 @@
                 <version>2.9.0</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/Azure/mmlspark -->
+            <dependency>
+                <groupId>Azure</groupId>
+                <artifactId>mmlspark</artifactId>
+                <version>0.17</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

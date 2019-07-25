@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
+package com.wallace.spark.sparkmllibdemo
+
+import com.microsoft.ml.spark.{LightGBMClassificationModel, LightGBMClassifier}
+import com.wallace.common.{CreateSparkSession, Using}
+
+/**
+  * Created by wallace on 2019/7/23.
+  */
+object LightGBMDemo extends CreateSparkSession with Using {
+  def main(args: Array[String]): Unit = {
+    usingSpark(createSparkSession("LightGBM_Demo")) {
+      spark =>
+        import spark.implicits._
+        val lightGBMModel = LightGBMClassificationModel.loadNativeModelFromFile("")
+
+        lightGBMModel
+          .setFeaturesCol("")
+          .setPredictionCol("")
+          .getProbabilityCol
+    }
+  }
+}

@@ -6,11 +6,16 @@
 [![codecov](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo/branch/master/graph/badge.svg)](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo)
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
-    All of this are my private coding prototypes demo. Including scala demo/spark demo.
-    Please use SBT build this repo:
+    Code prototypes demo, include ScalaDemo/SparkDemo/DataLoader etc.
+    Build project with sbt:
     $ cd code_source_path
     $ sbt update gen-idea
     $ sbt clean assembly
+    
+    Build project with maven:
+    $ cd code_source_path
+    $ mvn clean install -DskipTests
+    $ mvn clean package -DskipTests
 
 
 

@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
 package com.wallace.spark.sparkdemo.dataframedemo
 
 import com.wallace.common.CreateSparkSession
@@ -24,6 +32,22 @@ case class Customer(Time: String, Id: String, Spending: Int)
 case class Record(num: Int, col2: String, col3: String, col4: String, col5: String, index: Int)
 
 object DataFrameDemo extends CreateSparkSession {
+  def saveAsSparkTable(df: DataFrame, tableName: String, saveMode: SaveMode,
+                       partNum: Int = 1,
+                       source: String = "parquet",
+                       partByCols: Seq[String] = Seq.empty): Unit = {
+    df.repartition(partNum)
+      .write
+      .format(source)
+      .mode(saveMode)
+      .partitionBy(partByCols: _*)
+      .saveAsTable(tableName)
+  }
+
+  def readSparkTable(sc: SQLContext, tableName: String, source: String = "parquet"): DataFrame = {
+    sc.read.format(source).table(tableName)
+  }
+
   val schema: StructType = StructType(Array(StructField("num", IntegerType, nullable = true),
     StructField("col2", StringType, nullable = true),
     StructField("col3", StringType, nullable = true),

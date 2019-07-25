@@ -494,7 +494,7 @@
             <groupId>com.zte.hadoop.loader</groupId>
             <artifactId>hadoop-loader</artifactId>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../../lib/loader.jar</systemPath>
+            <systemPath>${pom.basedir}/../../lib/loader.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
