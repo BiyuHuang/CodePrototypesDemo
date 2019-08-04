@@ -87,10 +87,12 @@ object AlgDemo extends LogSupport {
     //TODO 2 Two Sum: (1, 3)
     twoSum(Array(11, 2, 1, 7, 15), 9)
 
-
     //TODO 3 Reverse Int Value
-    println(reverseIntValue(-123))
-    println(reverseIntValue(210))
+    println("-123 reverse: " + reverseIntValue(-123))
+    println("210 reverse: " + reverseIntValue(210))
+
+    //TODO 4 Roman to Int
+    println("MCMXCIV: " + romanToInt("MCMXCIV"))
   }
 
   def twoSum(d: Array[Int], target: Int): Unit = {
@@ -116,5 +118,17 @@ object AlgDemo extends LogSupport {
     //      tmp = tmp / 10
     //    }
     //    res
+  }
+
+  def romanToInt(x: String): Int = {
+    val reflectMap: Map[Char, Int] = Map('I' -> 1, 'V' -> 5, 'X' -> 10, 'L' -> 50, 'C' -> 100, 'D' -> 500, 'M' -> 1000)
+    reflectMap(x.last) + x.reverse.tail.zip(x.reverse).map {
+      elem =>
+        if (reflectMap(elem._1) >= reflectMap(elem._2)) {
+          reflectMap(elem._1)
+        } else {
+          -reflectMap(elem._1)
+        }
+    }.sum
   }
 }
