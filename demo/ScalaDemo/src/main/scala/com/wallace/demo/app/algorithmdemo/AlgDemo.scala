@@ -86,6 +86,11 @@ object AlgDemo extends LogSupport {
 
     //TODO 2 Two Sum: (1, 3)
     twoSum(Array(11, 2, 1, 7, 15), 9)
+
+
+    //TODO 3 Reverse Int Value
+    println(reverseIntValue(-123))
+    println(reverseIntValue(210))
   }
 
   def twoSum(d: Array[Int], target: Int): Unit = {
@@ -98,5 +103,18 @@ object AlgDemo extends LogSupport {
           hMap.put(target - x._1, x._2)
         }
     }
+  }
+
+  def reverseIntValue(x: Int): Int = {
+    //    val isNegative: Boolean = (x & Int.MinValue) == Int.MinValue
+    val tmp: Int = Math.abs(x).toString.reverse.toInt
+    if (x < 0) -tmp else tmp
+    //    var tmp: Int = x
+    //    var res: Int = 0
+    //    while (tmp != 0) {
+    //      res = res * 10 + tmp % 10
+    //      tmp = tmp / 10
+    //    }
+    //    res
   }
 }
