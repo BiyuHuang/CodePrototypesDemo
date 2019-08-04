@@ -10,7 +10,7 @@ package com.wallace.spark.sparkmllibdemo
 
 import com.wallace.common.CreateSparkSession
 import org.apache.spark.mllib.classification.{LogisticRegressionWithLBFGS, NaiveBayes, SVMWithSGD}
-import org.apache.spark.mllib.evaluation.{BinaryClassificationMetrics, MulticlassMetrics}
+import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
 import org.apache.spark.mllib.tree.RandomForest
@@ -26,12 +26,17 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
   protected val spark: SparkSession = createSparkSession("ForecastIndoorAndOutdoorMRDemo")
 
   def main(args: Array[String]): Unit = {
-    val filePath: String = "./demo/SparkDemo/src/main/resources/trainingData.csv"
-    val rdd: RDD[DataFields] = spark.sparkContext.textFile(filePath).filter(x => !x.toLowerCase.contains("positionmark_real")).map(_.split(",", -1)).map {
-      x =>
-        DataFields(x(0), Try(x(1).toDouble).getOrElse(Double.NaN), Try(x(2).toDouble).getOrElse(Double.NaN), Try(x(3).toDouble).getOrElse(Double.NaN),
-          Try(x(4).toDouble).getOrElse(Double.NaN), Try(x(5).toDouble).getOrElse(Double.NaN), Try(x(6).toDouble).getOrElse(Double.NaN), Try(x(7).toDouble).getOrElse(Double.NaN), x(8), x(9), x(10), x(11), x(12), x(13), x(14).toInt)
-    }
+    val filePath: String = "./demo/SparkDemo/src/main/resources/trainingData.csv.gz"
+    val rdd: RDD[DataFields] = spark.sparkContext.textFile(filePath)
+      .filter(x => !x.toLowerCase.contains("positionmark_real")).map(_.split(",", -1))
+      .map {
+        x =>
+          DataFields(x(0), Try(x(1).toDouble).getOrElse(Double.NaN), Try(x(2).toDouble).getOrElse(Double.NaN),
+            Try(x(3).toDouble).getOrElse(Double.NaN),
+            Try(x(4).toDouble).getOrElse(Double.NaN), Try(x(5).toDouble).getOrElse(Double.NaN),
+            Try(x(6).toDouble).getOrElse(Double.NaN), Try(x(7).toDouble).getOrElse(Double.NaN),
+            x(8), x(9), x(10), x(11), x(12), x(13), x(14).toInt)
+      }
 
     val inputRDD: RDD[LabeledPoint] = rdd.map(dataFields => LabeledPoint(
       dataFields.positionMarkReal,
@@ -44,10 +49,12 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
         dataFields.ta,
         dataFields.taDltValue))
     )).cache()
-    val splitRdds: Array[RDD[LabeledPoint]] = inputRDD.randomSplit(Array(0.7, 0.3), seed = 1L) //Split data into training (70%) and test(30%)
+
+    //Split data into training (70%) and test(30%)
+    val splitRdds: Array[RDD[LabeledPoint]] = inputRDD.randomSplit(Array(0.7, 0.3), seed = 1L)
     svmWithSGDModel(splitRdds, 200, 0.6, 0.0005)
     //    linearRegressionWithSGD(splitRdds)
-    //logisticRegressionWithLBFGSModel(splitRdds)
+    logisticRegressionWithLBFGSModel(splitRdds)
     //    naiveBayes(splitRdds)
 
     // randomForestModel(splitRdds)
@@ -92,7 +99,8 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
       **/
     val metrics = new BinaryClassificationMetrics(predictionAndLabels)
     val auROC = metrics.areaUnderROC()
-    log.warn(s"[Model = SVMWithSGDModel, Area under ROC = $auROC, numIterations = $numIterations, stepSize = $stepSize, regParam = $regParam, miniBatchFraction = $miniBatchFraction]")
+    log.warn(s"[Model = SVMWithSGDModel, Area under ROC = $auROC, numIterations = $numIterations, " +
+      s"stepSize = $stepSize, regParam = $regParam, miniBatchFraction = $miniBatchFraction]")
   }
 
   protected def logisticRegressionWithLBFGSModel(data: Array[RDD[LabeledPoint]]): Unit = {
@@ -100,7 +108,7 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
     val testData = data.last
 
     val model = new LogisticRegressionWithLBFGS()
-      .setNumClasses(20)
+      .setNumClasses(2)
       .run(trainingData)
 
     val predictionAndLabels = testData.map {
@@ -110,10 +118,10 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
     }
 
     // Get evaluation metrics.获取评估指标
-    val metrics = new MulticlassMetrics(predictionAndLabels)
-    val precision: Double = metrics.accuracy
-
-    log.warn(s"[Model = LogisticRegressionWithLBFGSModel, Precision = $precision]")
+    val metrics = new BinaryClassificationMetrics(predictionAndLabels)
+    val precision: Array[(Double, Double)] = metrics.precisionByThreshold().collect
+    val auc: Double = metrics.areaUnderROC()
+    log.warn(s"[Model = LogisticRegressionWithLBFGSModel, Precision = ${precision.mkString("#")}], AUC = $auc")
   }
 
   /**
@@ -167,7 +175,9 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
   /**
     * 朴素贝叶斯
     **/
-  protected def naiveBayesModel(data: Array[RDD[LabeledPoint]], lambda: Double = 1.0, modelType: String = "bernoulli"): Unit = {
+  protected def naiveBayesModel(data: Array[RDD[LabeledPoint]],
+                                lambda: Double = 1.0,
+                                modelType: String = "bernoulli"): Unit = {
     val trainingData = data.head
     val testData = data.last
 
@@ -183,6 +193,9 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
     log.warn(s"[Model = NaiveBayesModel, Precision = $accuracy]")
   }
 
-  private case class DataFields(reportCellKey: String, strongestNBPci: Double, aoa: Double, ta_calc: Double, rsrp: Double, rsrq: Double, ta: Double, taDltValue: Double, mrtime: String, imsi: String, ndsKey: String, ueRecordID: String, startTime: String, endTime: String, positionMarkReal: Int)
+  private case class DataFields(reportCellKey: String, strongestNBPci: Double, aoa: Double, ta_calc: Double,
+                                rsrp: Double, rsrq: Double, ta: Double, taDltValue: Double, mrtime: String,
+                                imsi: String, ndsKey: String, ueRecordID: String, startTime: String,
+                                endTime: String, positionMarkReal: Int)
 
 }
