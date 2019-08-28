@@ -263,5 +263,10 @@
             <artifactId>kafka-clients</artifactId>
             <version>0.10.0.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.mxnet</groupId>
+            <artifactId>mxnet-full_2.11-linux-x86_64-cpu</artifactId>
+        </dependency>
     </dependencies>
 </project>
