@@ -131,4 +131,11 @@ object AlgDemo extends LogSupport {
         }
     }.sum
   }
+
+  def findPublicPrefix(xs: Array[String]): String = {
+    val cMap = new mutable.HashMap[Char, Int]()
+    val tmp = xs.map(_.toCharArray)
+    //    tmp.reduce
+    ???
+  }
 }
