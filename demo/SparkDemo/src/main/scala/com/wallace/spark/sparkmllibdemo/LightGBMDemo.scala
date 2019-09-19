@@ -8,7 +8,7 @@
 
 package com.wallace.spark.sparkmllibdemo
 
-import com.microsoft.ml.spark.{LightGBMClassificationModel, LightGBMClassifier}
+import com.microsoft.ml.spark.LightGBMClassificationModel
 import com.wallace.common.{CreateSparkSession, Using}
 
 /**
@@ -18,7 +18,7 @@ object LightGBMDemo extends CreateSparkSession with Using {
   def main(args: Array[String]): Unit = {
     usingSpark(createSparkSession("LightGBM_Demo")) {
       spark =>
-        import spark.implicits._
+
         val lightGBMModel = LightGBMClassificationModel.loadNativeModelFromFile("")
 
         lightGBMModel
