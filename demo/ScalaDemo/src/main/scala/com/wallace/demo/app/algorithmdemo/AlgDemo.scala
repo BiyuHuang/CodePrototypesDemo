@@ -11,6 +11,7 @@ package com.wallace.demo.app.algorithmdemo
 import com.wallace.demo.app.common.LogSupport
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
 
 /**
@@ -93,6 +94,10 @@ object AlgDemo extends LogSupport {
 
     //TODO 4 Roman to Int
     println("MCMXCIV: " + romanToInt("MCMXCIV"))
+
+    //TODO 5 Find all subsets
+    val allSubsets = findAllSubSet(Array(1, 2, 3, 4, 5))
+    allSubsets.foreach(x => println("[" + x.mkString("\t") + "]"))
   }
 
   def twoSum(d: Array[Int], target: Int): Unit = {
@@ -137,5 +142,24 @@ object AlgDemo extends LogSupport {
     val tmp = xs.map(_.toCharArray)
     //    tmp.reduce
     ???
+  }
+
+
+  def findAllSubSet[T: ClassTag](arr: Array[T]): Array[Array[T]] = {
+    val max: BigInt = BigDecimal.double2bigDecimal(math.pow(2, arr.length)).toBigInt
+    val res: ArrayBuffer[Array[T]] = new ArrayBuffer[Array[T]]()
+    (BigInt(0) until max).foreach {
+      i =>
+        var flag: BigInt = i
+        var shift: Int = 0
+        val tmp: ArrayBuffer[T] = new ArrayBuffer[T]()
+        while (flag > 0) {
+          if ((flag & BigInt(1)) == 1) tmp.append(arr(shift))
+          shift += 1
+          flag >>= 1
+        }
+        res.append(tmp.result().toArray[T])
+    }
+    res.result().toArray[Array[T]]
   }
 }

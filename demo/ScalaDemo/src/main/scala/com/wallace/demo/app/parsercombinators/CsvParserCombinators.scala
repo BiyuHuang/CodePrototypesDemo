@@ -1,5 +1,6 @@
 package com.wallace.demo.app.parsercombinators
 
+import scala.language.postfixOps
 import scala.util.matching.Regex
 import scala.util.parsing.combinator._
 

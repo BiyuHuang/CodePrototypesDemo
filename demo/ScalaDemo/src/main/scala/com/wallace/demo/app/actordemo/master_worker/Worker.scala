@@ -16,6 +16,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
   * Created by wallace on 2018/6/21 0021.

@@ -20,6 +20,7 @@ import sun.misc.{Signal, SignalHandler}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
   * Created by 10192057 on 2018/6/20 0020.

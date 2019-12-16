@@ -1,5 +1,7 @@
 package com.wallace.demo.app.implicitdemo
 
+import scala.language.implicitConversions
+
 /**
   * Created by 10192057 on 2018/8/17 0017.
   */

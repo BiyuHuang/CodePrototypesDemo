@@ -134,7 +134,7 @@
 		BAEFAECB2333879D003E26D4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1030;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "黄碧宇";
 				TargetAttributes = {
 					BAEFAED22333879D003E26D4 = {
@@ -297,6 +297,7 @@
 		BAEFAEDB2333879D003E26D4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7768NN9MZ3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -306,6 +307,7 @@
 		BAEFAEDC2333879D003E26D4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7768NN9MZ3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -315,6 +317,7 @@
 		BAEFAEE6233387CE003E26D4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7768NN9MZ3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -324,6 +327,7 @@
 		BAEFAEE7233387CE003E26D4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7768NN9MZ3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
