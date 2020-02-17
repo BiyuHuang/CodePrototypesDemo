@@ -1,8 +1,8 @@
 sudo: false
 
-install:
-    - mvn dependency:resolve
-    - travis_wait 60 mvn install -DskipTests -q
+#install:
+#    - mvn dependency:resolve
+#    - travis_wait 60 mvn install -DskipTests -q
 
 cache:
   directories:
