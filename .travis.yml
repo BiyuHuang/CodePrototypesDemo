@@ -26,8 +26,8 @@ scala:
   - 2.11.12
 
 jdk:
-  - oraclejdk9
-  - openjdk9
+  - oraclejdk8
+  - openjdk8
 
 notifications:
   email:
