@@ -1,7 +1,7 @@
 sudo: false
 
 install:
-    - travis_wait 60 mvn install -DskipTests -q
+    - travis_wait 60 mvn clean install -DskipTests -q
 #    - mvn dependency:resolve
 
 cache:
