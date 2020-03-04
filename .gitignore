@@ -11,7 +11,8 @@ project/target/
 projectFilesBackup*/
 target/
 metastore_db/
-
+.DS_Store
+*.obj
 *.log
 *.csv
 .checkpoint-*

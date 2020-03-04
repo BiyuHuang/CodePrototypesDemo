@@ -1,18 +1,19 @@
 package com.wallace.demo.app.utils
 
 import java.io.{FileInputStream, FileOutputStream, _}
-import java.nio.{ByteBuffer, MappedByteBuffer}
 import java.nio.channels.FileChannel
 import java.nio.charset.Charset
 import java.nio.file.WatchService
+import java.nio.{ByteBuffer, MappedByteBuffer}
 import java.text.NumberFormat
 import java.util.zip.{GZIPInputStream, ZipFile, ZipInputStream}
-
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
+
 import com.typesafe.config.{Config, ConfigFactory}
 import com.wallace.demo.app.common._
 import com.wallace.demo.app.parsexml.{MROSax, SaxHandler}
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
+import org.apache.commons.compress.archivers.zip
 import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.utils.IOUtils
@@ -23,6 +24,7 @@ import org.apache.parquet.example.data.simple.SimpleGroupFactory
 import org.apache.parquet.hadoop.ParquetWriter
 import org.apache.parquet.hadoop.example.GroupWriteSupport
 import org.apache.parquet.schema.{MessageType, MessageTypeParser}
+import org.apache.spark.rdd.RDD
 
 import scala.collection.immutable
 import scala.concurrent.ExecutionContext
@@ -131,6 +133,48 @@ object FileUtils extends Using {
   }
 
   def main(args: Array[String]): Unit = {
+    val rdd3: RDD[(String, String)] = ???
+    rdd3.foreach {
+      e =>
+        println("name:" + e + "\nend")
+        val originalFile = e._1
+        val innerFile = e._2
+        var f1 = originalFile.substring(6, originalFile.length)
+        val f_new = new File(f1)
+        val zf: zip.ZipFile = new org.apache.commons.compress.archivers.zip.ZipFile(f_new, "gbk")
+        val packinfo: ZipArchiveEntry = zf.getEntry(innerFile)
+        val innerFileInputStream = zf.getInputStream(packinfo)
+        if (innerFile.endsWith(".zip")) {
+          val zais: ZipArchiveInputStream = new ZipArchiveInputStream(zf.getInputStream(packinfo), "UTF-8", true)
+          var innerzae: ZipArchiveEntry = zais.getNextZipEntry
+          while (innerzae != null) {
+            val size = innerzae.getSize
+            println(s"Entry Name: ${innerzae.getName}, Entry Size: $size.")
+            val defaultSize: Long = Math.min(Runtime.getRuntime.freeMemory(), Int.MaxValue)
+            println(s"FreeMemory: ${Runtime.getRuntime.freeMemory() / (1024 * 1024)} MB. Default Bytes Size: $defaultSize Bytes")
+            val currentSize: Long = if (size < 0) defaultSize else size
+            val bos = new ByteArrayOutputStream(currentSize.toInt)
+            IOUtils.copy(zais, bos, 40960)
+            val res: ByteArrayInputStream = new ByteArrayInputStream(bos.toByteArray)
+            println(s"third:${innerzae.getName},$zais")
+            processCSV(innerzae.getName, res)
+            innerzae = zais.getNextZipEntry
+          }
+        } else {
+          println(s"$originalFile")
+          processCSV(originalFile, innerFileInputStream)
+        }
+        zf.close()
+    }
+
+    def processCSV(filename: String, ins: InputStream): Unit = {
+      val br: BufferedReader = new BufferedReader(new InputStreamReader(ins))
+      var line: Option[String] = Option(br.readLine())
+      while (line.isDefined) {
+        println("line:" + line.get)
+        line = Option(br.readLine())
+      }
+    }
     //    // TODO READ GZ FILE
     //    val costTime1 = runtimeDuration(readGZFile("./demo/ScalaDemo/src/main/resources/AH_RM_20170926_all_all-cm_lte_cel-20170926000000-20170927000000-v2.0-20170926112500-001.csv.gz"))
     //    log.info(s"CostTime1: $costTime1 ms.")
@@ -190,8 +234,8 @@ object FileUtils extends Using {
 
     // TODO Read readZipArchiveFile
     //val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335110_20180403101500.zip"
-    val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335112_20180403101500.xml.zip"
-    //val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ZTE_OMC1_637784_20170522204500.zip"
+    //    val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335112_20180403101500.xml.zip"
+    val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ZTE_OMC1_637784_20170522204500.zip"
     val costTime4: Double = runtimeDuration(readZipArchiveFile(fileName))
     log.info(s"CostTime4: $costTime4 ms.")
 
@@ -368,22 +412,27 @@ object FileUtils extends Using {
           zipIns =>
             var entry: ZipArchiveEntry = zipIns.getNextZipEntry
             while (zipIns.canReadEntryData(entry) && entry != null) {
-              val size = entry.getSize
-              log.info(s"Entry Name: ${entry.getName}, Entry Size: $size.")
-              val defaultSize: Long = Math.min(Runtime.getRuntime.freeMemory(), Int.MaxValue)
-              log.debug(s"FreeMemory: ${Runtime.getRuntime.freeMemory() / (1024 * 1024)} MB. Default Bytes Size: $defaultSize Bytes")
-              val currentSize: Long = if (size < 0) defaultSize else size
-              val bos = new ByteArrayOutputStream(currentSize.toInt)
-              IOUtils.copy(zipIns, bos, 40960)
-              val res: ByteArrayInputStream = new ByteArrayInputStream(bos.toByteArray)
-              using(new BufferedReader(new InputStreamReader(res))) {
-                br =>
-                  while (br.ready()) {
-                    log.info(br.readLine())
-                  }
+
+              if (entry.getName.endsWith(".zip")) {
+
+              } else {
+                val size = entry.getSize
+                log.info(s"Entry Name: ${entry.getName}, Entry Size: $size.")
+                val defaultSize: Long = Math.min(Runtime.getRuntime.freeMemory(), Int.MaxValue)
+                log.debug(s"FreeMemory: ${Runtime.getRuntime.freeMemory() / (1024 * 1024)} MB. Default Bytes Size: $defaultSize Bytes")
+                val currentSize: Long = if (size < 0) defaultSize else size
+                val bos = new ByteArrayOutputStream(currentSize.toInt)
+                IOUtils.copy(zipIns, bos, 40960)
+                val res: ByteArrayInputStream = new ByteArrayInputStream(bos.toByteArray)
+                using(new BufferedReader(new InputStreamReader(res))) {
+                  br =>
+                    while (br.ready()) {
+                      log.info(br.readLine())
+                    }
+                }
+                bos.flush()
+                bos.close()
               }
-              bos.flush()
-              bos.close()
               entry = zipIns.getNextZipEntry
             }
         }

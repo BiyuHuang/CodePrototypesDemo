@@ -7,6 +7,7 @@ import com.wallace.demo.app.common.LogSupport
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 import scala.math.random
 
 /**
@@ -63,7 +64,7 @@ class Master(nrOfWorkers: Int, nrOfMessages: Int, times: Int) extends Actor {
 }
 
 object PiAkkaDemo extends LogSupport {
-  implicit val timeout = Timeout(100 seconds)
+  implicit val timeout: Timeout = Timeout(100 seconds)
 
   def main(args: Array[String]): Unit = {
     if (args.length < 3) {

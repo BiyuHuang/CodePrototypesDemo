@@ -19,6 +19,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Random;
 
+import static org.apache.parquet.hadoop.ParquetReader.builder;
+
 public class ParquetIOUtils {
     static Logger logger = Logger.getLogger(ParquetIOUtils.class);
 
@@ -30,7 +32,7 @@ public class ParquetIOUtils {
 
     private static void parquetReaderV2() throws Exception {
         GroupReadSupport readSupport = new GroupReadSupport();
-        ParquetReader.Builder<Group> reader = ParquetReader.builder(readSupport, new Path("test\\parquet-out2"));
+        ParquetReader.Builder<Group> reader = builder(readSupport, new Path("test\\parquet-out2"));
         ParquetReader<Group> build = reader.build();
         Group line = null;
         while ((line = build.read()) != null) {
@@ -54,9 +56,10 @@ public class ParquetIOUtils {
     //新版本中new ParquetReader()所有构造方法好像都弃用了,用上面的builder去构造对象
     static void parquetReader(String inPath) throws Exception {
         GroupReadSupport readSupport = new GroupReadSupport();
-        ParquetReader<Group> reader = new ParquetReader<Group>(new Path(inPath), readSupport);
+        ParquetReader.Builder<Group> builder = builder(readSupport, new Path(inPath));
+        // ParquetReader<Group> reader = new ParquetReader<Group>(new Path(inPath), readSupport);
         Group line = null;
-        while ((line = reader.read()) != null) {
+        while ((line = builder.build().read()) != null) {
             System.out.println(line.toString());
         }
         System.out.println("读取结束");

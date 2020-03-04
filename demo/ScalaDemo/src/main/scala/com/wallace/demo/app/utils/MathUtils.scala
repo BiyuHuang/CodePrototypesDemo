@@ -93,6 +93,7 @@ object MathUtils {
 
   def getSumOfLong(x: Long): Long = (0 to 63).map(x >> _ & 0x01).sum
 
+
   def oddEvenCheck(x: Int): Int = x match {
     case 0 => 0
     case _ => x & 0x01
