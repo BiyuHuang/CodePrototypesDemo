@@ -16,7 +16,8 @@
     <!-- definition of appender STDOUT -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} |-%-5level in%replace(%caller{1}){'\t|Caller.{1}0|\r\n|at\s', ''} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} |-[%thread]-[%level]-[%logger{35}.%method:%line] - %msg%n</pattern>
+            <!--<pattern>%d{HH:mm:ss.SSS} |-%-5level in%replace(%caller{1}){'\t|Caller.{1}0|\r\n|at\s', ''} - %msg%n</pattern>-->
         </encoder>
     </appender>
 
