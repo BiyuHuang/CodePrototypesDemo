@@ -1,6 +1,6 @@
 # ___Code Prototypes Demo___
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b23dab2ea7274e05a92d589cc3767f2a)](https://www.codacy.com/app/BiyuHuang/CodePrototypesDemo?utm_source=github.com&utm_medium=referral&utm_content=BiyuHuang/CodePrototypesDemo&utm_campaign=badger)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b23dab2ea7274e05a92d589cc3767f2a)](https://www.codacy.com/gh/BiyuHuang/CodePrototypesDemo?utm_source=github.com&utm_medium=referral&utm_content=BiyuHuang/CodePrototypesDemo&utm_campaign=badger)
 [![Build Status](https://travis-ci.org/BiyuHuang/CodePrototypesDemo.svg?branch=master)](https://travis-ci.org/BiyuHuang/)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/BiyuHuang/CodePrototypesDemo/blob/master/LICENSE)
 [![codecov](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo/branch/master/graph/badge.svg)](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo)
