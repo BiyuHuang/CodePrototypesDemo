@@ -77,7 +77,7 @@
             <dependency>
                 <groupId>net.minidev</groupId>
                 <artifactId>json-smart</artifactId>
-                <version>2.3</version>
+                <version>2.4.1</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.scala-lang.modules/scala-parser-combinators -->
@@ -103,13 +103,13 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.1.2</version>
+                <version>1.2.0</version>
             </dependency>
 
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.1.2</version>
+                <version>1.2.0</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor -->
@@ -143,7 +143,7 @@
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.31</version>
+                <version>8.0.16</version>
                 <scope>test</scope>
             </dependency>
             <!-- https://mvnrepository.com/artifact/ch.ethz.ganymed/ganymed-ssh2 -->
@@ -224,7 +224,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.18</version>
+                <version>1.21</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop -->
@@ -252,7 +252,7 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5.3</version>
+                <version>4.5.13</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->

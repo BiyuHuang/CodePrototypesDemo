@@ -1,9 +1,10 @@
 # ___Code Prototypes Demo___
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a8f3b0414c2145aea3a10a50a9914a14)](https://www.codacy.com/app/h417652303/CodePrototypesDemo?utm_source=github.com&utm_medium=referral&utm_content=BiyuHuang/CodePrototypesDemo&utm_campaign=badger)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b23dab2ea7274e05a92d589cc3767f2a)](https://www.codacy.com/gh/BiyuHuang/CodePrototypesDemo?utm_source=github.com&utm_medium=referral&utm_content=BiyuHuang/CodePrototypesDemo&utm_campaign=badger)
 [![Build Status](https://travis-ci.org/BiyuHuang/CodePrototypesDemo.svg?branch=master)](https://travis-ci.org/BiyuHuang/)
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/BiyuHuang/CodePrototypesDemo/blob/master/LICENSE)
 [![codecov](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo/branch/master/graph/badge.svg)](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo)
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
     Code prototypes demo, include ScalaDemo/SparkDemo/DataLoader etc.
     Build project with sbt:
