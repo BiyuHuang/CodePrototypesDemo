@@ -198,7 +198,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <scope>test</scope>
+            <!--            <scope>test</scope>-->
         </dependency>
         <!-- https://mvnrepository.com/artifact/ch.ethz.ganymed/ganymed-ssh2 -->
         <dependency>

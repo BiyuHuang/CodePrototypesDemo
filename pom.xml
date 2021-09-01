@@ -140,11 +140,17 @@
                 <scope>test</scope>
             </dependency>
             <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+            <!--            <dependency>-->
+            <!--                <groupId>mysql</groupId>-->
+            <!--                <artifactId>mysql-connector-java</artifactId>-->
+            <!--                <version>8.0.16</version>-->
+            <!--                <scope>test</scope>-->
+            <!--            </dependency>-->
+
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>8.0.16</version>
-                <scope>test</scope>
+                <version>5.1.47</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/ch.ethz.ganymed/ganymed-ssh2 -->
             <dependency>
@@ -208,9 +214,9 @@
             </dependency>
 
             <!--<dependency>-->
-                <!--<groupId>org.apache.kafka</groupId>-->
-                <!--<artifactId>kafka-clients</artifactId>-->
-                <!--<version>0.8.2.1</version>-->
+            <!--<groupId>org.apache.kafka</groupId>-->
+            <!--<artifactId>kafka-clients</artifactId>-->
+            <!--<version>0.8.2.1</version>-->
             <!--</dependency>-->
 
             <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
@@ -300,8 +306,8 @@
             </dependency>
 
             <!--<dependency>-->
-                <!--<groupId>org.apache.mxnet</groupId>-->
-                <!--<artifactId>mxnet-full_2.11-linux-x86_64-cpu</artifactId>-->
+            <!--<groupId>org.apache.mxnet</groupId>-->
+            <!--<artifactId>mxnet-full_2.11-linux-x86_64-cpu</artifactId>-->
             <!--</dependency>-->
         </dependencies>
     </dependencyManagement>

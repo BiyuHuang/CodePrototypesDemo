@@ -15,6 +15,9 @@ metastore_db/
 *.obj
 *.log
 *.csv
+*.log.*
+logs/
+log/
 .checkpoint-*
 checkpoint*
 receivedBlockMetadata/
