@@ -16,6 +16,7 @@ import scala.reflect.ClassTag
 
 /**
   * Created by wallace on 2018/8/26.
+  * awesome-java-leetcode(https://github.com/Blankj/awesome-java-leetcode)
   */
 object AlgDemo extends LogSupport {
 
@@ -98,6 +99,10 @@ object AlgDemo extends LogSupport {
     //TODO 5 Find all subsets
     val allSubsets = findAllSubSet(Array(1, 2, 3, 4, 5))
     allSubsets.foreach(x => println("[" + x.mkString("\t") + "]"))
+   
+    // TODO 6 Find median in two sorted Arrays
+    //    val kMinValue: Double = findMedianSortedArrays(Array(1, 3), Array(2))
+    //    println(s"Median Value: $kMinValue")
   }
 
   def twoSum(d: Array[Int], target: Int): Unit = {
@@ -161,5 +166,36 @@ object AlgDemo extends LogSupport {
         res.append(tmp.result().toArray[T])
     }
     res.result().toArray[Array[T]]
+  }
+ 
+ 
+  def findMedianSortedArrays(nums1: Array[Int], nums2: Array[Int]): Double = {
+    val len1: Int = nums1.length
+    val len2: Int = nums2.length
+    val left: Int = (len1 + len2 + 1) / 2
+    val right: Int = (len1 + len2 + 2) / 2
+    (findKMin(nums1, 0, nums2, 0, left) + findKMin(nums1, 0, nums2, 0, right)) * 1.0 / 2
+  }
+
+  @scala.annotation.tailrec
+  def findKMin(nums1: Array[Int], i: Int, nums2: Array[Int], j: Int, k: Int): Int = {
+    if (i >= nums1.length) {
+      nums1(i + k - 1)
+    } else {
+      if (j >= nums2.length) {
+        nums2(j + k - 1)
+      } else {
+        if (k == 1) {
+          val minValue: Int = Math.min(nums1(i), nums2(j))
+          minValue
+        } else {
+          val kNext: Int = k - k / 2
+          val mid1 = if ((i + k / 2 - 1) < nums1.length) nums1(i + k / 2 - 1) else Int.MaxValue
+          val mid2 = if ((j + k / 2 - 1) < nums2.length) nums2(j + k / 2 - 1) else Int.MaxValue
+          val (iNext, jNext) = if (mid1 < mid2) (i + k / 2, j) else (i, j + k / 2)
+          findKMin(nums1, iNext, nums2, jNext, kNext)
+        }
+      }
+    }
   }
 }
