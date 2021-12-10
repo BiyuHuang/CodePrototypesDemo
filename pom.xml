@@ -21,6 +21,7 @@
         <module>demo/DataLoader</module>
         <module>demo/SparkDemo</module>
         <module>demo/ScalaDemo</module>
+        <module>demo/demo-common</module>
     </modules>
 
     <properties>
@@ -34,8 +35,9 @@
 
     <repositories>
         <repository>
-            <id>Maven</id>
-            <url>https://dl.bintray.com/spark-packages/maven/</url>
+            <id>bintray</id>
+            <name>Bintray</name>
+            <url>https://repos.spark-packages.org</url>
         </repository>
     </repositories>
 
