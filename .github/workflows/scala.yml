@@ -1,4 +1,4 @@
-name: Scala CI
+name: Scala CI With Maven
 
 on:
   push:
@@ -18,8 +18,8 @@ jobs:
       with:
         java-version: '8.0'
         distribution: 'adopt'
-    - name: Run tests
-      run: mvn test
+    - name: Run tests with Maven
+      run: mvn clean test
       
-    - name: Run package
+    - name: Run package with Maven
       run: mvn clean pacakge -DskipTests --file pom.xml
