@@ -270,14 +270,14 @@
                 <version>4.4.9</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.zte.hadoop.loader</groupId>
-                <artifactId>hadoop-loader</artifactId>
-                <version>7.4.1</version>
-                <scope>system</scope>
-                <!--<systemPath>${project.path}/lib/loader.jar</systemPath>-->
-                <systemPath>${pom.basedir}/lib/loader.jar</systemPath>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.zte.hadoop.loader</groupId>-->
+<!--                <artifactId>hadoop-loader</artifactId>-->
+<!--                <version>7.4.1</version>-->
+<!--                <scope>system</scope>-->
+<!--                &lt;!&ndash;<systemPath>${project.path}/lib/loader.jar</systemPath>&ndash;&gt;-->
+<!--                <systemPath>${project.basedir}/lib/loader.jar</systemPath>-->
+<!--            </dependency>-->
 
             <!-- required by scalatest-maven-plugin to generate HTML report -->
             <dependency>
