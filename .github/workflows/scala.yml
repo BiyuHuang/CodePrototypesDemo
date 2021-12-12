@@ -18,8 +18,8 @@ jobs:
       with:
         java-version: '8.0'
         distribution: 'adopt'
-    - name: Run tests with Maven
-      run: mvn clean test
+    #- name: Run tests with Maven
+    #  run: mvn clean test
       
     - name: Run package with Maven
       run: mvn clean package -DskipTests --file pom.xml
