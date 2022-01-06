@@ -6,8 +6,6 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-import sbt._
-
 object Dependencies {
   val commonDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % "1.2.1",
@@ -25,7 +23,9 @@ object Dependencies {
     "com.jcraft" % "jsch" % "0.1.54",
     "com.github.pathikrit" %% "better-files-akka" % "3.4.0" exclude("com.typesafe.akka", "akka-actor"),
     "net.minidev" % "json-smart" % "2.3",
-    "redis.clients" % "jedis" % "2.9.0"
+    "redis.clients" % "jedis" % "2.9.0",
+    "io.lettuce" % "lettuce-core" % "5.0.5.RELEASE",
+    "io.netty" % "netty-all" % "4.1.24.Final"
   )
 
   val httpDependencies: Seq[ModuleID] = Seq(
@@ -48,7 +48,8 @@ object Dependencies {
     "org.apache.spark" % "spark-sql_2.11" % "2.2.0",
     "org.apache.spark" % "spark-hive_2.11" % "2.2.0",
     "org.apache.spark" % "spark-streaming_2.11" % "2.2.0",
-    "org.apache.spark" % "spark-mllib_2.11" % "2.2.0"
+    "org.apache.spark" % "spark-mllib_2.11" % "2.2.0",
+    "org.apache.flink" % "flink-streaming-scala_2.11" % "1.9.1"
   )
 
   val sparkAppDependencies: Seq[ModuleID] = commonDependencies ++ hdfsDependencies ++ sparkDependencies

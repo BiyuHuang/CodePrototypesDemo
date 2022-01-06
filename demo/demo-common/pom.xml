@@ -60,6 +60,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -89,13 +90,6 @@
             <artifactId>protobuf-java</artifactId>
             <version>3.2.0</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zte.hadoop.loader</groupId>
-            <artifactId>hadoop-loader</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/../../lib/loader.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

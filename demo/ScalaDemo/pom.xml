@@ -493,6 +493,7 @@
         <dependency>
             <groupId>com.zte.hadoop.loader</groupId>
             <artifactId>hadoop-loader</artifactId>
+            <version>7.4.1</version>
             <scope>system</scope>
             <systemPath>${pom.basedir}/../../lib/loader.jar</systemPath>
         </dependency>

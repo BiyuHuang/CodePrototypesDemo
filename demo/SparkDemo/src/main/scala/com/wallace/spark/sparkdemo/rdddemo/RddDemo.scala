@@ -18,9 +18,9 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 
 /**
-  * com.wallace.spark.sparkdemo.rdddemo
-  * Created by 10192057 on 2017/12/19 0019.
-  */
+ * com.wallace.spark.sparkdemo.rdddemo
+ * Created by 10192057 on 2017/12/19 0019.
+ */
 object RddDemo extends CreateSparkSession with Using {
   private val _spark: SparkSession = createSparkSession("RddDemo")
   val minPartitions: Int = Math.min(Runtime.getRuntime.availableProcessors(), 10)
@@ -43,7 +43,7 @@ object RddDemo extends CreateSparkSession with Using {
 
     log.warn(s"Count1: ${data.count()}")
     log.warn(s"Count2: ${fileRdd.count()}")
-    log.info(s"Last String: ${data.collect().last}")
+    log.info("Last String: %s".format(data.take(1).head))
     fileRdd.map(x => (x, 1)).reduceByKey(_ + _)
     val tempRdd = fileRdd.repartition(10)
     tempRdd.mapPartitionsWithIndex {
@@ -54,7 +54,7 @@ object RddDemo extends CreateSparkSession with Using {
             val k = s"${2018 % 9}0821164$index${s"%0${11 - len}d".format(elem._2)}".toLong
             (k, elem._1)
         }
-    }.collect.take(10).foreach(println)
+    }.take(10).foreach(println)
 
     println(tempRdd.partitions.length)
   }
