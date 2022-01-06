@@ -160,6 +160,7 @@ object DataFrameDemo extends CreateSparkSession {
         log.info(s"#### ${row.mkString(",")}")
     }
     val resDF = spark.createDataFrame(res, schema)
+   resDF.registerTempTable()
     resDF.show()
   }
 

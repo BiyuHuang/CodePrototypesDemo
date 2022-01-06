@@ -198,4 +198,30 @@ object AlgDemo extends LogSupport {
       }
     }
   }
+
+  def findSubStr(str: String, target: String): Int = {
+    (str.nonEmpty, target.nonEmpty) match {
+      case (false, false) => 0
+      case (true, false) => 0
+      case (false, true) => -1
+      case (true, true) =>
+        val srcArr: Array[Char] = str.toCharArray
+        val srcLen: Int = srcArr.length
+        val tgtArr: Array[(Char, Int)] = target.toCharArray.zipWithIndex
+        val tgtLen: Int = tgtArr.length
+        var i: Int = 0
+        var res: Int = -1
+        val firstTgt: Char = tgtArr.head._1
+        while (i <= (srcLen - tgtLen)) {
+          val firstSrc: Char = srcArr(i)
+          if (firstTgt == firstSrc && tgtArr.forall(e => e._1 == srcArr(i + e._2))) {
+            res = i
+            i = srcLen
+          } else {
+            i += 1
+          }
+        }
+        res
+    }
+  }
 }
