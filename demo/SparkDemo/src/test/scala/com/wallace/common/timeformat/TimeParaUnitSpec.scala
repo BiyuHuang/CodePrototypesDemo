@@ -8,23 +8,23 @@
 
 package com.wallace.common.timeformat
 
+import com.wallace.UnitSpec
+
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import com.wallace.UnitSpec
-
 /**
-  * Created by wallacehuang on 2017/7/26.
-  */
+ * Created by wallacehuang on 2017/7/26.
+ */
 class TimeParaUnitSpec extends UnitSpec {
   teamID should "do unit spec for TimePara method: dateFormat(seconds: String)" in {
     val res = TimePara.dateFormat("86401")
-    res shouldBe "1970-01-02 00:00:01.000"
+    assertResult("1970-01-02 00:00:01.000")(res)
   }
 
   teamID should "do unit spec for TimePara method: dateFormat(seconds: Long)" in {
     val res = TimePara.dateFormat("1")
-    res shouldBe "1970-01-01 00:00:01.000"
+    assertResult("1970-01-01 00:00:01.000")(res)
   }
   teamID should "do unit spec for TimePara method: dateFormat(None)" in {
     val res = TimePara.dateFormat(None)

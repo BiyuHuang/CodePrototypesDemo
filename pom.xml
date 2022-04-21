@@ -26,7 +26,9 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <scala.version>2.11.12</scala.version>
+        <scala.version>2.12.8</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <spark.version>3.1.2</spark.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -38,6 +40,11 @@
             <id>bintray</id>
             <name>Bintray</name>
             <url>https://repos.spark-packages.org</url>
+        </repository>
+        <repository>
+            <id>aliyun</id>
+            <name>aliyun</name>
+            <url>https://maven.aliyun.com/repository/public</url>
         </repository>
     </repositories>
 
@@ -64,8 +71,8 @@
 
             <dependency>
                 <groupId>com.typesafe.scala-logging</groupId>
-                <artifactId>scala-logging_2.11</artifactId>
-                <version>3.1.0</version>
+                <artifactId>scala-logging_${scala.binary.version}</artifactId>
+                <version>3.9.2</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/com.jcraft/jsch -->
@@ -85,14 +92,14 @@
             <!-- https://mvnrepository.com/artifact/org.scala-lang.modules/scala-parser-combinators -->
             <dependency>
                 <groupId>org.scala-lang.modules</groupId>
-                <artifactId>scala-parser-combinators_2.11</artifactId>
-                <version>1.1.0</version>
+                <artifactId>scala-parser-combinators_${scala.binary.version}</artifactId>
+                <version>2.1.1</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/com.github.pathikrit/better-files -->
             <dependency>
                 <groupId>com.github.pathikrit</groupId>
-                <artifactId>better-files_2.11</artifactId>
+                <artifactId>better-files_${scala.binary.version}</artifactId>
                 <version>3.4.0</version>
             </dependency>
 
@@ -117,14 +124,14 @@
             <!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor -->
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-actor_2.11</artifactId>
+                <artifactId>akka-actor_${scala.binary.version}</artifactId>
                 <version>2.5.16</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-remote -->
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-remote_2.11</artifactId>
+                <artifactId>akka-remote_${scala.binary.version}</artifactId>
                 <version>2.5.16</version>
             </dependency>
 
@@ -137,8 +144,8 @@
             <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest_2.11 -->
             <dependency>
                 <groupId>org.scalatest</groupId>
-                <artifactId>scalatest_2.11</artifactId>
-                <version>2.2.4</version>
+                <artifactId>scalatest_${scala.binary.version}</artifactId>
+                <version>3.2.10</version>
                 <scope>test</scope>
             </dependency>
             <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
@@ -171,48 +178,57 @@
 
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_2.11</artifactId>
-                <version>2.2.0</version>
+                <artifactId>spark-core_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_2.11</artifactId>
-                <version>2.2.0</version>
+                <artifactId>spark-sql_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-streaming_2.11</artifactId>
-                <version>2.2.0</version>
+                <artifactId>spark-streaming_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-streaming-kafka-0-10_2.11</artifactId>
-                <version>2.2.0</version>
+                <artifactId>spark-streaming-kafka-0-10_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka -->
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.binary.version}</artifactId>
+                <version>0.10.2.2</version>
+            </dependency>
+
+            <!-- should be deleted -->
             <dependency>
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-streaming-kafka-0-8_2.11</artifactId>
-                <version>2.2.0</version>
+                <version>2.4.8</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-hive_2.11 -->
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-hive_2.11</artifactId>
-                <version>2.2.0</version>
+                <artifactId>spark-hive_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
                 <!-- <scope>provided</scope> -->
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-mllib_2.11 -->
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-mllib_2.11</artifactId>
-                <version>2.2.0</version>
+                <artifactId>spark-mllib_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-flume_2.11 -->
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-streaming-flume_2.11</artifactId>
-                <version>2.2.0</version>
+                <artifactId>spark-streaming-flume_${scala.binary.version}</artifactId>
+                <version>2.4.8</version>
             </dependency>
 
             <!--<dependency>-->
@@ -270,14 +286,14 @@
                 <version>4.4.9</version>
             </dependency>
 
-<!--            <dependency>-->
-<!--                <groupId>com.zte.hadoop.loader</groupId>-->
-<!--                <artifactId>hadoop-loader</artifactId>-->
-<!--                <version>7.4.1</version>-->
-<!--                <scope>system</scope>-->
-<!--                &lt;!&ndash;<systemPath>${project.path}/lib/loader.jar</systemPath>&ndash;&gt;-->
-<!--                <systemPath>${project.basedir}/lib/loader.jar</systemPath>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.zte.hadoop.loader</groupId>-->
+            <!--                <artifactId>hadoop-loader</artifactId>-->
+            <!--                <version>7.4.1</version>-->
+            <!--                <scope>system</scope>-->
+            <!--                &lt;!&ndash;<systemPath>${project.path}/lib/loader.jar</systemPath>&ndash;&gt;-->
+            <!--                <systemPath>${project.basedir}/lib/loader.jar</systemPath>-->
+            <!--            </dependency>-->
 
             <!-- required by scalatest-maven-plugin to generate HTML report -->
             <dependency>

@@ -12,7 +12,7 @@ import com.wallace.common.CreateSparkSession
 import org.apache.spark.mllib.classification.{LogisticRegressionWithLBFGS, NaiveBayes, SVMWithSGD}
 import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
+import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.RandomForest
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
@@ -20,8 +20,8 @@ import org.apache.spark.sql.SparkSession
 import scala.util.Try
 
 /**
-  * Created by wallace on 2017/11/7.
-  */
+ * Created by wallace on 2017/11/7.
+ */
 object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
   protected val spark: SparkSession = createSparkSession("ForecastIndoorAndOutdoorMRDemo")
 
@@ -62,12 +62,12 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
   }
 
   /**
-    * @param data              RDD of (label, array of features) pairs.
-    * @param numIterations     Number of iterations of gradient descent to run.
-    * @param stepSize          Step size to be used for each iteration of gradient descent.
-    * @param regParam          Regularization parameter.
-    * @param miniBatchFraction Fraction of data to be used per iteration.
-    **/
+   * @param data              RDD of (label, array of features) pairs.
+   * @param numIterations     Number of iterations of gradient descent to run.
+   * @param stepSize          Step size to be used for each iteration of gradient descent.
+   * @param regParam          Regularization parameter.
+   * @param miniBatchFraction Fraction of data to be used per iteration.
+   * */
   protected def svmWithSGDModel(data: Array[RDD[LabeledPoint]],
                                 numIterations: Int,
                                 stepSize: Double = 1.0,
@@ -90,13 +90,13 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
     log.info(s"Compute raw scores on the testData")
     predictionAndLabels.foreach(x => log.info(s"score: ${x._1},label: ${x._2}."))
     /**
-      * Get evaluation metrics.得到评估指标
-      * 以召回率为y轴，以特异性为x轴，我们就直接得到了RoC曲线
-      * 召回率越高，特异性越小，RoC曲线越靠近左上角，模型和算法就越高效
-      * 另一方面，如果ROC是光滑的，那么基本可以判断没有太大的过拟合（overfitting)
-      * 从几何的角度讲，RoC曲线下方的面积越大越大，则模型越优。
-      * 所以有时候我们用RoC曲线下的面积，即AUC（Area Under Curve）值来作为算法和模型好坏的标准
-      **/
+     * Get evaluation metrics.得到评估指标
+     * 以召回率为y轴，以特异性为x轴，我们就直接得到了RoC曲线
+     * 召回率越高，特异性越小，RoC曲线越靠近左上角，模型和算法就越高效
+     * 另一方面，如果ROC是光滑的，那么基本可以判断没有太大的过拟合（overfitting)
+     * 从几何的角度讲，RoC曲线下方的面积越大越大，则模型越优。
+     * 所以有时候我们用RoC曲线下的面积，即AUC（Area Under Curve）值来作为算法和模型好坏的标准
+     * */
     val metrics = new BinaryClassificationMetrics(predictionAndLabels)
     val auROC = metrics.areaUnderROC()
     log.warn(s"[Model = SVMWithSGDModel, Area under ROC = $auROC, numIterations = $numIterations, " +
@@ -125,8 +125,8 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
   }
 
   /**
-    * RandomForest
-    **/
+   * RandomForest
+   * */
   protected def randomForestModel(data: Array[RDD[LabeledPoint]]): Unit = {
     val trainingData = data.head
     val testData = data.last
@@ -157,24 +157,24 @@ object ForecastIndoorAndOutdoorMR extends CreateSparkSession {
   }
 
   protected def linearRegressionWithSGDModel(data: Array[RDD[LabeledPoint]]): Unit = {
-    val trainingData = data.head
-    val testData = data.last
-
-    val model = LinearRegressionWithSGD.train(trainingData, 500, 0.0000000000000001)
-    val predictionAndLabels = testData.map {
-      point =>
-        val prediction = model.predict(point.features)
-        (prediction, point.label)
-    }
-
-    // Get evaluation metrics.获取评估指标
-    val mse = predictionAndLabels.map { case (v, p) => math.pow(v - p, 2) }.mean()
-    log.warn(s"[Model = LinearRegressionWithSGDModel, Training Mean Squared Error = $mse]")
+    //    val trainingData = data.head
+    //    val testData = data.last
+    //    val lrMode = new LinearRegressionWithSGD(50.0, 10, 0.3, 0.8)
+    //    val model = lrMode.run(trainingData)
+    //    val predictionAndLabels = testData.map {
+    //      point =>
+    //        val prediction = model.predict(point.features)
+    //        (prediction, point.label)
+    //    }
+    //
+    //    // Get evaluation metrics.获取评估指标
+    //    val mse = predictionAndLabels.map { case (v, p) => math.pow(v - p, 2) }.mean()
+    //    log.warn(s"[Model = LinearRegressionWithSGDModel, Training Mean Squared Error = $mse]")
   }
 
   /**
-    * 朴素贝叶斯
-    **/
+   * 朴素贝叶斯
+   * */
   protected def naiveBayesModel(data: Array[RDD[LabeledPoint]],
                                 lambda: Double = 1.0,
                                 modelType: String = "bernoulli"): Unit = {

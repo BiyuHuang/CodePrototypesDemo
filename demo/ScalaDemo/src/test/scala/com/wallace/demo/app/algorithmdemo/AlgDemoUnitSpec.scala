@@ -6,7 +6,7 @@ import com.wallace.demo.app.UnitSpec
  * @Project: CodePrototypesDemo
  * @Package: com.wallace.demo.app.algorithmdemo
  * @Author: 80286616
- * @Company: OPPO
+ * @Company: notalk tech
  * @CreateDate: 2022/2/22
  * @Description:
  */

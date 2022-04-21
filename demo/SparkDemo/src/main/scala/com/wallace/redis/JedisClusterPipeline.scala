@@ -1,41 +1,21 @@
 package com.wallace.redis
 
+import redis.clients.jedis._
+import redis.clients.jedis.exceptions.JedisMovedDataException
+import redis.clients.util.{JedisClusterCRC16, SafeEncoder}
+
 import java.io.Closeable
 import java.lang.reflect.Field
 import java.util
 import java.util.concurrent.atomic.AtomicBoolean
-
-import redis.clients.jedis._
-import redis.clients.jedis.exceptions.{JedisMovedDataException, JedisRedirectionException}
-import redis.clients.util.{JedisClusterCRC16, SafeEncoder}
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * Created by wallace on 2020/4/25.
-  */
+ * Created by wallace on 2020/4/25.
+ */
 class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with Closeable {
-  private def getField(cls: Class[_], fieldName: String) = {
-    try {
-      val field = cls.getDeclaredField(fieldName)
-      field.setAccessible(true)
-      field
-    } catch {
-      case e@(_: SecurityException | _: NoSuchFieldException) =>
-        throw new RuntimeException(s"can't find or access field '$fieldName' from ${cls.getName}", e)
-    }
-  }
-
-  private def getValue[T](obj: AnyRef, field: Field): AnyRef = {
-    try {
-      field.get(obj)
-    } catch {
-      case e@(_: IllegalAccessException | _: IllegalArgumentException) =>
-        throw new RuntimeException("failed to get value", e)
-    }
-  }
-
+  self =>
   private val FIELD_CONNECTION_HANDLER: Field = getField(classOf[BinaryJedisCluster], "connectionHandler")
   private val FIELD_CACHE: Field = getField(classOf[JedisClusterConnectionHandler], "cache")
   private val clients: util.LinkedList[Client] = new util.LinkedList[Client]()
@@ -45,6 +25,18 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
     .asInstanceOf[JedisSlotBasedConnectionHandler]
   private val clusterInfoCache: JedisClusterInfoCache = getValue(connectionHandler, FIELD_CACHE)
     .asInstanceOf[JedisClusterInfoCache]
+
+  override def getClient(key: String): Client = {
+    val binaryKey: Array[Byte] = SafeEncoder.encode(key)
+    getClient(binaryKey)
+  }
+
+  override def getClient(key: Array[Byte]): Client = {
+    val jedis: Jedis = getJedis(JedisClusterCRC16.getSlot(key))
+    val client: Client = jedis.getClient
+    clients.add(client)
+    client
+  }
 
   private def getJedis(slot: Int): Jedis = {
     val pool: JedisPool = clusterInfoCache.getSlotPool(slot)
@@ -60,22 +52,46 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
     jedisCli
   }
 
-
-  private def flushCachedData(jedis: Jedis): Unit = {
+  def pipelineSetEx(data: Array[KVDataEX]): Unit = {
     try {
-      jedis.getClient.getAll()
+      data.foreach {
+        elem =>
+          val expireTime: Int = elem.expireTime
+          self.setex(elem.key, expireTime, elem.value)
+      }
+      syncAndReturnAll
     } catch {
-      case e: RuntimeException =>
-        e.printStackTrace()
+      case e: Exception =>
+        throw new RuntimeException("[setex] operator error", e)
     }
   }
+
+  def pipelineHGetAll(keys: Array[String]): Array[KVData] = {
+    val result: ArrayBuffer[KVData] = new ArrayBuffer[KVData]()
+    try {
+      keys.foreach(self.hgetAll)
+      val res = syncAndReturnAll.map(_.asInstanceOf[util.Map[String, String]])
+
+      res.foreach {
+        elem =>
+          val kv: KVData = KVData(elem.keySet().asScala.head, elem.values().asScala.head)
+          result.append(kv)
+      }
+    } catch {
+      case e: Exception =>
+        throw new RuntimeException("[setex] operator error", e)
+    }
+
+    result.result().toArray[KVData]
+  }
+
+  def syncAndReturnAll: Array[Any] = innerSync
 
   private def innerSync: Array[Any] = {
     val responseList: ArrayBuffer[Any] = new ArrayBuffer[Any]()
     val clientSet: util.HashSet[Client] = new util.HashSet[Client]()
-    var isExcept: Boolean = false
+    var isExcept: Boolean = true
     try {
-      isExcept = true
       val clientIter: util.Iterator[Client] = clients.iterator()
       while (clientIter.hasNext) {
         val client: Client = clientIter.next()
@@ -85,15 +101,14 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
       }
       isExcept = false
     } catch {
-      case je: JedisRedirectionException =>
-        if (je.isInstanceOf[JedisMovedDataException]) refreshCluster()
-        throw je
+      case _: JedisMovedDataException =>
+        refreshCluster()
     } finally {
       if (isExcept) {
         if (clientSet.size() != jedisMap.size()) {
-          val jedisIter1: util.Iterator[Jedis] = jedisMap.values().iterator()
-          while (jedisIter1.hasNext) {
-            val jedis: Jedis = jedisIter1.next()
+          val jedisIterator: util.Iterator[Jedis] = jedisMap.values().iterator()
+          while (jedisIterator.hasNext) {
+            val jedis: Jedis = jedisIterator.next()
             if (!clientSet.contains(jedis.getClient)) flushCachedData(jedis)
           }
         }
@@ -114,18 +129,6 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
     responseList.result().toArray
   }
 
-  override def getClient(key: String): Client = {
-    val binaryKey: Array[Byte] = SafeEncoder.encode(key)
-    getClient(binaryKey)
-  }
-
-  override def getClient(key: Array[Byte]): Client = {
-    val jedis: Jedis = getJedis(JedisClusterCRC16.getSlot(key))
-    val client: Client = jedis.getClient
-    clients.add(client)
-    client
-  }
-
   override def close(): Unit = {
     clean()
     clients.clear()
@@ -141,41 +144,35 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
     }
   }
 
-  def syncAndReturnAll: Array[Any] = innerSync
-
-  def refreshCluster(): Unit = connectionHandler.renewSlotCache()
-
-  def pipelineSetEx(data: Array[KVDataEX]): Unit = {
+  private def flushCachedData(jedis: Jedis): Unit = {
     try {
-      data.foreach {
-        elem =>
-          val expireTime: Int = elem.expireTime
-          setex(elem.key, expireTime, elem.value)
-      }
-      syncAndReturnAll
+      jedis.getClient.getAll()
     } catch {
-      case e: Exception =>
-        throw new RuntimeException("[setex] operator error", e)
+      case e: RuntimeException =>
+        e.printStackTrace()
     }
   }
 
-  def pipelineHGetAll(keys: Array[String]): Array[KVData] = {
-    val result: ArrayBuffer[KVData] = new ArrayBuffer[KVData]()
+  def refreshCluster(): Unit = connectionHandler.renewSlotCache()
+
+  private def getField(cls: Class[_], fieldName: String) = {
     try {
-      keys.foreach(hgetAll)
-      val res = syncAndReturnAll.map(_.asInstanceOf[util.Map[String, String]])
-
-      res.foreach {
-        elem =>
-          val kv: KVData = KVData(elem.keySet().asScala.head, elem.values().asScala.head)
-          result.append(kv)
-      }
+      val field = cls.getDeclaredField(fieldName)
+      field.setAccessible(true)
+      field
     } catch {
-      case e: Exception =>
-        throw new RuntimeException("[setex] operator error", e)
+      case e@(_: SecurityException | _: NoSuchFieldException) =>
+        throw new RuntimeException(s"can't find or access field '$fieldName' from ${cls.getName}", e)
     }
+  }
 
-    result.result().toArray[KVData]
+  private def getValue[T](obj: AnyRef, field: Field): AnyRef = {
+    try {
+      field.get(obj)
+    } catch {
+      case e@(_: IllegalAccessException | _: IllegalArgumentException) =>
+        throw new RuntimeException("failed to get value", e)
+    }
   }
 }
 

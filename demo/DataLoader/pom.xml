@@ -158,7 +158,7 @@
 
         <dependency>
             <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging_2.11</artifactId>
+            <artifactId>scala-logging_${scala.binary.version}</artifactId>
         </dependency>
 
         <dependency>
@@ -178,12 +178,12 @@
 
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-actor_2.11</artifactId>
+            <artifactId>akka-actor_${scala.binary.version}</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-remote_2.11</artifactId>
+            <artifactId>akka-remote_${scala.binary.version}</artifactId>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.typesafe/config -->
@@ -194,7 +194,7 @@
         <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest_2.11 -->
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.11</artifactId>
+            <artifactId>scalatest_${scala.binary.version}</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
@@ -218,37 +218,37 @@
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.11</artifactId>
+            <artifactId>spark-core_${scala.binary.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.11</artifactId>
+            <artifactId>spark-sql_${scala.binary.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_2.11</artifactId>
+            <artifactId>spark-streaming_${scala.binary.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-streaming-kafka-0-8_2.11</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-hive_2.11 -->
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-hive_${scala.binary.version} -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-hive_2.11</artifactId>
+            <artifactId>spark-hive_${scala.binary.version}</artifactId>
             <!-- <scope>provided</scope> -->
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-mllib_2.11 -->
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-mllib_${scala.binary.version} -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-mllib_2.11</artifactId>
+            <artifactId>spark-mllib_${scala.binary.version}</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-flume_2.11 -->
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming-flume_${scala.binary.version} -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming-flume_2.11</artifactId>
+            <artifactId>spark-streaming-flume_${scala.binary.version}</artifactId>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
