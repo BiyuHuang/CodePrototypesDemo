@@ -5,7 +5,6 @@
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/BiyuHuang/CodePrototypesDemo/blob/master/LICENSE)
 [![codecov](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo/branch/master/graph/badge.svg)](https://codecov.io/gh/BiyuHuang/CodePrototypesDemo)
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
-    
     Code prototypes demo, include ScalaDemo/SparkDemo/DataLoader etc.
     Build project with sbt:
     $ cd ./CodePrototypesDemo/
