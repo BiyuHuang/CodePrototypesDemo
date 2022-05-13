@@ -211,7 +211,7 @@ object AlgDemo extends LogSupport {
         val tgtLen: Int = tgtArr.length
         var i: Int = 0
         var res: Int = -1
-        val firstTgt: Char = tgtArr.head._1
+        val firstTgt: Char = tgtArr.map(case (ch, _) => ch).head
         while (i <= (srcLen - tgtLen)) {
           val firstSrc: Char = srcArr(i)
           if (firstTgt == firstSrc && tgtArr.forall(e => e._1 == srcArr(i + e._2))) {
