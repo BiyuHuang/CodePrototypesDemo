@@ -15,9 +15,9 @@ import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
 
 /**
-  * Created by wallace on 2018/8/26.
-  * awesome-java-leetcode(https://github.com/Blankj/awesome-java-leetcode)
-  */
+ * Created by wallace on 2018/8/26.
+ * awesome-java-leetcode(https://github.com/Blankj/awesome-java-leetcode)
+ */
 object AlgDemo extends LogSupport {
 
   def trailingZerosV2(n: Long, factor: Double = Math.log(5)): Long = {
@@ -99,7 +99,7 @@ object AlgDemo extends LogSupport {
     //TODO 5 Find all subsets
     val allSubsets = findAllSubSet(Array(1, 2, 3, 4, 5))
     allSubsets.foreach(x => println("[" + x.mkString("\t") + "]"))
-   
+
     // TODO 6 Find median in two sorted Arrays
     //    val kMinValue: Double = findMedianSortedArrays(Array(1, 3), Array(2))
     //    println(s"Median Value: $kMinValue")
@@ -167,8 +167,8 @@ object AlgDemo extends LogSupport {
     }
     res.result().toArray[Array[T]]
   }
- 
- 
+
+
   def findMedianSortedArrays(nums1: Array[Int], nums2: Array[Int]): Double = {
     val len1: Int = nums1.length
     val len2: Int = nums2.length
@@ -197,5 +197,103 @@ object AlgDemo extends LogSupport {
         }
       }
     }
+  }
+
+  def findSubStr(str: String, target: String): Int = {
+    (str.nonEmpty, target.nonEmpty) match {
+      case (false, false) => 0
+      case (true, false) => 0
+      case (false, true) => -1
+      case (true, true) =>
+        val srcArr: Array[Char] = str.toCharArray
+        val srcLen: Int = srcArr.length
+        val tgtArr: Array[(Char, Int)] = target.toCharArray.zipWithIndex
+        val tgtLen: Int = tgtArr.length
+        var i: Int = 0
+        var res: Int = -1
+        val firstTgt: Char = tgtArr.map{case (ch, _) => ch}.head
+        while (i <= (srcLen - tgtLen)) {
+          val firstSrc: Char = srcArr(i)
+          if (firstTgt == firstSrc && tgtArr.forall{case (ch, idx) => ch == srcArr(i + idx)}) {
+            res = i
+            i = srcLen
+          } else {
+            i += 1
+          }
+        }
+        res
+    }
+  }
+
+  def minOfRotateArrayByBinarySearch(array: Array[Int], length: Int): Int = {
+    if (array == null || length <= 0) {
+      0
+    } else {
+      var min: Int = array(0)
+      var left: Int = 0
+      var right: Int = length - 1
+      while (left < right) {
+        if (array(left) >= array(right) && right - left <= 1) {
+          min = array(right)
+          left = right
+        } else {
+          val middle: Int = left + (right - left) / 2
+          if (array(left) == array(middle) && array(right) == array(middle)) {
+            left = right
+            array.foreach {
+              e =>
+                if (min > e) {
+                  min = e
+                }
+            }
+          }
+          if (array(middle) <= array(right)) {
+            right = middle
+          }
+          if (array(middle) >= array(left)) {
+            left = middle
+          }
+        }
+      }
+      min
+    }
+  }
+
+  def findNumberIn2DArray(matrix: Array[Array[Int]], target: Int): Boolean = {
+    //    val rows: Int = array.length
+    //    val cols: Int = array(0).length
+    //    if (rows == 0) {
+    //      false
+    //    } else {
+    //      var rowIndex: Int = 0
+    //      var colIndex: Int = cols - 1
+    //      var existedFlag: Boolean = false
+    //      while (rowIndex < rows && colIndex >= 0) {
+    //        if (array(rowIndex)(colIndex) == target) {
+    //          existedFlag = true
+    //          rowIndex = rows
+    //        }
+    //        if (rowIndex < rows) {
+    //          if (array(rowIndex)(colIndex) < target) rowIndex += 1
+    //          if (rowIndex < rows) {
+    //            if (array(rowIndex)(colIndex) > target) colIndex -= 1
+    //          }
+    //        }
+    //      }
+    //      existedFlag
+    //    }
+
+    if (matrix.length == 0) return false
+    var i = 0
+    var j = matrix(0).length - 1
+    while (i < matrix.length && j >= 0)
+      if (target == matrix(i)(j)) {
+        return true
+      } else if (target < matrix(i)(j)) {
+        j -= 1
+      } else {
+        i += 1
+      }
+    false
   }
 }

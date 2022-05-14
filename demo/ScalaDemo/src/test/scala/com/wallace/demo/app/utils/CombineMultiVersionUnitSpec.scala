@@ -8,12 +8,12 @@
 
 package com.wallace.demo.app.utils
 
-import org.scalatest.{FlatSpec, ShouldMatchers}
+import com.wallace.demo.app.UnitSpec
 
 /**
-  * Created by wallacehuang on 2017/5/13.
-  */
-class CombineMultiVersionUnitSpec extends FlatSpec with ShouldMatchers {
+ * Created by wallacehuang on 2017/5/13.
+ */
+class CombineMultiVersionUnitSpec extends UnitSpec {
 
   val handler = new CombineMultiVersion
   "Wallace Huang" should "do unit test for the function: just one column" in {

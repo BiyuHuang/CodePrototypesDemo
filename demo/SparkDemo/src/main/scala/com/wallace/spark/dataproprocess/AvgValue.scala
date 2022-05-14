@@ -6,14 +6,13 @@ import com.wallace.common.timeformat.TimePara
 import scala.io.Source
 
 /**
-  * Created by Wallace on 2016/5/6.
-  * 计算一列数据的平均值，个数，总和
-  */
+ * Created by Wallace on 2016/5/6.
+ * 计算一列数据的平均值，个数，总和
+ */
 object AvgValue extends App with LogSupport {
   val inputFile = Source.fromFile(s"./demo/SparkDemo/data/AvgValue_${TimePara.getDatePartition}_TestSpendTime.csv")
-  val lines = inputFile.getLines().toArray
-  var sum = 0.0
-  (1 to lines.length).foreach(i => sum += lines(i - 1).toDouble)
-  log.error(s"[${TimePara.getCurrentDate}] Avg value: ${sum / lines.length}, Total numbers: ${lines.length}, Sum value: $sum    .")
-
+  val lines: Array[String] = inputFile.getLines().toArray
+  val sum: Double = lines.map(_.toDouble).sum
+  log.error(s"[${TimePara.getCurrentDate}] Avg value: ${sum / lines.length}," +
+    s" Total numbers: ${lines.length}, Sum value: $sum    .")
 }

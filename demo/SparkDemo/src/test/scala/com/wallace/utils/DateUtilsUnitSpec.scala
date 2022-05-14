@@ -8,13 +8,13 @@
 
 package com.wallace.utils
 
-import java.text.SimpleDateFormat
-
 import com.wallace.UnitSpec
 
+import java.text.SimpleDateFormat
+
 /**
-  * Created by wallace on 2019/1/27.
-  */
+ * Created by wallace on 2019/1/27.
+ */
 class DateUtilsUnitSpec extends UnitSpec {
   teamID should "do unit test for addDate" in {
     val res: String = DateUtils.addDate("2018-12-31", -10)

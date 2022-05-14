@@ -8,15 +8,15 @@
 
 package com.wallace.demo.app.utils
 
+import com.wallace.demo.app.common.LogSupport
+import org.scalatest.funsuite.AnyFunSuite
+
 import java.sql.Timestamp
 
-import com.wallace.demo.app.common.LogSupport
-import org.scalatest.FunSuite
-
 /**
-  * Created by 10192057 on 2018/5/9 0009.
-  */
-class DateTimeUtilsUnitSpec extends FunSuite with LogSupport {
+ * Created by 10192057 on 2018/5/9 0009.
+ */
+class DateTimeUtilsUnitSpec extends AnyFunSuite with LogSupport {
   test("timestamp and us") {
     val now: Timestamp = new Timestamp(System.currentTimeMillis())
     now.setNanos(1000)

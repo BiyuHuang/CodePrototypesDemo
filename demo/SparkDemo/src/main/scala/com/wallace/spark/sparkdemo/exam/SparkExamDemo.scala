@@ -17,8 +17,8 @@ import org.apache.spark.sql.SQLContext
 import scala.util.Try
 
 /**
-  * Created by wallace on 2019/1/27.
-  */
+ * Created by wallace on 2019/1/27.
+ */
 object SparkExamDemo extends CreateSparkSession with Using {
   def main(args: Array[String]): Unit = {
     usingSpark(createSparkSession("SparkExamDemo")) {
@@ -128,12 +128,18 @@ object SparkExamDemo extends CreateSparkSession with Using {
           (key, 1)
       }
 
-    val rightData = hc.sql(s"select mobile_no,action_menu,total_action_cnt,total_action_duration from $srcTab2").rdd.map {
-      row =>
-        val key: (String, String) = (Try(row.getString(0)).getOrElse(""), Try(row.getString(1)).getOrElse(""))
-        val value: (String, String) = (Try(row.getString(2)).getOrElse(""), Try(row.getString(3)).getOrElse(""))
-        (key, value)
-    }
+    val rightData = hc.sql(
+      s"""select mobile_no,
+         |       action_menu,
+         |       total_action_cnt,
+         |       total_action_duration
+         |  from $srcTab2""".stripMargin).rdd
+      .map {
+        row =>
+          val key: (String, String) = (Try(row.getString(0)).getOrElse(""), Try(row.getString(1)).getOrElse(""))
+          val value: (String, String) = (Try(row.getString(2)).getOrElse(""), Try(row.getString(3)).getOrElse(""))
+          (key, value)
+      }
 
     val resData: RDD[(String, String, String, String, String)] = leftData.leftOuterJoin(rightData).map {
       row =>
