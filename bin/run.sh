@@ -3,9 +3,11 @@
 function usage() {
   echo "Usage: bash run.sh -n <name> -dt <date_time> [-q <yarn_queue>]"
   echo "Options: "
-  echo "  -n, --name   <Required>  Job name(class name)"
-  echo "  -d, --date   <Required>  date time"
-  echo "  -q, --queue  [Optional]  yarn queue"
+  echo "  -n, --name         <Required>  Job name(class name)"
+  echo "  -d, --date         <Required>  date time"
+  echo "  -q, --queue        [Optional]  yarn queue"
+  echo "      --instances    [Optional]  num-executors"
+  echo "      --parallelism  [Optional]  spark.default.parallelism"
   exit 0
 }
 
@@ -15,7 +17,7 @@ function tips() {
   exit 0
 }
 
-ARGS=$(getopt -a -o n:d:q:h -l name:,date:,queue:,help -- "$@")
+ARGS=$(getopt -a -o n:d:q:h -l name:,date:,queue:,instances:,parallelism:,help -- "$@")
 eval set -- "${ARGS}"
 while true; do
   case "$1" in
@@ -29,6 +31,14 @@ while true; do
     ;;
   -q | --queue)
     YARN_QUEUE="$2"
+    shift
+    ;;
+  --instances)
+    INSTANCES="$2"
+    shift
+    ;;
+  --parallelism)
+    PARALLELISM="$2"
     shift
     ;;
   -h | --help)
@@ -54,9 +64,9 @@ function check_args() {
   fi
 }
 t1Day=$(date -d "1 day ago" +%Y%m%d)
-items=("P_DATE:${t1Day}" YARN_QUEUE:default INSTANCES:10)
+items=("P_DATE:${t1Day}" YARN_QUEUE:default INSTANCES:10 PARALLELISM:10)
 
-for item in "${items[@]}}"; do
+for item in "${items[@]}"; do
   check_args "$item"
 done
 
