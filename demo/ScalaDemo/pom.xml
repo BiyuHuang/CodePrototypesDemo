@@ -39,7 +39,7 @@
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
                 <configuration>
-                    <recompileMode>incremental</recompileMode>
+                    <!-- <recompileMode>incremental</recompileMode> -->
                     <args>
                         <arg>-unchecked</arg>
                         <arg>-deprecation</arg>
@@ -480,10 +480,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.pegdown</groupId>
-            <artifactId>pegdown</artifactId>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.pegdown</groupId>-->
+        <!--            <artifactId>pegdown</artifactId>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>redis.clients</groupId>
