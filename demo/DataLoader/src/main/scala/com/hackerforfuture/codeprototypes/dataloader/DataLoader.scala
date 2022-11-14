@@ -31,8 +31,9 @@ object DataLoader extends LogSupport {
         }
       } catch {
         case e: ReflectiveOperationException =>
-          log.warn("Failed to register optional signal handler that logs a message when the process is terminated " +
-            s"by a signal. Reason for registration failure is: $e", e)
+          log.warn("Failed to register optional signal handler that logs a message " +
+            "when the process is terminated by a signal. " +
+            "Reason for registration failure is: $e", e)
       }
 
       // attach shutdown handler to catch terminating signals as well as normal termination
