@@ -2,6 +2,7 @@ package com.wallace.demo.app.common
 
 import com.wallace.demo.app.utils.FuncRuntimeDur
 
+import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
 
 trait Using extends FuncRuntimeDur {
@@ -10,7 +11,7 @@ trait Using extends FuncRuntimeDur {
       f(param)
     } catch {
       case NonFatal(e) =>
-        log.error(s"$errMsg: ", e)
+        logger.error(s"$errMsg: ", e)
     } finally {
       param.close()
     }

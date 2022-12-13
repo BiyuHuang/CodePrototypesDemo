@@ -18,6 +18,6 @@ object StrategyDemoRunTest extends LogSupport {
     }
     val money: Double = scala.io.StdIn.readLine("Please input total money: ").toDouble
     val res: Double = cashStrategy.getAcceptCashResult(money)
-    log.info(s"Total money: $res RMB")
+    logger.info(s"Total money: $res RMB")
   }
 }

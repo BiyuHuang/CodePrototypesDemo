@@ -8,9 +8,9 @@ import org.apache.hadoop.io.IOUtils
 import org.apache.hadoop.io.compress.{CompressionCodecFactory, CompressionOutputStream}
 
 /**
-  * com.wallace.demo.app.common
-  * Created by Wallace on 2017/12/5 0005.
-  */
+ * com.wallace.demo.app.common
+ * Created by Wallace on 2017/12/5 0005.
+ */
 trait HdfsSupportHA extends ProjectConfig {
   def hdfsConf: Configuration
 
@@ -20,7 +20,7 @@ trait HdfsSupportHA extends ProjectConfig {
   def usingHdfs(errMsg: String)(f: FileSystem => Unit): Unit = {
     this.synchronized(usingHdfsCnt += 1)
     if (usingHdfsCnt >= 10000) {
-      log.info("Current error count :" + errorHdfsCnt)
+      logger.info("Current error count :" + errorHdfsCnt)
       this.synchronized(usingHdfsCnt = 0)
     }
     try {
@@ -29,11 +29,11 @@ trait HdfsSupportHA extends ProjectConfig {
     } catch {
       case e: IOException =>
         this.synchronized(errorHdfsCnt += 1)
-        log.error(errMsg + s" error Count:$errorHdfsCnt.", e)
+        logger.error(errMsg + s" error Count:$errorHdfsCnt.", e)
         throw e
       case ex: Throwable =>
         this.synchronized(errorHdfsCnt += 1)
-        log.error(errMsg + s" error Count:$errorHdfsCnt ", ex)
+        logger.error(errMsg + s" error Count:$errorHdfsCnt ", ex)
         throw ex
     }
   }
@@ -57,11 +57,11 @@ trait HdfsSupportHA extends ProjectConfig {
       hdfs =>
         val path = new Path(target)
         if (hdfs.exists(path)) {
-          log.info(s"Start to delect: ${path.toString}")
+          logger.info(s"Start to delect: ${path.toString}")
           hdfs.delete(path, true)
-          log.info(s"End to delect: ${path.toString}")
+          logger.info(s"End to delect: ${path.toString}")
         } else {
-          log.warn(s"Delete Path Failed! Path: ${path.toString} is not exists!")
+          logger.warn(s"Delete Path Failed! Path: ${path.toString} is not exists!")
         }
     }
   }
@@ -70,7 +70,7 @@ trait HdfsSupportHA extends ProjectConfig {
     usingHdfs("emptyDir failed.") {
       hdfs =>
         val p = new Path(dir)
-        if (hdfs.isDirectory(p)) {
+        if (hdfs.getFileStatus(p).isDirectory) {
           val files = hdfs.listFiles(p, false)
           while (files.hasNext) {
             hdfs.delete(files.next().getPath, true)
@@ -199,7 +199,7 @@ trait HdfsSupportHA extends ProjectConfig {
         val hdfsPath = new Path(path)
         if (hdfs.exists(hdfsPath)) {
           result = hdfs.listStatus(hdfsPath).map(_.getPath.getName).toList
-          result.foreach(log.debug)
+          result.foreach(x => logger.debug(x))
         }
     }
     result

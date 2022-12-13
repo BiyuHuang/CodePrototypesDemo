@@ -13,7 +13,7 @@ class OperationDiv(numA: Double, numB: Double) extends Operation[Double] with Lo
 
   override def calcResult: Option[Double] = {
     if (numberA == 0 && numberB == 0) {
-      log.info("至少有一个数不为0.")
+      logger.info("至少有一个数不为0.")
     }
 
     if (numberB != 0) Try(numberA / numberB).toOption else Try(numberB / numberA).toOption

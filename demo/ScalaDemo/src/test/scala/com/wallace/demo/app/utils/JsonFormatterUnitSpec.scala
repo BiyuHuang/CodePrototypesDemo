@@ -82,7 +82,7 @@ class JsonFormatterUnitSpec extends UnitSpec {
 
     val res = JsonFormatter.format(jsonStr)
 
-    log.info(res.toString())
+    logger.info(res.toString())
     res.isEmpty shouldBe false
     res("test") shouldBe "1234567"
     res("common.column.datetimeFormat") shouldBe "yyyy-MM-dd HH:mm:ss"

@@ -118,14 +118,14 @@ object HeapSortDemo extends LogSupport {
 
     (0 to (data.length - 2) / 2).reverse.foreach {
       i =>
-        log.info(s"index1: $i")
+        logger.info(s"index1: $i")
         downAndAdjust(comparator)(data, i, data.length)
     }
     data.foreach(println)
 
     (1 until data.length).reverse.foreach {
       i =>
-        log.info(s"index2: $i")
+        logger.info(s"index2: $i")
         val temp = data(i)
         data.update(i, data(0))
         data.update(0, temp)

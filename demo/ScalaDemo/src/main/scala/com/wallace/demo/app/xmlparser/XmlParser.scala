@@ -29,7 +29,7 @@ object XmlParser extends LogSupport {
 
     // TODO 获取所有子节点
     val allFields: NodeSeq = xmlFile \\ "_"
-    log.info(s"${allFields.head.toString()}")
+    logger.info(s"${allFields.head.toString()}")
 
     // TODO 获取fields
     val headerField = xmlFile \ "header" \ "field"

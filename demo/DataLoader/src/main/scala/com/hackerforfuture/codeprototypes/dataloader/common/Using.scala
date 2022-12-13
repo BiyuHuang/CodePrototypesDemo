@@ -8,6 +8,7 @@
 
 package com.hackerforfuture.codeprototypes.dataloader.common
 
+import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
 
 /**

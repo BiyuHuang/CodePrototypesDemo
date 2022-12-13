@@ -20,7 +20,7 @@ class FileUtilsUnitSpec extends UnitSpec {
     val res: Map[String, AlgMetaData] = FileUtils.readXMLConfigFile(fileName)
     res.foreach {
       x =>
-        log.info(s"${x._1}, ${x._2}")
+        logger.info(s"${x._1}, ${x._2}")
     }
     //    log.info(s"${res("t2_1000002").toString}")
     //    log.info(s"${res("t5_1000005").toString}")

@@ -17,7 +17,7 @@ object Greeter {
 class Greeter extends Actor with LogSupport {
   def receive: PartialFunction[Any, Unit] = {
     case Greeter.Greet =>
-      log.info("[Greeter] Hello World!")
+      logger.info("[Greeter] Hello World!")
       sender() ! Greeter.Done
   }
 }

@@ -35,12 +35,12 @@ object ExtractorDemo extends App with LogSupport {
   val user: User = new FreeUser("Daniel", 3000, 0.76d)
   user match {
     case FreeUser(name, _, p) =>
-      if (p > 0.75) log.info(name + ", what can we do for you today?") else log.info("Hello " + name)
-    case PremiumUser(name, _) => log.info("Welcome back, dear " + name)
+      if (p > 0.75) logger.info(name + ", what can we do for you today?") else logger.info("Hello " + name)
+    case PremiumUser(name, _) => logger.info("Welcome back, dear " + name)
   }
 
   user match {
-    case freeUser@PremiumCandidate() => log.info(freeUser.name + ", what can we do for you today?")
-    case _ => log.info("Welcome back, Sir!")
+    case freeUser@PremiumCandidate() => logger.info(freeUser.name + ", what can we do for you today?")
+    case _ => logger.info("Welcome back, Sir!")
   }
 }

@@ -19,8 +19,8 @@ import org.apache.hadoop.io.IOUtils
 import scala.util.{Failure, Success, Try}
 
 /**
-  * Created by wallace on 2017/12/4.
-  */
+ * Created by wallace on 2017/12/4.
+ */
 object HdfsManager extends HdfsSupportHA with Using {
   lazy val currentPath: String = System.getProperty("user.dir")
 
@@ -33,16 +33,16 @@ object HdfsManager extends HdfsSupportHA with Using {
       file =>
         if (new java.io.File(file).exists()) {
           hdfsConf.addResource(new Path(file))
-          log.debug(s"HdfsFileManager addResource from config directory: $file.current directory $configHome")
+          logger.debug(s"HdfsFileManager addResource from config directory: $file.current directory $configHome")
         } else {
           val configPath = file.split("/").init.mkString("/")
           val configFilename = file.split("/").last
 
           if (new java.io.File(configFilename).exists()) {
             hdfsConf.addResource(new Path(configFilename))
-            log.debug(s"HdfsFileManager addResource from current directory $currentPath: adding $configFilename: Cannot find file in config directory $configPath")
+            logger.debug(s"HdfsFileManager addResource from current directory $currentPath: adding $configFilename: Cannot find file in config directory $configPath")
           } else {
-            log.debug(s"HdfsFileManager addResource adding $configFilename failure: Cannot find file in config directory $configPath and current directory $currentPath")
+            logger.debug(s"HdfsFileManager addResource adding $configFilename failure: Cannot find file in config directory $configPath and current directory $currentPath")
           }
         }
     }
@@ -80,7 +80,7 @@ object HdfsManager extends HdfsSupportHA with Using {
     usingHdfs("Check fileName exists failed.") {
       hdfs =>
         val p = new Path(fileName)
-        res = hdfs.isFile(p)
+        res = hdfs.getFileStatus(p).isFile
     }
     res
   }
@@ -136,10 +136,10 @@ object HdfsManager extends HdfsSupportHA with Using {
         val out: FileOutputStream = new FileOutputStream(s"$target", append)
         if (hdfs.exists(new Path(srcPath))) {
           val files = hdfs.listFiles(new Path(srcPath), false)
-          log.info("files path" + files)
+          logger.info("files path" + files)
           try {
             while (files.hasNext) {
-              log.info("while start")
+              logger.info("while start")
               val file = files.next()
               if (file.getPath.toString.contains("part-")) {
                 val in: FSDataInputStream = hdfs.open(new Path(file.getPath.toString))
@@ -162,20 +162,20 @@ object HdfsManager extends HdfsSupportHA with Using {
             }
           }
         } else {
-          log.debug("download Error:" + srcPath + " not exist ")
+          logger.debug("download Error:" + srcPath + " not exist ")
         }
     }
   }
 
   def appendDir(srcPath: String, dstPath: String): Unit = {
-    log.debug(s"try to append $srcPath to $dstPath ...")
+    logger.debug(s"try to append $srcPath to $dstPath ...")
     listFiles(srcPath).foreach(fileName => if (fileName.startsWith("part-")) {
       appendFile(s"$srcPath/$fileName", s"$dstPath/$fileName")
     })
   }
 
   def appendFile(src: String, target: String): Unit = {
-    log.debug(s"try to append $src to $target ...")
+    logger.debug(s"try to append $src to $target ...")
     usingHdfs("append failed") {
       hdfs =>
         val in: FSDataInputStream = hdfs.open(new Path(src))
@@ -193,7 +193,7 @@ object HdfsManager extends HdfsSupportHA with Using {
           if (out != null) out.close()
         }
     }
-    log.debug(s"append $src to $target complete")
+    logger.debug(s"append $src to $target complete")
   }
 
   def getDfsNameServices: String = {
@@ -203,7 +203,7 @@ object HdfsManager extends HdfsSupportHA with Using {
         temp = Some(hdfs.getCanonicalServiceName)
     }
     val dfsName = temp.getOrElse(hdfsConf.get("dfs.nameservices"))
-    log.info(s"getDfsNameServices return $dfsName")
+    logger.info(s"getDfsNameServices return $dfsName")
     dfsName
   }
 
@@ -216,7 +216,7 @@ object HdfsManager extends HdfsSupportHA with Using {
 
 
   def downloadGzipFilesToLocal(remoteHdfsPath: String, localFileName: String): Unit = {
-    log.info(s"downloadGzipFilesToLocal: From $remoteHdfsPath to $localFileName,start time: " + new Date().toString)
+    logger.info(s"downloadGzipFilesToLocal: From $remoteHdfsPath to $localFileName,start time: " + new Date().toString)
     usingHdfs("download Hdfs Gzip Files error.") {
       hdfs =>
         val files = hdfs.listFiles(new Path(remoteHdfsPath), false)
@@ -251,7 +251,7 @@ object HdfsManager extends HdfsSupportHA with Using {
         }
 
     }
-    log.info(s"downloadGzipFilesToLocal: From $remoteHdfsPath to $localFileName,end time: " + new Date().toString)
+    logger.info(s"downloadGzipFilesToLocal: From $remoteHdfsPath to $localFileName,end time: " + new Date().toString)
   }
 
   private def createLocalPath(localFileName: String): Boolean = {
@@ -272,7 +272,7 @@ object HdfsManager extends HdfsSupportHA with Using {
       case Success(result) =>
         result
       case Failure(e) =>
-        log.error(s"Create directories or change directory authority for file $localFileName. Throw exceptions: ", e)
+        logger.error(s"Create directories or change directory authority for file $localFileName. Throw exceptions: ", e)
         false
     }
   }

@@ -20,7 +20,7 @@ class StringFuncUtilsUnitSpec extends UnitSpec {
     val expect = ""
     val result = StringFuncUtils.splitString(str, ",", "\"")
     for (elem <- result) {
-      log.info("@" + elem + "@")
+      logger.info("@" + elem + "@")
     }
     result.length shouldBe 3
     result(0) shouldBe expect
@@ -32,7 +32,7 @@ class StringFuncUtilsUnitSpec extends UnitSpec {
     val expect = ""
     val result = StringFuncUtils.splitString(str, ",", "\"")
     for (elem <- result) {
-      log.info("@" + elem + "@")
+      logger.info("@" + elem + "@")
     }
     result.length shouldBe 1
     result.head shouldBe expect
@@ -43,7 +43,7 @@ class StringFuncUtilsUnitSpec extends UnitSpec {
     val expect = "elem1"
     val result = StringFuncUtils.splitString(str, ",", "\"")
     for (elem <- result) {
-      log.info("@" + elem + "@")
+      logger.info("@" + elem + "@")
     }
     result.length shouldBe 1
     result.head shouldBe expect
@@ -54,7 +54,7 @@ class StringFuncUtilsUnitSpec extends UnitSpec {
     val expect = "elem2"
     val result = StringFuncUtils.splitString(str, ",", "\"")
     for (elem <- result) {
-      log.info("@" + elem + "@")
+      logger.info("@" + elem + "@")
     }
     result.length shouldBe 2
     result.last shouldBe expect
@@ -65,7 +65,7 @@ class StringFuncUtilsUnitSpec extends UnitSpec {
     val expect = "elem3=1,elem4=2,elem5=3"
     val result = StringFuncUtils.splitString(str, ",", "\"")
     for (elem <- result) {
-      log.info("@" + elem + "@")
+      logger.info("@" + elem + "@")
     }
     result.length shouldBe 3
     result.last shouldBe expect
@@ -77,7 +77,7 @@ class StringFuncUtilsUnitSpec extends UnitSpec {
     val expect2 = "elem7=4,elem8=5,elem9=6"
     val result = StringFuncUtils.splitString(str, ",", "\"")
     for (elem <- result) {
-      log.info("@" + elem + "@")
+      logger.info("@" + elem + "@")
     }
     result.length shouldBe 6
     result(2) shouldBe expect1
@@ -102,7 +102,7 @@ class StringFuncUtilsUnitSpec extends UnitSpec {
   "Wallace Huang" should "do unit test for: countKeyWord" in {
     val input = "Hello world and Hello again. It's wonderful day!"
     val res: Map[String, Int] = StringFuncUtils.countKeyWord(input, " ")
-    res.foreach(x => log.info(s"KeyWord: ${x._1}, Count: ${x._2}"))
+    res.foreach(x => logger.info(s"KeyWord: ${x._1}, Count: ${x._2}"))
     val expect = 2
     res.getOrElse("Hello", "") shouldBe expect
     res.getOrElse("wonderful", "") shouldBe 1
@@ -127,12 +127,12 @@ class StringFuncUtilsUnitSpec extends UnitSpec {
     val costTime4: Double = runtimeDuration(StringFuncUtils.extractFieldsScala("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"), runTimes)
     val costTime5: Double = runtimeDuration(StringFuncUtils.extractFieldsJava("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"), runTimes)
     val costTime6: Double = runtimeDuration(StringFuncUtils.extractFieldsScala("2018-4-8 17:19:19,666666,1,109.01,32.34,true,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50"), runTimes)
-    log.info(s"[BenchmarkTest ### extractFieldsJava ] Times: $runTimes, CostTime: $costTime1 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime1 / 1000.0)}")
-    log.info(s"[BenchmarkTest ### extractFieldsJava ] Times: $runTimes, CostTime: $costTime2 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime2 / 1000.0)}")
-    log.info(s"[BenchmarkTest ### extractFieldsScala] Times: $runTimes, CostTime: $costTime3 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime3 / 1000.0)}")
-    log.info(s"[BenchmarkTest ### extractFieldsScala] Times: $runTimes, CostTime: $costTime4 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime4 / 1000.0)}")
-    log.info(s"[BenchmarkTest ### extractFieldsJava ] Times: $runTimes, CostTime: $costTime5 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime5 / 1000.0)}")
-    log.info(s"[BenchmarkTest ### extractFieldsScala] Times: $runTimes, CostTime: $costTime6 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime6 / 1000.0)}")
+    logger.info(s"[BenchmarkTest ### extractFieldsJava ] Times: $runTimes, CostTime: $costTime1 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime1 / 1000.0)}")
+    logger.info(s"[BenchmarkTest ### extractFieldsJava ] Times: $runTimes, CostTime: $costTime2 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime2 / 1000.0)}")
+    logger.info(s"[BenchmarkTest ### extractFieldsScala] Times: $runTimes, CostTime: $costTime3 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime3 / 1000.0)}")
+    logger.info(s"[BenchmarkTest ### extractFieldsScala] Times: $runTimes, CostTime: $costTime4 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime4 / 1000.0)}")
+    logger.info(s"[BenchmarkTest ### extractFieldsJava ] Times: $runTimes, CostTime: $costTime5 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime5 / 1000.0)}")
+    logger.info(s"[BenchmarkTest ### extractFieldsScala] Times: $runTimes, CostTime: $costTime6 ms, Rate(Records/sec): ${runTimes * 1.0 / (costTime6 / 1000.0)}")
 
     res0 shouldBe expect
     res1 shouldBe expect

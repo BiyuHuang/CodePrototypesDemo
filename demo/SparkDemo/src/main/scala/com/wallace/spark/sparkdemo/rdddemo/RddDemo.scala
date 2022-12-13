@@ -61,8 +61,7 @@ object RddDemo extends CreateSparkSession with Using {
 
   def main(args: Array[String]): Unit = {
     val sc = _spark.sparkContext
-    val hc = new HiveContext(sc)
-    import hc.implicits._
+    import _spark.implicits._
     val fs: FileSystem = FileSystem.get(sc.hadoopConfiguration)
     println(s"Home Directory: ${fs.getHomeDirectory}")
     val rdd: RDD[String] = sc.parallelize(Array("hello world", "hello", "world", "hello world world"), 2)

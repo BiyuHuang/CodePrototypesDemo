@@ -1,10 +1,10 @@
 package com.wallace.demo.app.utils
 
 import java.util
-
 import com.wallace.demo.app.common.Using
 import com.wallace.demo.app.utils.stringutils.StringUtils
 
+import java.util.concurrent.ForkJoinPool
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.ForkJoinTaskSupport
@@ -214,14 +214,14 @@ object StringFuncUtils extends Using {
   def bytesCoventToString(bytes: Array[Byte], charsetName: String = "UTF-8"): String = new String(bytes, charsetName)
 
   def main(args: Array[String]): Unit = {
-    val pool = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(_curParallelism))
+    val pool = new ForkJoinTaskSupport(new ForkJoinPool(_curParallelism))
     Properties.setProp("scala.time", "true")
     runtimeDuration({
       _uniqueIndex = updateUniqueIndex(_uniqueIndex)
-      log.info(s"UniqueIndex: ${_uniqueIndex}")
+      logger.info(s"UniqueIndex: ${_uniqueIndex}")
     }, 10)
 
-    log.info(formatString("16.1"))
+    logger.info(formatString("16.1"))
     val str0 = """1,2,3,4,"a=1,b=2,c=3","e=1.2,f=32.1,g=1.3",7,8,9"""
     val str1 = """1,2,3,"4,"a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
     val str2 = """1,2,3,4","a=1,b=2,c=3",10,11,12,13,"e=1.2,f=32.1,g=1.3",7,8,9"""
@@ -232,12 +232,12 @@ object StringFuncUtils extends Using {
     input.par.foreach {
       str =>
         val threadName = Thread.currentThread().getName
-        log.info(s"$threadName: $str")
+        logger.info(s"$threadName: $str")
         val res: Array[String] = splitString(str, ",", "\"")
         synchronized {
           res.foreach {
             elem =>
-              log.info(s"$threadName: $elem")
+              logger.info(s"$threadName: $elem")
           }
         }
     }

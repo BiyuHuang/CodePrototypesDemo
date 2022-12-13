@@ -1,8 +1,8 @@
 package com.wallace.demo.app.sortdemo
 
 /**
-  * Created by 10192057 on 2018/8/20 0020.
-  */
+ * Created by 10192057 on 2018/8/20 0020.
+ */
 class ParHeapSort {
   val combop: (List[Int], List[Int]) => List[Int] = (ls1: List[Int], ls2: List[Int]) => ls1.:::(ls2)
 
@@ -17,108 +17,108 @@ import com.wallace.demo.app.common.LogSupport
 import scala.collection.mutable
 
 /**
-  * 实现并行堆排序算法
-  *
-  */
+ * 实现并行堆排序算法
+ *
+ */
 class HeapSort[A, B, S <: Iterable[A]](f: A => B)(implicit ord: Ordering[B]) extends LogSupport {
   val combop: (List[Int], List[Int]) => List[Int] = (ls1: List[Int], ls2: List[Int]) => ls1.:::(ls2)
 
   val seqop: (List[Int], Int) => List[Int] = (ls: List[Int], value: Int) => ls.::(value)
 
   /**
-    * 对l排序返回排序后的Seq
-    *
-    * @param l    待排序集合的迭代器
-    * @param desc 降/升序(默认为true,降序)
-    * @return
-    */
+   * 对l排序返回排序后的Seq
+   *
+   * @param l    待排序集合的迭代器
+   * @param desc 降/升序(默认为true,降序)
+   * @return
+   */
   def sort(l: S, desc: Boolean = true): mutable.Seq[A] = HeapSort.sort(f)(l, 0, desc)
 
   /**
-    * 对l排序并返回前top个结果
-    *
-    * @param l    待排序集合的迭代器
-    * @param top  返回最多结果数目
-    * @param desc 降/升序(默认为true,降序)
-    * @return
-    */
+   * 对l排序并返回前top个结果
+   *
+   * @param l    待排序集合的迭代器
+   * @param top  返回最多结果数目
+   * @param desc 降/升序(默认为true,降序)
+   * @return
+   */
   def top(l: S, top: Int, desc: Boolean = true): mutable.Seq[A] = HeapSort.sort(f)(l, top, desc)
 
   /**
-    * 对可变集合排序，返回排序后的Seq
-    *
-    * @param l    待排序可变集合的迭代器
-    * @param desc 降/升序(默认为true,降序)
-    * @return
-    */
+   * 对可变集合排序，返回排序后的Seq
+   *
+   * @param l    待排序可变集合的迭代器
+   * @param desc 降/升序(默认为true,降序)
+   * @return
+   */
   def sortM[M <: mutable.Seq[A]](l: M, desc: Boolean = true): mutable.Seq[A] = HeapSort.sortMutable(f)(l, 0, desc)
 
   /**
-    * 对可变集合l排序并返回前top个结果
-    *
-    * @param l    待排序可变集合的迭代器
-    * @param top  返回最多结果数目
-    * @param desc 降/升序(默认为true,降序)
-    * @return
-    */
+   * 对可变集合l排序并返回前top个结果
+   *
+   * @param l    待排序可变集合的迭代器
+   * @param top  返回最多结果数目
+   * @param desc 降/升序(默认为true,降序)
+   * @return
+   */
   def topM[M <: mutable.Seq[A]](l: M, top: Int, desc: Boolean = true): mutable.Seq[A] = HeapSort.sortMutable(f)(l, top, desc)
 
   /**
-    * 对可变集合l并行排序并返回前top个结果
-    *
-    * @param l    待排序可变集合的迭代器
-    * @param top  返回最多结果数目
-    * @param desc 降/升序(默认为true,降序)
-    * @return
-    */
+   * 对可变集合l并行排序并返回前top个结果
+   *
+   * @param l    待排序可变集合的迭代器
+   * @param top  返回最多结果数目
+   * @param desc 降/升序(默认为true,降序)
+   * @return
+   */
   def topParM[M <: mutable.Seq[A]](l: M, top: Int, desc: Boolean = true): mutable.Seq[A] = HeapSort.topParMutable(f)(l, top, desc)
 
   /**
-    * 对可变集合l的指定范围排序并返回排序后的Seq
-    *
-    * @param seq   待排序可变集合
-    * @param top   返回最多结果数目
-    * @param desc  降/升序(默认为true,降序)
-    * @param from  待排序的起始位置
-    * @param until 待排序的结束位置
-    * @return
-    */
+   * 对可变集合l的指定范围排序并返回排序后的Seq
+   *
+   * @param seq   待排序可变集合
+   * @param top   返回最多结果数目
+   * @param desc  降/升序(默认为true,降序)
+   * @param from  待排序的起始位置
+   * @param until 待排序的结束位置
+   * @return
+   */
   def sortRange[M <: mutable.Seq[A]](seq: M, top: Int, desc: Boolean = true)(from: Int = 0, until: Int = seq.length): (Int, Int) = {
     HeapSort.sortMutableRange(f)(seq, top, desc)(from, until)
   }
 
   /**
-    * 对seq中两个已经排序的区段进行合并排序，将src合并到dst
-    *
-    * @param seq  可变集合
-    * @param src  待合并的源区段(起始位置，结束位置)
-    * @param dst  待合并的目标区段(起始位置，结束位置)
-    * @param desc 降/升序(默认为true,降序)
-    * @return
-    */
+   * 对seq中两个已经排序的区段进行合并排序，将src合并到dst
+   *
+   * @param seq  可变集合
+   * @param src  待合并的源区段(起始位置，结束位置)
+   * @param dst  待合并的目标区段(起始位置，结束位置)
+   * @param desc 降/升序(默认为true,降序)
+   * @return
+   */
   def merge2Seq(seq: mutable.Seq[A], src: (Int, Int), dst: (Int, Int), desc: Boolean = true): (Int, Int) = HeapSort.merge2Seq(f)(seq, src, dst, desc)
 
   /**
-    * 对seq中两个已经排序的区段进行合并排序，将src合并到dst
-    *
-    * @param seq  可变集合
-    * @param src  待合并的源区段(起始位置，结束位置)
-    * @param dst  待合并的目标区段(起始位置，结束位置)
-    * @param desc 降/升序(默认为true,降序)
-    * @return
-    */
+   * 对seq中两个已经排序的区段进行合并排序，将src合并到dst
+   *
+   * @param seq  可变集合
+   * @param src  待合并的源区段(起始位置，结束位置)
+   * @param dst  待合并的目标区段(起始位置，结束位置)
+   * @param desc 降/升序(默认为true,降序)
+   * @return
+   */
   def merge2Seq2(seq: mutable.Seq[A], src: (Int, Int), dst: (Int, Int), desc: Boolean = true): (Int, Int) = HeapSort.merge2Seq2(f)(seq, src, dst, desc)
 
   /**
-    * 对seq中两个已经排序的区段进行合并排序，将src合并到dst<br>
-    * 该算法在排序过程不申请新内存
-    *
-    * @param seq  可变集合
-    * @param src  待合并的源区段(起始位置，结束位置)
-    * @param dst  待合并的目标区段(起始位置，结束位置)
-    * @param desc 降/升序(默认为true,降序)
-    * @return
-    */
+   * 对seq中两个已经排序的区段进行合并排序，将src合并到dst<br>
+   * 该算法在排序过程不申请新内存
+   *
+   * @param seq  可变集合
+   * @param src  待合并的源区段(起始位置，结束位置)
+   * @param dst  待合并的目标区段(起始位置，结束位置)
+   * @param desc 降/升序(默认为true,降序)
+   * @return
+   */
   def merge2SeqNM(seq: mutable.Seq[A], src: (Int, Int), dst: (Int, Int), desc: Boolean = true): (Int, Int) = HeapSort.merge2SeqNM(f)(seq, src, dst, desc)
 }
 
@@ -364,8 +364,8 @@ object HeapSort extends LogSupport {
 
         def swapStHead(): Unit = {
           swapTop(st)
-          swapst = swapStTail
-          swapqh = swapQhEnable
+          swapst = () => swapStTail()
+          swapqh = () => swapQhEnable()
           qh = st
           qbf = st
           qbt = st
@@ -382,8 +382,8 @@ object HeapSort extends LogSupport {
           qh = nextQh()
         }
 
-        swapst = swapStHead
-        swapqh = swapQhDisable
+        swapst = () => swapStHead()
+        swapqh = () => swapQhDisable()
         while (idx >= dst._1 && st >= src._1) {
           if (cmpdst(st)) {
             swapst()
@@ -434,7 +434,7 @@ object HeapSort extends LogSupport {
     val rnd = new java.util.Random()
     val l = Array.tabulate[Int](40)((x: Int) => rnd.nextInt(x + 100))
     for (i <- 0 to 0) {
-      log.info("==============time ", i, "=================")
+      logger.info("==============time ", i, "=================")
       val s = l.toBuffer[Int]
       println("=========> s: " + s)
       val t1: Long = System.currentTimeMillis

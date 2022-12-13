@@ -22,22 +22,22 @@ object Boot extends LogSupport {
     var file: Option[File] = None
     try {
       file = Some(new File("./test.csv"))
-      log.info(file.get.getPath)
+      logger.info(file.get.getPath)
     } catch {
       case NonFatal(e) =>
-        log.error(s"Catch Non-Fatal Exception: ${e.getMessage}.")
+        logger.error(s"Catch Non-Fatal Exception: ${e.getMessage}.")
     } finally {
       if (file.isDefined) {
         file.get.delete()
-        log.info("delete file.")
+        logger.info("delete file.")
       }
     }
-    log.info(s"${func2(4)}")
-    log.info("End.")
+    logger.info(s"${func2(4)}")
+    logger.info("End.")
   }
 
   def func1(): Unit = {
-    log.info(s"${ManagementFactory.getRuntimeMXBean.getName}")
+    logger.info(s"${ManagementFactory.getRuntimeMXBean.getName}")
     try {
       util.Properties.setProp("scala.time", "true")
       var a = 1
@@ -47,21 +47,21 @@ object Boot extends LogSupport {
           breakable {
             if (a.equals(b)) {
               a += 1
-              log.info("Testing @the first place.")
+              logger.info("Testing @the first place.")
               break()
             } else {
               a += 1
-              log.info("Testing @the second place.")
+              logger.info("Testing @the second place.")
             }
-            log.info("Testing @the third place.")
+            logger.info("Testing @the third place.")
           }
-          if (a == 5) break() else log.info("Testing @the fourth place.")
+          if (a == 5) break() else logger.info("Testing @the fourth place.")
         }
       }
-      log.info("Testing @fifth place.")
+      logger.info("Testing @fifth place.")
     } catch {
       case NonFatal(e) =>
-        log.error(s"Catch Non-Fatal Exception: ${e.getMessage}.")
+        logger.error(s"Catch Non-Fatal Exception: ${e.getMessage}.")
     }
   }
 

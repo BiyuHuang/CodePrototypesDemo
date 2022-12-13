@@ -57,8 +57,8 @@ object BigDataTopNDemo extends LogSupport {
         fw.write(record)
         fw.flush()
       } match {
-        case Success(_) => log.debug(s"Succeed to write record for $fileName.")
-        case Failure(e) => log.error(s"Aborted to split $fileName", e)
+        case Success(_) => logger.debug(s"Succeed to write record for $fileName.")
+        case Failure(e) => logger.error(s"Aborted to split $fileName", e)
       }
     }
     splitFiles

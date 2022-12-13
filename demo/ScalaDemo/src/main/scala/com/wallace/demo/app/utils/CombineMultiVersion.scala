@@ -11,13 +11,13 @@ class CombineMultiVersion extends LogSupport {
     val temp: Array[(String, Int)] = originSQLText.split(",", -1).map(_.trim.toLowerCase).zipWithIndex
     for (colName <- toBeRepairedCol) {
       val index = colIndex(temp, colName)
-      log.debug(s"[RepairedColIndex]: $index")
+      logger.debug(s"[RepairedColIndex]: $index")
       if (index > 0) {
         val repairedValue = repairColValue(colName)
-        log.debug(s"[RepairedValue]: $repairedValue")
+        logger.debug(s"[RepairedValue]: $repairedValue")
         temp.update(index, (repairedValue, index))
       } else {
-        log.error(
+        logger.error(
           s"""
              |#########################################################################
              |[CombineMultiVersion] => Index of #$colName#: $index, it was Out Of Range.

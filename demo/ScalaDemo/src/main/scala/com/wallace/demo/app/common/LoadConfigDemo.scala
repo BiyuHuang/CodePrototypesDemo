@@ -27,7 +27,7 @@ object LoadConfigDemo extends ProjectConfig {
         val temp = conf.split("=").map(_.trim)
         val key = temp.head
         val value = temp.last
-        log.info(s"Key: $key, Value: $value")
+        logger.info(s"Key: $key, Value: $value")
     }
 
 
@@ -39,7 +39,7 @@ object LoadConfigDemo extends ProjectConfig {
 
     timeOffsetList.foreach {
       x =>
-        log.info(s"Key: ${x._1}, Value: ${x._2}")
+        logger.info(s"Key: ${x._1}, Value: ${x._2}")
     }
   }
 
