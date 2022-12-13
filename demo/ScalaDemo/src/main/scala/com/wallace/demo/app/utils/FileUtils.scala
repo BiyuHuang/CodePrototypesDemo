@@ -47,7 +47,7 @@ object FileUtils extends Using {
           br =>
             while (br.ready()) {
               val line: String = br.readLine()
-              log.info(line)
+              logger.info(line)
             }
         }
     }
@@ -83,15 +83,15 @@ object FileUtils extends Using {
   def betterFilesFunc(): Unit = {
     import better.files.{File, FileMonitor}
     val f = File("./demo/ScalaDemo/src/main/resources/testingData.csv")
-    log.info(s"File Path: ${f.path}")
+    logger.info(s"File Path: ${f.path}")
     //log.info(s"File CheckSum: ${f.sha512}")
-    log.info(s"File Line Size: ${f.lines(Charset.forName("UTF-8")).size}")
-    log.info(s"File Context Size: ${f.size / 1024L / 1024L} MB")
-    log.info(s"File LastModifiedTime: ${f.lastModifiedTime}")
+    logger.info(s"File Line Size: ${f.lines(Charset.forName("UTF-8")).size}")
+    logger.info(s"File Context Size: ${f.size / 1024L / 1024L} MB")
+    logger.info(s"File LastModifiedTime: ${f.lastModifiedTime}")
 
     //TODO 普通的Java文件监控
     val watchDir: File = f.parent
-    log.info(s"File Parent: $watchDir, IsDirectory: ${watchDir.isDirectory}")
+    logger.info(s"File Parent: $watchDir, IsDirectory: ${watchDir.isDirectory}")
     import java.nio.file.{StandardWatchEventKinds => EventType}
     val service: WatchService = watchDir.newWatchService
     watchDir.register(service, events = Seq(EventType.ENTRY_MODIFY))
@@ -104,7 +104,7 @@ object FileUtils extends Using {
       //      }
       override def onModify(file: File, count: Int): Unit = {
         symbolCnt += 1
-        log.info(s"${file.name} got modified @$count")
+        logger.info(s"${file.name} got modified @$count")
       }
     }
     watcher.start()(ExecutionContext.global)
@@ -128,7 +128,7 @@ object FileUtils extends Using {
 
     while (symbolCnt < 10) {
       Thread.sleep(1000)
-      log.info(s"Watching ${watchDir.name} ($symbolCnt)...")
+      logger.info(s"Watching ${watchDir.name} ($symbolCnt)...")
     }
   }
 
@@ -187,7 +187,7 @@ object FileUtils extends Using {
     val costTime3 = runtimeDuration {
       readTarGZFile("./demo/ScalaDemo/src/main/resources/HW_HN_OMC1-mr-134.175.57.16-20170921043000-20170921044500-20170921051502-001.tar.gz")
     }
-    log.info(s"CostTime3: $costTime3 ms.")
+    logger.info(s"CostTime3: $costTime3 ms.")
 
     //    // TODO Run test for filenamePrefixFromOffset
     //    val offset = filenamePrefixFromOffset(100L)
@@ -230,14 +230,14 @@ object FileUtils extends Using {
     //    val totalLines = getTotalLines(testFile)
     val totalLines = getTotalLines(srcFile)
     val endTime = System.currentTimeMillis()
-    log.info(s"[$srcFileName]TotalLines: $totalLines, CostTime: ${endTime - startTime} ms.")
+    logger.info(s"[$srcFileName]TotalLines: $totalLines, CostTime: ${endTime - startTime} ms.")
 
     // TODO Read readZipArchiveFile
     //val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335110_20180403101500.zip"
     //    val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ERICSSON_OMC1_335112_20180403101500.xml.zip"
     val fileName = "./demo/ScalaDemo/src/main/resources/FDD-LTE_MRS_ZTE_OMC1_637784_20170522204500.zip"
     val costTime4: Double = runtimeDuration(readZipArchiveFile(fileName))
-    log.info(s"CostTime4: $costTime4 ms.")
+    logger.info(s"CostTime4: $costTime4 ms.")
 
     //TODO Get File Header
     var res: Option[Array[(String, Array[Byte])]] = None
@@ -246,9 +246,9 @@ object FileUtils extends Using {
     }
     res.get.foreach {
       elem =>
-        log.info(s"FileName: ${elem._1}, File Header Bytes: ${elem._2.take(3).mkString("_")}")
+        logger.info(s"FileName: ${elem._1}, File Header Bytes: ${elem._2.take(3).mkString("_")}")
     }
-    log.info(s"CostTime5: $costTime5 ms.")
+    logger.info(s"CostTime5: $costTime5 ms.")
 
   }
 
@@ -312,7 +312,7 @@ object FileUtils extends Using {
         offset = tempFileAndOffset.file.length() + tempFileAndOffset.offset
         tempFileAndOffset.file
     }
-    log.warn(s"Offset: $offset.")
+    logger.warn(s"Offset: $offset.")
     if (destFile.length() <= DEFAULT_FILE_SIZE_THRESHOLD) {
       destFile
     } else {
@@ -332,7 +332,7 @@ object FileUtils extends Using {
     val srcFileSize: Long = fcIn.size()
     assert(srcFileSize < Int.MaxValue, s"The size of FileInputStream is too long: $srcFileSize > ${Int.MaxValue}.")
     val minBufferCapacity: Int = Math.min(srcFileSize.toInt, defaultBufCapacity)
-    log.info(s"Before => fcIn: $srcFileSize, fcOut: ${fcOut.size()}, minBufferCapacity: $minBufferCapacity.")
+    logger.info(s"Before => fcIn: $srcFileSize, fcOut: ${fcOut.size()}, minBufferCapacity: $minBufferCapacity.")
     val buffer: ByteBuffer = ByteBuffer.allocate(minBufferCapacity)
     while (fIns.available() > 0) {
       buffer.clear()
@@ -341,11 +341,11 @@ object FileUtils extends Using {
         buffer.flip()
         fcOut.write(buffer)
       } else {
-        log.warn("Buffer is empty.")
+        logger.warn("Buffer is empty.")
       }
     }
 
-    log.info(s"After => fcIn: $srcFileSize, fcOut: ${fcOut.size()}")
+    logger.info(s"After => fcIn: $srcFileSize, fcOut: ${fcOut.size()}")
   }
 
   def readGZFile(fileName: String): Unit = {
@@ -356,7 +356,7 @@ object FileUtils extends Using {
             gis =>
               using(new BufferedReader(new InputStreamReader(gis, "GBK"))) {
                 br =>
-                  br.lines().toArray.foreach(line => log.info(s"$line"))
+                  br.lines().toArray.foreach(line => logger.info(s"$line"))
                   while (br.ready()) {
                     val oneLine = br.readLine().replaceAll("null", "")
                     oneLine.length
@@ -367,7 +367,7 @@ object FileUtils extends Using {
       }
     } catch {
       case NonFatal(e) =>
-        log.error(s"Failed to read $fileName: ", e)
+        logger.error(s"Failed to read $fileName: ", e)
     }
   }
 
@@ -387,7 +387,7 @@ object FileUtils extends Using {
                         var cnt: Long = 1
                         while (br.ready() && (cnt <= size)) {
                           val line = br.readLine()
-                          log.info(s"${line.length}")
+                          logger.info(s"${line.length}")
                           //log.info(s"$cnt: $line")
                           cnt += 1
                         }
@@ -398,7 +398,7 @@ object FileUtils extends Using {
       }
     } catch {
       case NonFatal(e) =>
-        log.error(s"Failed to read $fileName: ", e)
+        logger.error(s"Failed to read $fileName: ", e)
     }
   }
 
@@ -417,9 +417,9 @@ object FileUtils extends Using {
 
               } else {
                 val size = entry.getSize
-                log.info(s"Entry Name: ${entry.getName}, Entry Size: $size.")
+                logger.info(s"Entry Name: ${entry.getName}, Entry Size: $size.")
                 val defaultSize: Long = Math.min(Runtime.getRuntime.freeMemory(), Int.MaxValue)
-                log.debug(s"FreeMemory: ${Runtime.getRuntime.freeMemory() / (1024 * 1024)} MB. Default Bytes Size: $defaultSize Bytes")
+                logger.debug(s"FreeMemory: ${Runtime.getRuntime.freeMemory() / (1024 * 1024)} MB. Default Bytes Size: $defaultSize Bytes")
                 val currentSize: Long = if (size < 0) defaultSize else size
                 val bos = new ByteArrayOutputStream(currentSize.toInt)
                 IOUtils.copy(zipIns, bos, 40960)
@@ -427,7 +427,7 @@ object FileUtils extends Using {
                 using(new BufferedReader(new InputStreamReader(res))) {
                   br =>
                     while (br.ready()) {
-                      log.info(br.readLine())
+                      logger.info(br.readLine())
                     }
                 }
                 bos.flush()
@@ -498,9 +498,9 @@ object FileUtils extends Using {
               if (res.isDefined) {
                 val mrRecords = res.get.getResult
                 val eNBId: String = mrRecords.geteNB()
-                log.info(s"[$cnt]$entryName => EnodeBID: $eNBId")
+                logger.info(s"[$cnt]$entryName => EnodeBID: $eNBId")
               } else {
-                log.debug(s"Parsed $entryName and Returned None.")
+                logger.debug(s"Parsed $entryName and Returned None.")
               }
           }
       }
@@ -515,7 +515,7 @@ object FileUtils extends Using {
       case Success(result) =>
         Some(result)
       case Failure(e) =>
-        log.error(s"Failed to parse $entryName: ", e)
+        logger.error(s"Failed to parse $entryName: ", e)
         None
     }
   }
@@ -534,10 +534,10 @@ object FileUtils extends Using {
     val projectConfigFile = fileName
     val udfConfigFile: Array[File] = Array(new File(SystemEnvUtils.getUserDir + "../conf/" + fileName))
     if (udfConfigFile.nonEmpty) {
-      log.debug(s"loading file[${udfConfigFile.head.getPath}] and resource[$projectConfigFile]")
+      logger.debug(s"loading file[${udfConfigFile.head.getPath}] and resource[$projectConfigFile]")
       ConfigFactory.parseFile(udfConfigFile.head).withFallback(ConfigFactory.load(projectConfigFile))
     } else {
-      log.debug(s"loading resource[$projectConfigFile]")
+      logger.debug(s"loading resource[$projectConfigFile]")
       ConfigFactory.load(projectConfigFile)
     }
   }
@@ -587,7 +587,7 @@ object FileUtils extends Using {
           val tmpG = group.addGroup("time")
           tmpG.append("ttl", r.nextInt(9) + 1)
           tmpG.append("ttl2", r.nextInt(9) + "_a")
-          log.info("Group String: " + tmpG.toString)
+          logger.info("Group String: " + tmpG.toString)
           writer.write(group)
         }
     }
@@ -663,7 +663,7 @@ object FileUtils extends Using {
         if (file.delete()) {
           delState = true
         } else {
-          log.error(s"Failed to delete ${
+          logger.error(s"Failed to delete ${
             file.getCanonicalPath
           }.")
           delState = false
@@ -673,20 +673,20 @@ object FileUtils extends Using {
           if (file.delete()) {
             delState = true
           } else {
-            log.error(s"Failed to delete ${
+            logger.error(s"Failed to delete ${
               file.getCanonicalPath
             }.")
             delState = false
           }
         } else {
-          log.warn(s"Failed to set executable for ${
+          logger.warn(s"Failed to set executable for ${
             file.getName
           }")
           file.deleteOnExit()
         }
       }
     } else {
-      log.warn(s"${
+      logger.warn(s"${
         file.getName
       } doesn't exist or has no execute permission.")
     }
@@ -708,7 +708,7 @@ object FileUtils extends Using {
             }
         }
       } else {
-        log.debug(s"${
+        logger.debug(s"${
           rootFile.getName
         } is an empty directory, just delete it.")
       }

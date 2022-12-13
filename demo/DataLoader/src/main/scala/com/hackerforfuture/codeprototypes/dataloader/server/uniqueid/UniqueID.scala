@@ -11,8 +11,8 @@ package com.hackerforfuture.codeprototypes.dataloader.server.uniqueid
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicLong}
 
 /**
-  * Created by wallace on 2019/4/4.
-  */
+ * Created by wallace on 2019/4/4.
+ */
 class UniqueID {
 
   // SnowFlake - 64bit
@@ -32,7 +32,7 @@ class UniqueID {
   def genUniqueID(): Option[Long] = {
     val timestamp: Long = System.currentTimeMillis()
     if (initFalg.compareAndSet(false, true)) {
-      val wid: Int = workerId.get() << workerIdShift
+      val wid: Int = workerId.get() << workerIdShift.toInt
       if (lastTimeStamp.compareAndSet(timestamp, timestamp)) {
 
         val ts: Long = (timestamp - twepoch) << timeStampLeftShit

@@ -39,8 +39,8 @@ class FtpUtils(ftpMetadata: FtpMetaData) extends Using {
         config.put("StrictHostKeyChecking", "no")
         session.setConfig(config)
         session.setTimeout(ftpMetadata.timeOut)
-        log.debug("sftp session connected")
-        log.debug("opening channel")
+        logger.debug("sftp session connected")
+        logger.debug("opening channel")
         Try {
           session.connect()
           val channel = session.openChannel(ftpMetadata.ftpType).asInstanceOf[ChannelSftp]
@@ -51,7 +51,7 @@ class FtpUtils(ftpMetadata: FtpMetaData) extends Using {
   } match {
     case Success(ch) => Some(ch)
     case Failure(e) =>
-      log.error("Failed to login sftp server", e)
+      logger.error("Failed to login sftp server", e)
       None
   }
 
@@ -73,7 +73,7 @@ class FtpUtils(ftpMetadata: FtpMetaData) extends Using {
     } match {
       case Success(client) => Some(client)
       case Failure(e) =>
-        log.error("Failed to create FTP client", e)
+        logger.error("Failed to create FTP client", e)
         None
     }
   }

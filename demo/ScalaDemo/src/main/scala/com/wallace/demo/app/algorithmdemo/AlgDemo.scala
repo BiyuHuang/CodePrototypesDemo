@@ -84,7 +84,7 @@ object AlgDemo extends LogSupport {
   def main(args: Array[String]): Unit = {
     //TODO 1 TriangleCount
     val tCnt: Int = triangleCount(Array(3, 4, 6, 7, 8, 9))
-    log.info(s"Triangle Count: $tCnt")
+    logger.info(s"Triangle Count: $tCnt")
 
     //TODO 2 Two Sum: (1, 3)
     twoSum(Array(11, 2, 1, 7, 15), 9)

@@ -38,8 +38,8 @@ class ParsersConstructorUnitSpec extends UnitSpec {
       cnt += 1
     }
     val costTime: Long = System.currentTimeMillis() - startTime
-    log.info(s"RunTimes: $runTimes, CostTime: $costTime ms, Rate: ${runTimes * 1000.0 / costTime}.")
-    log.info(res)
+    logger.info(s"RunTimes: $runTimes, CostTime: $costTime ms, Rate: ${runTimes * 1000.0 / costTime}.")
+    logger.info(res)
     res shouldBe "f6,b2,c3,d4,e5,f7,f8"
   }
 }

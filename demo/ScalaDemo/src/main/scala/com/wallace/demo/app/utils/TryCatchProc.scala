@@ -23,7 +23,7 @@ trait TryCatchProc extends Using {
       Some(proc(in))
     } catch {
       case NonFatal(e) =>
-        log.error(s"""$msg, ${e.printStackTrace()}""".stripMargin)
+        logger.error(s"""$msg, ${e.printStackTrace()}""".stripMargin)
         None
     }
   }

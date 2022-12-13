@@ -1,16 +1,15 @@
 package com.wallace.demo.app.eulerpathdemo
 
-import java.util.Scanner
-
 import com.wallace.demo.app.common.LogSupport
 
-import scala.collection.JavaConversions._
+import java.util.Scanner
+import scala.jdk.CollectionConverters.collectionAsScalaIterableConverter
 import scala.util.control.Breaks._
 
 /**
-  * com.wallace.demo.app.EulerPathDemo
-  * Created by 10192057 on 2017/10/10 0010.
-  */
+ * com.wallace.demo.app.EulerPathDemo
+ * Created by 10192057 on 2017/10/10 0010.
+ */
 object EulerPathBoot extends App with LogSupport {
 
   //  Sample Input
@@ -62,7 +61,7 @@ object EulerPathBoot extends App with LogSupport {
     }
   }
 
-  for (elem <- handler.result) {
-    log.info(s"$elem")
+  for (elem <- handler.result.asScala) {
+    logger.info(s"$elem")
   }
 }

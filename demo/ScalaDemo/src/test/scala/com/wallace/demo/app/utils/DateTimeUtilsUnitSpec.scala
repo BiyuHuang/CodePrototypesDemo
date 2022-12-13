@@ -21,14 +21,14 @@ class DateTimeUtilsUnitSpec extends AnyFunSuite with LogSupport {
     val now: Timestamp = new Timestamp(System.currentTimeMillis())
     now.setNanos(1000)
     val ns = DateTimeUtils.fromJavaTimestamp(now)
-    log.info(s"Input: $now, Output: $ns")
+    logger.info(s"Input: $now, Output: $ns")
     assert(ns % 1000000L === 1)
     assert(DateTimeUtils.toJavaTimestamp(ns) === now)
 
     List(-111111111111L, -1L, 0, 1L, 111111111111L).foreach { t =>
       val ts = DateTimeUtils.toJavaTimestamp(t)
 
-      log.info(s"Input: $t, Output: $ts")
+      logger.info(s"Input: $t, Output: $ts")
       assert(DateTimeUtils.fromJavaTimestamp(ts) === t)
       assert(DateTimeUtils.toJavaTimestamp(DateTimeUtils.fromJavaTimestamp(ts)) === ts)
     }

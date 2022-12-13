@@ -93,7 +93,7 @@ class ObjConf(loadDefaults: Boolean) extends Cloneable with LogSupport with Seri
       throw new NullPointerException("null value for " + key)
     }
     if (!silent) {
-      log.warn(s"The configuration key '$key' has been deprecated.")
+      logger.warn(s"The configuration key '$key' has been deprecated.")
     }
     settings.put(key, value)
     this

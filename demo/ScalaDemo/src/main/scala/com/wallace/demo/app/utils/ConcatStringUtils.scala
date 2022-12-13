@@ -26,14 +26,14 @@ object ConcatStringUtils extends LogSupport {
             if (index % nCellCols == x) {
               nCellTempResData.append(nCellData(index))
             } else {
-              log.debug("[ConcatStringUtils]: No match value.")
+              logger.debug("[ConcatStringUtils]: No match value.")
             }
         }
         nCellResData.append(nCellTempResData.result().mkString("$"))
     }
-    log.debug(s"[HeadData] ${headData.mkString("##")}")
-    log.debug(s"[nCellData] ${nCellData.mkString("##")}")
-    log.debug(s"[TailData] ${tailData.mkString("##")}")
+    logger.debug(s"[HeadData] ${headData.mkString("##")}")
+    logger.debug(s"[nCellData] ${nCellData.mkString("##")}")
+    logger.debug(s"[TailData] ${tailData.mkString("##")}")
     headData ++ nCellResData.result().toArray[String] ++ tailData
   }
 
@@ -42,9 +42,9 @@ object ConcatStringUtils extends LogSupport {
     val temp = str.split(",", -1)
     val result = concatNColumn(temp, 5, 4) // a1,b2,c3,d4,e5,4,n1$n2$n3$n4,n11$n21$n31$n41,n12$n22$n32$n42,n13$n23$n33$n43,f6,g8,h9
     for (elem <- result) {
-      log.info("######## " + elem)
+      logger.info("######## " + elem)
     }
-    log.info("@@@@@@ " + result.mkString(","))
+    logger.info("@@@@@@ " + result.mkString(","))
   }
 
   /** 支持连续多个可变长的字段, 返回结果的字段个数是固定的. **/

@@ -68,7 +68,7 @@ object PiAkkaDemo extends LogSupport {
 
   def main(args: Array[String]): Unit = {
     if (args.length < 3) {
-      log.error("[PiAkkaDemo] Usage: Pi <nrOfWorkers> <nrOfMessages> <times>")
+      logger.error("[PiAkkaDemo] Usage: Pi <nrOfWorkers> <nrOfMessages> <times>")
       System.exit(1)
     }
     val system: ActorSystem = ActorSystem("PiSystem")
@@ -78,8 +78,8 @@ object PiAkkaDemo extends LogSupport {
     val future: Future[Any] = master ? Calculate
     val approximationPi = Await.result(future, timeout.duration)
       .asInstanceOf[PiApproximation]
-    log.info("[PiAkkaDemo] Pi: \t" + approximationPi.pi)
-    log.info("[PiAkkaDemo] Spend: \t" + approximationPi.duration)
+    logger.info("[PiAkkaDemo] Pi: \t" + approximationPi.pi)
+    logger.info("[PiAkkaDemo] Spend: \t" + approximationPi.duration)
     system.stop(master)
   }
 }

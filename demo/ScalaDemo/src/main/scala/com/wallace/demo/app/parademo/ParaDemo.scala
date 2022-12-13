@@ -8,8 +8,8 @@
 
 package com.wallace.demo.app.parademo
 
+import java.util.concurrent.ForkJoinPool
 import scala.collection.parallel.mutable.ParArray
-import scala.concurrent.forkjoin.ForkJoinPool
 
 /**
   * Created by wallace on 2019/6/20.

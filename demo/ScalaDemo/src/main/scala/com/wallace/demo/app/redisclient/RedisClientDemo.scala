@@ -20,7 +20,7 @@ object RedisClientDemo extends Using {
   def main(args: Array[String]): Unit = {
     using(new Jedis("localhost", 6379)) {
       redisCli =>
-        log.info(redisCli.ping())
+        logger.info(redisCli.ping())
         redisCli.lpush("site-list", "Runoob")
         redisCli.lpush("site-list", "Google")
         redisCli.lpush("site-list", "Taobao")

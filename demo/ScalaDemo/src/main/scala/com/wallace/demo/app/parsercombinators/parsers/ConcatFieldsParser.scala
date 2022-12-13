@@ -34,7 +34,7 @@ class ConcatFieldsParser extends AbstractParser {
     _concatColumnsFields.putAll(concatColumnsFields.asJava)
     concat_sep = context.methodMetaData.conf("separator")
     if (concat_sep.isEmpty) {
-      log.warn(s"Concat Sep[$concat_sep] is empty.")
+      logger.warn(s"Concat Sep[$concat_sep] is empty.")
     }
   }
 }

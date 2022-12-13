@@ -32,7 +32,7 @@ object HttpUtils extends Using {
     } match {
       case Success(res) => res
       case Failure(e) =>
-        log.error("Failed to do Post request: ", e)
+        logger.error("Failed to do Post request: ", e)
         defaultRes
     }
   }
@@ -72,7 +72,7 @@ object HttpUtils extends Using {
     } match {
       case Success(res) => res
       case Failure(e) =>
-        log.error("Failed to do Post request: ", e)
+        logger.error("Failed to do Post request: ", e)
         defaultRes
     }
   }

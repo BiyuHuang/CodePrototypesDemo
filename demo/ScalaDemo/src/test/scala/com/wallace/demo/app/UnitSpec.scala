@@ -25,7 +25,7 @@ trait UnitSpec extends AnyFlatSpec with Matchers with FuncRuntimeDur {
     require(runTimes >= 10000, s"Benchmark need to execute at least 10000 times And runTimes = $runTimes.")
     teamID should s"do $utMsg" in {
       val costTime = runtimeDuration(testFunc, runTimes)
-      log.info(s"RunTimes: $runTimes, CostTime: $costTime ms.")
+      logger.info(s"RunTimes: $runTimes, CostTime: $costTime ms.")
     }
   }
 }

@@ -7,8 +7,8 @@ import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success, Try}
 
 /**
-  * Created by Wallace on 2016/11/6.
-  */
+ * Created by Wallace on 2016/11/6.
+ */
 object FunctionalDemo extends UserDefineFunc with LogSupport {
   val p0: (Int, Int, Int) => Int = sum
   val p2: (Int) => Int = sum(10, _: Int, 20)
@@ -24,22 +24,22 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
 
     val a: Int = 3
     val b: BigInt = toBigInt(a)
-    log.info(s"${Int.MaxValue}, ${Int.MinValue}, ${b.pow(a)}")
-    log.info(s"${p0(1, 2, 3)}") // 6
-    log.info(s"${p2(100)}") // 130
-    log.info(s"${p3(10, 1)}")
-    log.info("[Partial Functions] " + divide(10))
-    log.info("[Partial Functions] " + divide1(10))
-    log.info("[Partial Functions] " + direction(180))
-    log.info("[匿名函数] " + m1(2))
-    log.info("[偏应用函数] " + sum(1, 2, 3))
-    log.info("Curry 函数] " + curriedSum(5)(6))
+    logger.info(s"${Int.MaxValue}, ${Int.MinValue}, ${b.pow(a)}")
+    logger.info(s"${p0(1, 2, 3)}") // 6
+    logger.info(s"${p2(100)}") // 130
+    logger.info(s"${p3(10, 1)}")
+    logger.info("[Partial Functions] " + divide(10))
+    logger.info("[Partial Functions] " + divide1(10))
+    logger.info("[Partial Functions] " + direction(180))
+    logger.info("[匿名函数] " + m1(2))
+    logger.info("[偏应用函数] " + sum(1, 2, 3))
+    logger.info("Curry 函数] " + curriedSum(5)(6))
   }
 
   /**
-    * Scala-Partial Functions(偏函数)
-    * 定义一个函数，而让它只接受和处理其参数定义域范围内的子集，对于这个参数范围外的参数则抛出异常，这样的函数就是偏函数
-    **/
+   * Scala-Partial Functions(偏函数)
+   * 定义一个函数，而让它只接受和处理其参数定义域范围内的子集，对于这个参数范围外的参数则抛出异常，这样的函数就是偏函数
+   * */
   def divide: PartialFunction[Int, Int] = new PartialFunction[Int, Int] {
     override def isDefinedAt(x: Int): Boolean = x != 0
 
@@ -78,8 +78,8 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
       case None => throw new NoSuchElementException
     }
     Try(m1(key)).flatMap(x => Try(m2(x)).flatMap(y => Try(m3(y)))) match {
-      case Success(res) => log.info(key, res)
-      case Failure(e) => log.error(s"$e")
+      case Success(res) => logger.info(key, res)
+      case Failure(e) => logger.error(s"$e")
     }
   }
 
@@ -90,10 +90,10 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
     import scala.concurrent.ExecutionContext.Implicits.global
     val futureTask: Future[String] = Future(m1(key)).flatMap(x => Future(m2(x)).flatMap(y => Future(m3(y))))
 
-    futureTask.onFailure {
-      case t: Throwable => println(t)
+    futureTask.onComplete {
+      case Failure(e) => println(e.getMessage)
     }
-    log.info(key, Await.result(futureTask, Duration.Inf))
+    logger.info(key, Await.result(futureTask, Duration.Inf))
 
     val inc: Int => Int = (a: Int) => a + 1
     val dec: Int => Int = (b: Int) => b - 2
@@ -104,17 +104,17 @@ object FunctionalDemo extends UserDefineFunc with LogSupport {
 
 
   /**
-    * Lambda表达式, 匿名函数
-    **/
+   * Lambda表达式, 匿名函数
+   * */
   def m1: (Int) => Int = (x: Int) => x * x
 
   /**
-    * 偏应用函数
-    **/
+   * 偏应用函数
+   * */
   def sum(a: Int, b: Int, c: Int): Int = a + b + c
 
   /**
-    * Curry函数
-    **/
+   * Curry函数
+   * */
   def curriedSum(x: Int)(y: Int): Int = x + y
 }

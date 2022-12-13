@@ -14,7 +14,7 @@ object ConvertMRToNeighborCellDemo extends Using {
     val res = FuncUtil.ProcessNeighbourInfo(mrRecord)
     res.asScala.foreach {
       line =>
-        log.info(line)
+        logger.info(line)
     }
 
     assert(args.length >= 1, "Please enter run times.")
@@ -34,7 +34,7 @@ object ConvertMRToNeighborCellDemo extends Using {
         cnt += 1
       }
     }
-    log.info(s"[testProcessNBDataByLine] RunTimes: $cnt, CostTime: $costTime ms.")
+    logger.info(s"[testProcessNBDataByLine] RunTimes: $cnt, CostTime: $costTime ms.")
   }
 
   def testProcessNBDataByVector(data: util.Vector[String], times: Int): Unit = {
@@ -45,7 +45,7 @@ object ConvertMRToNeighborCellDemo extends Using {
         cnt += 1
       }
     }
-    log.info(s"[testProcessNBDataByVector] RunTimes: $cnt, CostTime: $costTime ms.")
+    logger.info(s"[testProcessNBDataByVector] RunTimes: $cnt, CostTime: $costTime ms.")
   }
 
 }

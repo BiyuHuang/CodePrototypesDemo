@@ -1,18 +1,17 @@
 package com.wallace.spark.sparkstreaming.kafkademo
 
-import java.io.{File, FileInputStream}
-import java.nio.ByteBuffer
-import java.util
-import java.util.Properties
-
 import com.wallace.common.Using
 import kafka.common.OffsetAndMetadata
 import kafka.coordinator.{BaseKey, GroupMetadataManager}
 import org.apache.kafka.clients.consumer.{ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.{PartitionInfo, TopicPartition}
 
-import scala.collection.JavaConversions._
+import java.nio.ByteBuffer
+import java.util
+import java.util.Properties
+import scala.collection.convert.ImplicitConversions.`iterable AsScalaIterable`
 import scala.collection.mutable
+import scala.jdk.CollectionConverters.{asScalaBufferConverter, iterableAsScalaIterableConverter, seqAsJavaListConverter, setAsJavaSetConverter}
 
 /**
   * Created by 10192057 on 2017/8/4.
@@ -38,7 +37,7 @@ object KafkaConsumerDemo extends Using {
     using(createConsumer[ByteBuffer, ByteBuffer]("org.apache.kafka.common.serialization.ByteBufferDeserializer", "org.apache.kafka.common.serialization.ByteBufferDeserializer")) {
       consumer =>
         val p: TopicPartition = new TopicPartition(topics.head, "wallace_temp".hashCode % 30)
-        consumer.assign(Set(p))
+        consumer.assign(Set(p).asJava)
         //consumer.seekToBeginning(Set(p))
         // consumer.seekToEnd(parts)
         //        parts.foreach {
@@ -58,11 +57,11 @@ object KafkaConsumerDemo extends Using {
       consumer =>
         //consumer.assign(List(p0, p1))
         val partitions: util.List[PartitionInfo] = consumer.partitionsFor(topics.last)
-        val parts: mutable.Seq[TopicPartition] = partitions.map {
+        val parts: mutable.Seq[TopicPartition] = partitions.asScala.map {
           p =>
             new TopicPartition(p.topic(), p.partition())
         }
-        consumer.assign(parts)
+        consumer.assign(parts.asJava)
         //consumer.seekToBeginning(parts)
         // consumer.seekToEnd(parts)
         //        parts.foreach {
@@ -72,7 +71,7 @@ object KafkaConsumerDemo extends Using {
 
         partitions.map(x => x.toString).foreach(p => log.error("[KafkaConsumerDemo] %s".format(p)))
         val record: ConsumerRecords[String, String] = consumer.poll(20480L)
-        record.map(x => (x.key(), x.value())).foreach {
+        record.asScala.map(x => (x.key(), x.value())).foreach {
           r =>
             log.error(s"[KafkaConsumerDemo]\nKey: %s\nValue: %s".format(r._1, r._2))
         }

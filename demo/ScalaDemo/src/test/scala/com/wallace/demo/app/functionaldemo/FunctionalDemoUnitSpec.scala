@@ -18,16 +18,16 @@ class FunctionalDemoUnitSpec extends UnitSpec {
   teamID should "do unit test for Functional Demo" in {
     val a: Int = 3
     val b: BigInt = FunctionalDemo.toBigInt(a)
-    log.info(s"${Int.MaxValue}, ${Int.MinValue}, ${b.pow(a)}")
-    log.info(s"${p0(1, 2, 3)}") // 6
-    log.info(s"${p2(100)}") // 130
-    log.info(s"${p3(10, 1)}")
-    log.info("[Partial Functions] " + FunctionalDemo.divide(10))
-    log.info("[Partial Functions] " + FunctionalDemo.divide1(10))
-    log.info("[Partial Functions] " + FunctionalDemo.direction(180))
-    log.info("[匿名函数] " + FunctionalDemo.m1(2))
-    log.info("[偏应用函数] " + FunctionalDemo.sum(1, 2, 3))
-    log.info("Curry 函数] " + FunctionalDemo.curriedSum(5)(6))
+    logger.info(s"${Int.MaxValue}, ${Int.MinValue}, ${b.pow(a)}")
+    logger.info(s"${p0(1, 2, 3)}") // 6
+    logger.info(s"${p2(100)}") // 130
+    logger.info(s"${p3(10, 1)}")
+    logger.info("[Partial Functions] " + FunctionalDemo.divide(10))
+    logger.info("[Partial Functions] " + FunctionalDemo.divide1(10))
+    logger.info("[Partial Functions] " + FunctionalDemo.direction(180))
+    logger.info("[匿名函数] " + FunctionalDemo.m1(2))
+    logger.info("[偏应用函数] " + FunctionalDemo.sum(1, 2, 3))
+    logger.info("Curry 函数] " + FunctionalDemo.curriedSum(5)(6))
 
     val res_1 = FunctionalDemo.p0(1, 2, 3)
     val res_2 = FunctionalDemo.p2(100)

@@ -37,7 +37,7 @@ class DynamicLoadConfig(props: Properties, prefixPath: String, configFiles: Stri
           in.close()
         } catch {
           case NonFatal(e) =>
-            log.error(s"[${this.getClass.getCanonicalName}] Failed to reload $fileName: ${e.printStackTrace()}.")
+            logger.error(s"[${this.getClass.getCanonicalName}] Failed to reload $fileName: ${e.printStackTrace()}.")
         }
     }
   }
@@ -58,7 +58,7 @@ object DynamicLoadConfig extends LogSupport {
       Thread.sleep(10000L)
       val conf1 = props.getProperty("conf1", "default_value")
       val conf2 = props.getProperty("conf2", "default_value")
-      log.info(s"[${this.getClass.getSimpleName}]<$cnt> conf1: $conf1, conf2: $conf2.")
+      logger.info(s"[${this.getClass.getSimpleName}]<$cnt> conf1: $conf1, conf2: $conf2.")
       cnt += 1
     }
   }

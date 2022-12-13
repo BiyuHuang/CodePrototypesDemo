@@ -14,7 +14,7 @@ object MultiThreadTestDemo extends LogSupport {
 
   def main(args: Array[String]): Unit = {
     //创建线程池
-    log.info(s"Thread Pool Size: $currentPoolSize")
+    logger.info(s"Thread Pool Size: $currentPoolSize")
     val threadPool: ExecutorService = Executors.newFixedThreadPool(currentPoolSize)
     try {
       //提交5个线程
@@ -32,12 +32,12 @@ object MultiThreadTestDemo extends LogSupport {
     override def run(): Unit = {
       val threadId = Thread.currentThread().getId
       for (_ <- 1 to 10) {
-        log.info(threadName + "|" + threadId)
+        logger.info(threadName + "|" + threadId)
         Thread.sleep(100)
       }
       val state: Thread.State = Thread.currentThread().getState
       val symbol: Boolean = Thread.currentThread().isAlive
-      log.info(s"Thread State: $state, Thread Symbol: $symbol, Thread Name: $threadName, Thread ID: $threadId")
+      logger.info(s"Thread State: $state, Thread Symbol: $symbol, Thread Name: $threadName, Thread ID: $threadId")
     }
   }
 }

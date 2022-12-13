@@ -8,7 +8,7 @@ import com.wallace.demo.app.common.LogSupport
   */
 class Actor1 extends Actor with LogSupport {
   override def receive: Receive = {
-    case "test" => log.info("received test.")
-    case _ => log.info("received unknown message.")
+    case "test" => logger.info("received test.")
+    case _ => logger.info("received unknown message.")
   }
 }

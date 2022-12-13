@@ -16,7 +16,7 @@ trait ProjectConfig extends LogSupport {
   protected val configHome = "../vmax-conf/"
 
   def setConfigFiles(files: String*): Unit = synchronized {
-    log.debug(s"config home: $configHome")
+    logger.debug(s"config home: $configHome")
     config = files.toList.map(load).reduce((a, b) => a.withFallback(b))
   }
 
@@ -24,10 +24,10 @@ trait ProjectConfig extends LogSupport {
     val resourceFile = file
     val configFile = new File(makePath(file))
     if (configFile.exists()) {
-      log.debug(s"Loading file [${configFile.getPath}] and resource [$resourceFile]")
+      logger.debug(s"Loading file [${configFile.getPath}] and resource [$resourceFile]")
       ConfigFactory.parseFile(configFile).withFallback(ConfigFactory.load(resourceFile))
     } else {
-      log.debug(s"Loading resource [$resourceFile]")
+      logger.debug(s"Loading resource [$resourceFile]")
       ConfigFactory.load(resourceFile)
     }
   }

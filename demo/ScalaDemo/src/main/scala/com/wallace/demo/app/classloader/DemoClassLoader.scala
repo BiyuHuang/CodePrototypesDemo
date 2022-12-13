@@ -28,10 +28,10 @@ object DemoClassLoader extends Using {
         if (file.exists()) {
           loader.addURL(file.toURI.toURL)
         } else {
-          log.warn(s"Local jar $file does not exist, skipping.")
+          logger.warn(s"Local jar $file does not exist, skipping.")
         }
       case _ =>
-        log.warn(s"Skip remote jar $uri.")
+        logger.warn(s"Skip remote jar $uri.")
     }
   }
 
@@ -82,13 +82,13 @@ object DemoClassLoader extends Using {
       mainClass.newInstance().asInstanceOf[DecompressionFactory]
     } else {
       if (classOf[scala.App].isAssignableFrom(mainClass)) {
-        log.warn("Subclasses of scala.App may not work correctly. Use a new Object instead.")
+        logger.warn("Subclasses of scala.App may not work correctly. Use a new Object instead.")
       }
       new DecompressionFactory()
     }
 
     val res = instance.getDecompression("test.zip")
 
-    log.info(res.getClass.getName.stripSuffix("$"))
+    logger.info(res.getClass.getName.stripSuffix("$"))
   }
 }

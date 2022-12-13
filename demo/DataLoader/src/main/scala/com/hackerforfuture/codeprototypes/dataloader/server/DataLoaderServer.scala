@@ -65,8 +65,8 @@ object DataLoaderServer extends LogSupport {
         startupComplete.set(false)
         isShuttingDown.set(false)
         shutdownLatch.countDown()
+        log.info("Succeed to shutdown DataLoader.")
       }
-
     } catch {
       case NonFatal(e) =>
         log.error("Fatal error during DataLoaderServer shutdown.", e)

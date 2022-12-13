@@ -16,27 +16,22 @@ object AsyncDemo extends Using {
 
 
   def main(args: Array[String]): Unit = {
-    value onSuccess {
-      case res => log.info(s"[OnSuccess] $res")
-      case error => log.info(s"[OnSuccess] $error")
-    }
-
     value.onComplete {
-      case Success(res) => log.info(s"[OnComplete] $res")
-      case Failure(e) => log.info(s"[OnComplete] $e")
+      case Success(res) => logger.info(s"[OnComplete] $res")
+      case Failure(e) => logger.info(s"[OnComplete] $e")
     }
 
     Thread.sleep(100)
 
     value.value.get match {
       case Success(res) =>
-        log.info(s"[Match] $res")
+        logger.info(s"[Match] $res")
       case Failure(e) =>
-        log.info(s"[Match] $e")
+        logger.info(s"[Match] $e")
         throw e
     }
 
 
-    log.info("Shutting down...")
+    logger.info("Shutting down...")
   }
 }
