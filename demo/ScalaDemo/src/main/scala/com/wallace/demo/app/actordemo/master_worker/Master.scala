@@ -12,19 +12,19 @@ import java.util
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.{ConcurrentHashMap, LinkedBlockingQueue}
-
 import akka.actor.{Actor, ActorRef, ActorSelection, ActorSystem, DeadLetter, Props, UnhandledMessage}
 import com.typesafe.config.{Config, ConfigFactory}
 import sun.misc.{Signal, SignalHandler}
 
+import java.io.{BufferedReader, InputStream, InputStreamReader}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
 /**
-  * Created by 10192057 on 2018/6/20 0020.
-  */
+ * Created by 10192057 on 2018/6/20 0020.
+ */
 class Master(val host: String, val port: Int) extends Actor {
   val id2WorkInfo = new mutable.HashMap[String, WorkerInfo]()
   val workers = new mutable.HashSet[WorkerInfo]()

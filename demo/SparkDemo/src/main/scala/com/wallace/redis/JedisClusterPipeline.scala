@@ -16,15 +16,16 @@ import scala.collection.mutable.ArrayBuffer
  */
 class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with Closeable {
   self =>
-  private val FIELD_CONNECTION_HANDLER: Field = getField(classOf[BinaryJedisCluster], "connectionHandler")
-  private val FIELD_CACHE: Field = getField(classOf[JedisClusterConnectionHandler], "cache")
-  private val clients: util.LinkedList[Client] = new util.LinkedList[Client]()
-  private val jedisMap: util.HashMap[JedisPool, Jedis] = new util.HashMap[JedisPool, Jedis]()
-  private val hasDataInBuf: AtomicBoolean = new AtomicBoolean(false)
-  private val connectionHandler: JedisSlotBasedConnectionHandler = getValue(jedisCluster, FIELD_CONNECTION_HANDLER)
-    .asInstanceOf[JedisSlotBasedConnectionHandler]
-  private val clusterInfoCache: JedisClusterInfoCache = getValue(connectionHandler, FIELD_CACHE)
-    .asInstanceOf[JedisClusterInfoCache]
+  private final val FIELD_CONNECTION_HANDLER: Field =
+    getField(classOf[BinaryJedisCluster], "connectionHandler")
+  private final val FIELD_CACHE: Field = getField(classOf[JedisClusterConnectionHandler], "cache")
+  private final val clients: util.LinkedList[Client] = new util.LinkedList[Client]()
+  private final val jedisMap: util.HashMap[JedisPool, Jedis] = new util.HashMap[JedisPool, Jedis]()
+  private final val hasDataInBuf: AtomicBoolean = new AtomicBoolean(false)
+  private final val connectionHandler: JedisSlotBasedConnectionHandler =
+    getValue(jedisCluster, FIELD_CONNECTION_HANDLER)
+  private final val clusterInfoCache: JedisClusterInfoCache =
+    getValue(connectionHandler, FIELD_CACHE)
 
   override def getClient(key: String): Client = {
     val binaryKey: Array[Byte] = SafeEncoder.encode(key)
@@ -41,15 +42,15 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
   private def getJedis(slot: Int): Jedis = {
     val pool: JedisPool = clusterInfoCache.getSlotPool(slot)
     val tryGetJedis: Option[Jedis] = Option(jedisMap.get(pool))
-    val jedisCli: Jedis = if (tryGetJedis.isEmpty) {
-      val tmp: Jedis = pool.getResource
-      jedisMap.put(pool, tmp)
-      tmp
+    val jedisClient: Jedis = if (tryGetJedis.isEmpty) {
+      val jedis: Jedis = pool.getResource
+      jedisMap.put(pool, jedis)
+      jedis
     } else {
       tryGetJedis.get
     }
     hasDataInBuf.set(true)
-    jedisCli
+    jedisClient
   }
 
   def pipelineSetEx(data: Array[KVDataEX]): Unit = {
@@ -59,7 +60,7 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
           val expireTime: Int = elem.expireTime
           self.setex(elem.key, expireTime, elem.value)
       }
-      syncAndReturnAll
+      syncAndReturnAll()
     } catch {
       case e: Exception =>
         throw new RuntimeException("[setex] operator error", e)
@@ -70,7 +71,7 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
     val result: ArrayBuffer[KVData] = new ArrayBuffer[KVData]()
     try {
       keys.foreach(self.hgetAll)
-      val res = syncAndReturnAll.map(_.asInstanceOf[util.Map[String, String]])
+      val res = syncAndReturnAll().map(_.asInstanceOf[util.Map[String, String]])
 
       res.foreach {
         elem =>
@@ -85,9 +86,9 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
     result.result().toArray[KVData]
   }
 
-  def syncAndReturnAll: Array[Any] = innerSync
+  def syncAndReturnAll(): Array[Any] = innerSync()
 
-  private def innerSync: Array[Any] = {
+  private def innerSync(): Array[Any] = {
     val responseList: ArrayBuffer[Any] = new ArrayBuffer[Any]()
     val clientSet: util.HashSet[Client] = new util.HashSet[Client]()
     var isExcept: Boolean = true
@@ -166,9 +167,9 @@ class JedisClusterPipeline(jedisCluster: JedisCluster) extends PipelineBase with
     }
   }
 
-  private def getValue[T](obj: AnyRef, field: Field): AnyRef = {
+  private def getValue[T](obj: AnyRef, field: Field): T = {
     try {
-      field.get(obj)
+      field.get(obj).asInstanceOf[T]
     } catch {
       case e@(_: IllegalAccessException | _: IllegalArgumentException) =>
         throw new RuntimeException("failed to get value", e)

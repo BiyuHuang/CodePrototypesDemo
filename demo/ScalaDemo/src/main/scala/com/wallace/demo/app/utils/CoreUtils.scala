@@ -1,8 +1,9 @@
 package com.wallace.demo.app.utils
 
-import java.io.EOFException
-import java.nio.{ByteBuffer, ByteOrder}
+import java.io.{BufferedReader, EOFException, InputStream, InputStreamReader}
+import java.nio.ByteBuffer
 import java.nio.channels.ReadableByteChannel
+import scala.collection.mutable
 
 /**
   * Created by 10192057 on 2018/6/8 0008.
@@ -28,5 +29,20 @@ object CoreUtils {
       ((bytes(offset + 1) & 0xFF) << 16) |
       ((bytes(offset + 2) & 0xFF) << 8) |
       (bytes(offset + 3) & 0xFF)
+  }
+
+  def streamToString(is: InputStream): String = {
+    val rd: BufferedReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))
+    val builder: mutable.StringBuilder = new mutable.StringBuilder()
+    try {
+      var line = rd.readLine
+      while (line != null) {
+        builder.append(line + "\n")
+        line = rd.readLine
+      }
+    } finally {
+      rd.close()
+    }
+    builder.toString
   }
 }
