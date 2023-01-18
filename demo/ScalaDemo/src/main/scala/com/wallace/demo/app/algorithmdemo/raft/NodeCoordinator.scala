@@ -41,7 +41,7 @@ class NodeCoordinator(sleepMills: Long, name: String, host: String, nodeProps: P
   private final val cacheLeaderHeartbeat = new AtomicReference[Entry[String, Long]]()
 
   private final val internalActor: ActorRef =
-    ACTOR_SYSTEM.actorOf(Props(new HeartbeatActor()), "node-internal-actor")
+    ACTOR_SYSTEM.actorOf(Props(new InternalActor()), "node-internal-actor")
 
   override def stop(): Unit = {
     ACTOR_SYSTEM.stop(internalActor)
@@ -68,7 +68,7 @@ class NodeCoordinator(sleepMills: Long, name: String, host: String, nodeProps: P
 
   }
 
-  private class HeartbeatActor() extends Actor {
+  private class InternalActor() extends Actor {
     val nodeActors: mutable.HashMap[String, ActorSelection] = new mutable.HashMap()
 
     def getMessage: Any = {
@@ -129,7 +129,7 @@ class NodeCoordinator(sleepMills: Long, name: String, host: String, nodeProps: P
               cacheLeaderHeartbeat.set(Entry(nodeID, currentTimestamp))
             } else {
               if (currentTimestamp - cacheLeaderHeartbeat.get().value > 100) {
-                //todo doElection()
+                doElection()
               } else {
                 cacheLeaderHeartbeat.set(Entry(nodeID, currentTimestamp))
               }
