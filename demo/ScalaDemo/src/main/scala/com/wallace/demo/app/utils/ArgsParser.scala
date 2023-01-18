@@ -73,7 +73,9 @@ object ArgsParser extends Using with LazyLogging {
     if (null != path && path.nonEmpty) {
       jobProps.load(new FileReader(path))
     } else {
-      jobProps.load(this.getClass.getClassLoader.getResourceAsStream(defaultProps))
+      if (defaultProps != null && defaultProps.nonEmpty) {
+        jobProps.load(this.getClass.getClassLoader.getResourceAsStream(defaultProps))
+      }
     }
     jobProps
   }
