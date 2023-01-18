@@ -1,7 +1,9 @@
 package com.wallace.demo.app.algorithmdemo.raft
 
 import com.wallace.demo.app.common.LogSupport
+import com.wallace.demo.app.utils.ArgsParser
 
+import java.util.Properties
 import java.util.concurrent.CountDownLatch
 import scala.util.control.NonFatal
 
@@ -21,8 +23,10 @@ object TestBoot extends LogSupport {
           countDownLatch.countDown()
         }
       })
-
-      val node1: NodeCoordinator = NodeCoordinator(5000L, "node1")
+      val nodeProps: Properties = ArgsParser.loadProps(args, "")
+      nodeProps.setProperty("node.actor.list", "node1,node2,node3")
+      nodeProps.setProperty("node.actor.port", "10001")
+      val node1: NodeCoordinator = NodeCoordinator(5000L, "RaftActorSystem", "localhost", nodeProps)
       node1.init()
       node1.start()
     } catch {
