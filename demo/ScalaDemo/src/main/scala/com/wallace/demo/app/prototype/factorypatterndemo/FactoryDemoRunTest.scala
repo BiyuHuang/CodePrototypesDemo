@@ -1,4 +1,4 @@
-package com.wallace.demo.app.factorypatterndemo
+package com.wallace.demo.app.prototype.factorypatterndemo
 
 import com.wallace.demo.app.common.LogSupport
 

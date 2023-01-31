@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap
 trait ActorSystemSupport {
   protected val builder: ActorSystemBuilder = new ActorSystemBuilder()
 
-  private class ActorSystemBuilder() {
+  class ActorSystemBuilder() {
     private final val actorConfMap = new ConcurrentHashMap[String, String]()
 
     private var HOST: Option[String] = None

@@ -1,4 +1,4 @@
-package com.wallace.demo.app.builderdemo
+package com.wallace.demo.app.prototype.builderdemo
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}

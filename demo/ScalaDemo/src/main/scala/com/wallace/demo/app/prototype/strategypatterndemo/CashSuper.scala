@@ -1,4 +1,4 @@
-package com.wallace.demo.app.strategypatterndemo
+package com.wallace.demo.app.prototype.strategypatterndemo
 
 /**
   * Created by Wallace on 2017/4/16.

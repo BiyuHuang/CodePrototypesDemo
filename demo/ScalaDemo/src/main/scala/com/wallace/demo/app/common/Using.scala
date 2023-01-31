@@ -6,22 +6,22 @@ import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
 
 trait Using extends FuncRuntimeDur {
-  protected def usingWithErrMsg[A <: {def close() : Unit}, B](param: A, errMsg: String)(f: A => B): Unit = {
+  protected def usingWithErrMsg[C <: {def close(): Unit}, R](ctx: C, errMsg: String)(func: C => R): Unit = {
     try {
-      f(param)
+      func(ctx)
     } catch {
       case NonFatal(e) =>
         logger.error(s"$errMsg: ", e)
     } finally {
-      param.close()
+      ctx.close()
     }
   }
 
-  protected def using[A <: {def close() : Unit}, B](param: A)(f: A => B): B = {
+  protected def using[C <: {def close(): Unit}, R](ctx: C)(func: C => R): R = {
     try {
-      f(param)
+      func(ctx)
     } finally {
-      param.close()
+      ctx.close()
     }
   }
 }
