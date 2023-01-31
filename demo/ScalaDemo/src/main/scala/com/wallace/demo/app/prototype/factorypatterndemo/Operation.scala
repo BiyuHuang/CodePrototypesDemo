@@ -1,4 +1,4 @@
-package com.wallace.demo.app.factorypatterndemo
+package com.wallace.demo.app.prototype.factorypatterndemo
 
 /**
   * Created by Wallace on 2017/4/15.

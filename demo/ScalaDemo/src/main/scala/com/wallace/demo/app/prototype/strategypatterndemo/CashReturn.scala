@@ -1,4 +1,4 @@
-package com.wallace.demo.app.strategypatterndemo
+package com.wallace.demo.app.prototype.strategypatterndemo
 
 import scala.util.Try
 
