@@ -365,6 +365,10 @@
                     <artifactId>reload4j</artifactId>
                     <groupId>ch.qos.reload4j</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>curator-client</artifactId>
+                    <groupId>org.apache.curator</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -507,6 +511,28 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
+        </dependency>
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-quartz</artifactId>-->
+        <!--            <version>2.5.3</version>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <artifactId>log4j-to-slf4j</artifactId>-->
+        <!--                    <groupId>org.apache.logging.log4j</groupId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>2.13.0</version>
         </dependency>
 
         <dependency>
