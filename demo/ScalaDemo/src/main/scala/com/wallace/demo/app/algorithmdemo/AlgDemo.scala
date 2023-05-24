@@ -103,6 +103,12 @@ object AlgDemo extends LogSupport {
     // TODO 6 Find median in two sorted Arrays
     //    val kMinValue: Double = findMedianSortedArrays(Array(1, 3), Array(2))
     //    println(s"Median Value: $kMinValue")
+
+    // maxContinuousPositive
+    // int(120) => binary(1111000),return 4
+    // int(101) => binary(1100101),return 2
+    maxContinuousPositive(120)
+    maxContinuousPositive(101)
   }
 
   def twoSum(d: Array[Int], target: Int): Unit = {
@@ -211,10 +217,10 @@ object AlgDemo extends LogSupport {
         val tgtLen: Int = tgtArr.length
         var i: Int = 0
         var res: Int = -1
-        val firstTgt: Char = tgtArr.map{case (ch, _) => ch}.head
+        val firstTgt: Char = tgtArr.map { case (ch, _) => ch }.head
         while (i <= (srcLen - tgtLen)) {
           val firstSrc: Char = srcArr(i)
-          if (firstTgt == firstSrc && tgtArr.forall{case (ch, idx) => ch == srcArr(i + idx)}) {
+          if (firstTgt == firstSrc && tgtArr.forall { case (ch, idx) => ch == srcArr(i + idx) }) {
             res = i
             i = srcLen
           } else {
@@ -295,5 +301,35 @@ object AlgDemo extends LogSupport {
         i += 1
       }
     false
+  }
+
+  def maxContinuousPositive[T <: AnyVal](value: T): Int = {
+    require(value match {
+      case _: Long | _: Int | _: Char | _: Short | _: Byte => true
+      case _ => false
+    }, s"not support data-type: ${value.getClass.getSimpleName}")
+    var tmp: Long = value.toString.toLong
+    if (tmp <= 0) {
+      0
+    } else {
+      val dp: ArrayBuffer[Int] = new ArrayBuffer[Int]()
+      var index: Int = 0
+      dp.append((tmp % 2).toInt)
+      tmp /= 2
+      index += 1
+      while (tmp != 0) {
+        val isPositive: Boolean = ((tmp % 2) & 1) == 1
+
+        if (isPositive) {
+          dp.append(dp(index - 1) + 1)
+        } else {
+          dp.append(0)
+        }
+        tmp /= 2
+        index += 1
+        println(dp.mkString("DP => ArrayBuffer(", ", ", ")"))
+      }
+      dp.max
+    }
   }
 }
