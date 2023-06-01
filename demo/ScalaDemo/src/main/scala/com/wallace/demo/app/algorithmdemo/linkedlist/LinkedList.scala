@@ -129,6 +129,8 @@ class LinkedList[T]() {
       true
     }
   }
+
+  //TODO scan nodes by previous order
 }
 
 object Boot extends LogSupport {
