@@ -64,13 +64,24 @@ abstract class TreeNode[T, BaseType <: TreeNode[T, BaseType]] {
     s"TreeNode{isEnd=${this.getEnd}, deep=${this.getDeep}, content=${this.getContent}, " +
       s"children=[${this.getChildren.map(x => s"${x.toString}").mkString(",")}]}"
   }
+
+  def treeString(depth: Int): String = {
+    var prefix = "\t"
+    if (depth > 0) {
+      prefix = "\t" * (depth + 1)
+    }
+    val childStr = this.getChildren.map(x => s"\n$prefix${x.treeString(depth + 1)}").mkString(",")
+    s"TreeNode{isEnd=${this.getEnd}, deep=${this.getDeep}, content=${this.getContent}, " +
+      s"children=[$childStr]}"
+
+  }
 }
 
 class TrieTree {
   private val root = new TrieTreeNode(None)
 
 
-  override def toString: String = this.root.toString
+  override def toString: String = this.root.treeString(0)
 
   def addWord(word: String): Unit = {
     var curNode = root
