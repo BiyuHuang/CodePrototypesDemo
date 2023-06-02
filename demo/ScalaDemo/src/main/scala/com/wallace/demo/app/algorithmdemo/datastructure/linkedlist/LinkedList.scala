@@ -1,4 +1,4 @@
-package com.wallace.demo.app.algorithmdemo.linkedlist
+package com.wallace.demo.app.algorithmdemo.datastructure.linkedlist
 
 import com.wallace.demo.app.common.LogSupport
 

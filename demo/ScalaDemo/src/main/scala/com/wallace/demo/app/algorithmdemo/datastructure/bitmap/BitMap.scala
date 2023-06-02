@@ -1,4 +1,4 @@
-package com.wallace.demo.app.algorithmdemo
+package com.wallace.demo.app.algorithmdemo.datastructure.bitmap
 
 /**
  * Created by wallace on 2019/10/28.
