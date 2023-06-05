@@ -65,15 +65,25 @@ abstract class TreeNode[T, BaseType <: TreeNode[T, BaseType]] {
       s"children=[${this.getChildren.map(x => s"${x.toString}").mkString(",")}]}"
   }
 
-  def treeString(depth: Int): String = {
-    var prefix = "\t"
-    if (depth > 0) {
-      prefix = "\t" * (depth + 1)
+  def treeString(depth: Int, prefix: String = "+- ", isLastNode: Boolean = false): String = {
+    val currentPrefix: String = if (depth > 0) {
+      val sep = if (this.getParentNode.isDefined && this.getParentNode.get.getChildren.size <= 1) {
+        " "
+      } else {
+        if (isLastNode) " " else "|"
+      }
+      prefix.replace("+- ", "") + sep + (" " * (depth + 1)) + "+- "
+    } else {
+      prefix
     }
-    val childStr = this.getChildren.map(x => s"\n$prefix${x.treeString(depth + 1)}").mkString(",")
+    val nodeNum: Int = this.getChildren.size
+    val childStr: String = this.getChildren.zipWithIndex.map {
+      case (x, index) =>
+        val isLastNode = if (nodeNum > 1 && index == (nodeNum - 1)) true else false
+        s"\n$currentPrefix${x.treeString(depth + 1, currentPrefix, isLastNode)}"
+    }.mkString(",")
     s"TreeNode{isEnd=${this.getEnd}, deep=${this.getDeep}, content=${this.getContent}, " +
       s"children=[$childStr]}"
-
   }
 }
 
@@ -127,7 +137,7 @@ class TrieTree {
 
 object TrieTree extends LogSupport {
   def main(args: Array[String]): Unit = {
-    val data: Array[String] = Array("flow", "flower", "flight", "")
+    val data: Array[String] = Array("flow", "flower", "florida", "flight", "world", "worry")
     val trieTree: TrieTree = new TrieTree()
     data.foreach {
       w =>
