@@ -43,6 +43,16 @@ abstract class TreeNode[T, BaseType <: TreeNode[T, BaseType]] {
     true
   }
 
+  def removeChild(child: BaseType): Boolean = {
+    if (this.children.contains(child)) {
+      this.children.-=(child)
+      true
+    } else {
+      false
+    }
+  }
+
+
   def setChildren(children: ArrayBuffer[BaseType]): Boolean = {
     children.forall {
       child =>
@@ -88,7 +98,7 @@ abstract class TreeNode[T, BaseType <: TreeNode[T, BaseType]] {
 }
 
 class TrieTree {
-  private val root = new TrieTreeNode(None)
+  private val root: TrieTreeNode = new TrieTreeNode(None)
 
 
   override def toString: String = this.root.treeString(0)
@@ -108,13 +118,52 @@ class TrieTree {
     curNode.setEnd(true)
   }
 
-  def hasWord(word: String): Boolean = ???
+  def hasWord(word: String): Boolean = {
+    var curNode: TrieTreeNode = root
+    word.toCharArray.foreach {
+      ch =>
+        val node: TrieTreeNode = new TrieTreeNode(Option(ch))
+        if (curNode.findNode(node).isDefined) {
+          curNode = curNode.findNode(node).get
+        } else {
+          return false
+        }
+    }
+    curNode.getEnd
+  }
 
-  def removeWord(word: String): Boolean = ???
+  def removeWord(word: String): Boolean = {
+    if (hasWord(word)) {
+      var curNode: TrieTreeNode = root
+      word.toCharArray.foreach {
+        ch =>
+          val node: TrieTreeNode = new TrieTreeNode(Option(ch))
+          curNode = curNode.findNode(node).get
+      }
+      curNode.setEnd(false)
+      if (curNode.getChildren.isEmpty) {
+        // no children
+        var parentNode: Option[TrieTreeNode] = curNode.getParentNode
+        while (parentNode.isDefined) {
+          if (parentNode.get.getChildren.size == 1 && !parentNode.get.getEnd) {
+            parentNode.get.removeChild(curNode)
+            curNode = parentNode.get
+            parentNode = curNode.getParentNode
+          } else {
+            parentNode.get.removeChild(curNode)
+            return true
+          }
+        }
+      }
+      true
+    } else {
+      false
+    }
+  }
 
   def visitNode: String = ???
 
-  def getPrefix: String = ???
+  def getCommonPrefix: String = ???
 
   class TrieTreeNode(content: Option[Char]) extends TreeNode[Char, TrieTreeNode] {
     override def hashCode(): Int = {
@@ -143,6 +192,12 @@ object TrieTree extends LogSupport {
       w =>
         trieTree.addWord(w)
     }
+    logger.info(trieTree.toString)
+
+    logger.info("word isn't exists: " + trieTree.hasWord("word").toString)
+    logger.info("florida is exists: " + trieTree.hasWord("florida").toString)
+
+    trieTree.removeWord("florida")
     logger.info(trieTree.toString)
   }
 }
