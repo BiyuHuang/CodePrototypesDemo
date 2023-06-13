@@ -1,5 +1,7 @@
 package com.wallace.demo.app.algorithmdemo.datastructure.bitmap
 
+import com.wallace.demo.app.common.LogSupport
+
 import java.lang.Math._
 import scala.collection.mutable.ArrayBuffer
 import scala.util.hashing.MurmurHash3
@@ -73,10 +75,31 @@ class BitFilter[T <: AnyVal](n: Long, p: Double = 0.0001) {
     val res: ArrayBuffer[Long] = new ArrayBuffer[Long]()
     var number: Long = start
     while (res.size < k) {
-      System.out.println(number)
       if (isPrime(number)) res.append(number)
       number += 1
     }
     res.result().toArray
+  }
+
+  def show(num: Int): Unit = this.bitMap.show(num)
+
+  def bitCount: Long = this.bitMap.bitCount
+}
+
+object BitFilter extends LogSupport {
+  def main(args: Array[String]): Unit = {
+    val bitFilter: BitFilter[Int] = new BitFilter[Int](100)
+    Array(1, 2, 3, 5, 8, 30, 32, 64, 56, 159, 120, 21, 17, 35, 45, 320).foreach(bitFilter.add)
+
+    if (bitFilter.exists(320)) {
+      logger.info("Temp: 320 exists")
+    }
+
+    if (!bitFilter.exists(321)) {
+      logger.info("Temp: 321 doesn't exist")
+    }
+    bitFilter.show(100)
+    logger.info(s"{bitCount=${bitFilter.bitCount}, k=${bitFilter.getK}," +
+      s" size=${bitFilter.getSize / 1024}KB, FPR=${bitFilter.getFPR}}")
   }
 }
