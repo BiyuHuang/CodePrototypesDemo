@@ -24,10 +24,18 @@ object FlinkCEPDemo extends LogSupport {
         LoginEvent("user_1", "192.168.0.1", "fail", 2000L),
         LoginEvent("user_1", "192.168.0.2", "fail", 3000L),
         LoginEvent("user_1", "192.168.0.3", "fail", 4000L),
-        LoginEvent("user_2", "192.168.10.10", "success", 5000L)
+        LoginEvent("user_2", "192.168.10.10", "fail", 5000L),
+        LoginEvent("user_2", "192.168.10.11", "fail", 6000L),
+        LoginEvent("user_2", "192.168.10.12", "fail", 9000L),
+        LoginEvent("user_3", "192.168.19.3", "fail", 10000L),
+        LoginEvent("user_3", "192.168.19.4", "fail", 30000L),
+        LoginEvent("user_3", "192.168.19.5", "success", 35000L),
+        LoginEvent("user_4", "192.168.19.15", "success", 50000L),
       )
       .assignAscendingTimestamps(_.eventTime)
       .keyBy(r => r.userId)
+
+    stream.print("login_event ")
 
     val pattern: Pattern[LoginEvent, LoginEvent] = Pattern
       .begin[LoginEvent]("first")
@@ -48,8 +56,9 @@ object FlinkCEPDemo extends LogSupport {
 
         (first.userId, first.ip, second.ip, third.ip)
       })
-      .print()
+      .printToErr("result ")
 
     scalaEnv.execute()
+    logger.info("stop to run Flink CEP demo")
   }
 }
