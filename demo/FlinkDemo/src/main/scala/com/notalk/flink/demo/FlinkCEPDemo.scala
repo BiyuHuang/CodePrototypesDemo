@@ -12,15 +12,18 @@ import org.apache.flink.streaming.api.windowing.time.Time
 /**
  * Author: biyu.huang
  * Date: 2023/7/27 14:38
- * Description:
+ * Description: A demo of Flink CEP to detect patterns in a stream of login events
  */
 object FlinkCEPDemo extends LogSupport {
   def main(args: Array[String]): Unit = {
-    logger.info("start to run Flink CEP demo ... ")
+    logger.info("Start running Flink CEP demo...")
+
+    // Set up the Flink execution environment
     val scalaEnv: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     scalaEnv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     scalaEnv.setParallelism(1)
 
+    // Define the stream of login events
     val stream: KeyedStream[LoginEvent, String] = scalaEnv
       .fromElements(
         LoginEvent("user_1", "192.168.0.1", "fail", 2000L),
@@ -39,18 +42,22 @@ object FlinkCEPDemo extends LogSupport {
         LoginEvent("user_5", "192.168.44.11", "fail", 54000L),
       )
       .assignAscendingTimestamps(_.eventTime)
-      .keyBy(r => r.userId)
+      .keyBy(_.userId)
 
-    stream.print("login_event ")
+    // Print the login events
+    stream.print("login_event")
 
+    // Define the pattern for three consecutive failed login attempts
     val threeTimesFailPattern: Pattern[LoginEvent, LoginEvent] = Pattern
       .begin[LoginEvent]("first")
-      .where(r => r.eventType.equals("fail"))
+      .where(_.eventType == "fail")
       .next("second")
-      .where(r => r.eventType.equals("fail"))
+      .where(_.eventType == "fail")
       .next("third")
-      .where(r => r.eventType.equals("fail"))
+      .where(_.eventType == "fail")
       .within(Time.seconds(5))
+
+    // Apply the pattern to the stream and select the matching events
     val failedStream: PatternStream[LoginEvent] = CEP.pattern(stream, threeTimesFailPattern)
     failedStream
       .select((pattern: scala.collection.Map[String, Iterable[LoginEvent]]) => {
@@ -60,29 +67,31 @@ object FlinkCEPDemo extends LogSupport {
 
         (first.userId, first.ip, second.ip, third.ip)
       })
-      .printToErr("fail_result ")
+      .printToErr("fail_result")
 
+    // Define the pattern for a successful login following a failed attempt
     val successPattern: Pattern[LoginEvent, LoginEvent] = Pattern
-      .begin[LoginEvent]("fail", AfterMatchSkipStrategy.skipPastLastEvent()) // skipToFirst("success")
+      .begin[LoginEvent]("fail", AfterMatchSkipStrategy.skipPastLastEvent())
       .optional
-      .where(r => r.eventType.equals("fail"))
+      .where(_.eventType == "fail")
       .followedBy("success")
-      .where(r => r.eventType.equals("success"))
+      .where(_.eventType == "success")
       .within(Time.seconds(30))
+
+    // Apply the pattern to the stream and select the matching events
     val successStream = CEP.pattern(stream, successPattern)
     successStream.select((pattern: scala.collection.Map[String, Iterable[LoginEvent]]) => {
-      val fail = if (pattern.contains("fail")) {
-        pattern("fail").iterator.next()
-      } else {
-        LoginEvent("", "", "", 0L)
-      }
-      val success = pattern("success").iterator.next()
+      val iterator: Iterator[LoginEvent] = pattern.getOrElse("fail", Iterable.empty).iterator
+      val fail: LoginEvent = if (iterator.hasNext) iterator.next() else LoginEvent("", "", "", 0L)
+      val success: LoginEvent = pattern("success").iterator.next()
 
       (success.userId, fail.ip, success.ip)
     })
       .printToErr("success_result")
 
+    // Execute the Flink job
     scalaEnv.execute()
-    logger.info("stop to run Flink CEP demo")
+
+    logger.info("Stop running Flink CEP demo")
   }
 }
