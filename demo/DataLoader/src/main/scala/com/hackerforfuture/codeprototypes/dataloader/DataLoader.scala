@@ -31,7 +31,7 @@ object DataLoader extends LogSupport {
         }
       } catch {
         case e: ReflectiveOperationException =>
-          log.warn("Failed to register optional signal handler that logs a message " +
+          logger.warn("Failed to register optional signal handler that logs a message " +
             "when the process is terminated by a signal. " +
             "Reason for registration failure is: $e", e)
       }
@@ -45,7 +45,7 @@ object DataLoader extends LogSupport {
       DataLoaderServer.awaitShutdown()
     } catch {
       case NonFatal(e) =>
-        log.error("Failed to run DataLoader", e)
+        logger.error("Failed to run DataLoader", e)
         System.exit(1)
     }
     System.exit(0)

@@ -47,7 +47,7 @@ object DataLoaderServer extends LogSupport {
       }
     } catch {
       case NonFatal(e) =>
-        log.error("Failed to execute service thread", e)
+        logger.error("Failed to execute service thread", e)
         isStartingUp.set(false)
         shutdown()
         throw e
@@ -65,11 +65,11 @@ object DataLoaderServer extends LogSupport {
         startupComplete.set(false)
         isShuttingDown.set(false)
         shutdownLatch.countDown()
-        log.info("Succeed to shutdown DataLoader.")
+        logger.info("Succeed to shutdown DataLoader.")
       }
     } catch {
       case NonFatal(e) =>
-        log.error("Fatal error during DataLoaderServer shutdown.", e)
+        logger.error("Fatal error during DataLoaderServer shutdown.", e)
         isShuttingDown.set(false)
         throw e
     }

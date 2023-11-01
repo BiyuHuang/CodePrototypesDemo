@@ -63,7 +63,7 @@ class AntScheduler(threadNum: Int,
     * Initialize this scheduler so it is ready to accept scheduling of tasks
     */
   override def startup(): Unit = {
-    log.debug("Initializing task scheduler.")
+    logger.debug("Initializing task scheduler.")
     this synchronized {
       if (isStarted) throw new IllegalStateException("This scheduler has already been started!")
       executor = Some(new ScheduledThreadPoolExecutor(threadNum))
@@ -81,7 +81,7 @@ class AntScheduler(threadNum: Int,
     * This includes tasks scheduled with a delayed execution.
     */
   override def shutdown(): Unit = {
-    log.debug("Shutting down task scheduler.")
+    logger.debug("Shutting down task scheduler.")
     // We use the local variable to avoid NullPointerException if another thread shuts down scheduler at same time.
     val cachedExecutor: Option[ScheduledThreadPoolExecutor] = this.executor
     if (cachedExecutor.isDefined) {
@@ -110,19 +110,19 @@ class AntScheduler(threadNum: Int,
     * @param unit   The unit for the preceding times.
     */
   override def schedule(name: String, fun: () => Unit, delay: Long, period: Long, unit: TimeUnit): Unit = {
-    log.debug("Scheduling task %s with initial delay %d ms and period %d ms."
+    logger.debug("Scheduling task %s with initial delay %d ms and period %d ms."
       .format(name, TimeUnit.MILLISECONDS.convert(delay, unit), TimeUnit.MILLISECONDS.convert(period, unit)))
     this synchronized {
       ensureRunning()
       val runnable = new Runnable {
         override def run(): Unit = {
           try {
-            log.debug("Beginning execution of scheduled task '%s'.".format(name))
+            logger.debug("Beginning execution of scheduled task '%s'.".format(name))
             fun()
           } catch {
-            case t: Throwable => log.error("Uncaught exception in scheduled task '" + name + "'", t)
+            case t: Throwable => logger.error("Uncaught exception in scheduled task '" + name + "'", t)
           } finally {
-            log.debug("Completed execution of scheduled task '%s'.".format(name))
+            logger.debug("Completed execution of scheduled task '%s'.".format(name))
           }
         }
       }
