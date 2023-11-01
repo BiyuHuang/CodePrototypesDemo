@@ -29,10 +29,10 @@ trait DataScanConfigBase extends LogSupport {
     val resourceFile = file
     val configFile = new File(makePath(file))
     if (configFile.exists()) {
-      log.debug(s"Loading file [${configFile.getPath}] and resource [$resourceFile]")
+      logger.debug(s"Loading file [${configFile.getPath}] and resource [$resourceFile]")
       ConfigFactory.parseFile(configFile).withFallback(ConfigFactory.load(resourceFile))
     } else {
-      log.debug(s"Loading resource [$resourceFile]")
+      logger.debug(s"Loading resource [$resourceFile]")
       ConfigFactory.load(resourceFile)
     }
   }
@@ -62,7 +62,7 @@ trait DataScanConfigBase extends LogSupport {
           (fileName, lastModified)
       }.toMap
     } else {
-      log.warn("Does any upload config file exist?")
+      logger.warn("Does any upload config file exist?")
       Map.empty
     }
   }
@@ -75,7 +75,7 @@ trait DataScanConfigBase extends LogSupport {
         val newLastModified: Long = file.lastModified()
 
         if (newLastModified == oldLastModified) {
-          log.debug(s"$fileName never changed.")
+          logger.debug(s"$fileName never changed.")
           null
         } else {
           lastModifiedMap.updated(fileName, newLastModified)

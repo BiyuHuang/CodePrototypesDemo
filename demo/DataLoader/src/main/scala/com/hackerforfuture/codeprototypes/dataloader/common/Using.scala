@@ -20,7 +20,7 @@ trait Using extends LogSupport {
       f(param)
     } catch {
       case NonFatal(e) =>
-        log.error(s"$errMsg: ", e)
+        logger.error(s"$errMsg: ", e)
     } finally {
       param.close()
     }

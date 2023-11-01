@@ -8,11 +8,9 @@
 
 package com.hackerforfuture.codeprototypes.dataloader.common
 
-import org.slf4j.{Logger, LoggerFactory}
+import com.typesafe.scalalogging.LazyLogging
 
 /**
-  * Created by wallace on 2018/1/20.
-  */
-trait LogSupport {
-  protected val log: Logger = LoggerFactory.getLogger(this.getClass.getName.stripSuffix("$"))
-}
+ * Created by wallace on 2018/1/20.
+ */
+trait LogSupport extends LazyLogging
