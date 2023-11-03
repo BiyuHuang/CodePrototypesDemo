@@ -8,6 +8,7 @@
 
 package com.hackerforfuture.codeprototypes.dataloader.common
 
+import java.util.concurrent.locks.ReentrantLock
 import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
 
@@ -15,6 +16,7 @@ import scala.util.control.NonFatal
   * Created by wallace on 2018/1/20.
   */
 trait Using extends LogSupport {
+  private val lock: ReentrantLock = new ReentrantLock()
   protected def usingWithErrMsg[A <: {def close() : Unit}, B](param: A, errMsg: String)(f: A => B): Unit = {
     try {
       f(param)
@@ -31,6 +33,15 @@ trait Using extends LogSupport {
       f(param)
     } finally {
       param.close()
+    }
+  }
+
+  protected def syncableBlock[R](body: => R): R = {
+    lock.lock()
+    try {
+      body
+    } finally {
+      lock.unlock()
     }
   }
 }
