@@ -16,7 +16,7 @@ import org.scalatest.matchers.should.Matchers
  * Created by Wallace on 2016/11/6.
  */
 trait UnitSpec extends AnyFlatSpec with Matchers with FuncRuntimeDur {
-  protected val teamID = "Wallace Huang"
+  protected val teamID: String = "NoTalk Tech"
 
   var runTimes: Int = 1
 
