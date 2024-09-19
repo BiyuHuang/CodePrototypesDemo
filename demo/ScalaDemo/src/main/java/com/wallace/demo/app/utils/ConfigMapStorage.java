@@ -44,13 +44,13 @@ public class ConfigMapStorage {
     String envKey = System.getenv("ENCRYPTION_KEY");
     if (envKey == null) {
       throw new IllegalArgumentException("Environment variable ENCRYPTION_KEY not set");
-    } else {
-      byte[] keyBytes = Base64.getDecoder().decode(envKey);
-      byte[] newKeyBytes = new byte[KEY_LENGTH];
-      System.arraycopy(keyBytes, 0, newKeyBytes, 0, Math.min(keyBytes.length, KEY_LENGTH));
-      this.encryptionKey = new SecretKeySpec(newKeyBytes, "AES");
     }
-    String SAVE_FILE_NAME = "/.kms_conf";
+    byte[] keyBytes = Base64.getDecoder().decode(envKey);
+    byte[] newKeyBytes = new byte[KEY_LENGTH];
+    System.arraycopy(keyBytes, 0, newKeyBytes, 0, Math.min(keyBytes.length, KEY_LENGTH));
+    this.encryptionKey = new SecretKeySpec(newKeyBytes, "AES");
+
+    String SAVE_FILE_NAME = "/.kms_kv";
     if (savePath == null || savePath.trim().isEmpty()) {
       this.SAVE_FILE = "/tmp" + SAVE_FILE_NAME;
     } else {
@@ -66,8 +66,12 @@ public class ConfigMapStorage {
     logger.info("SAVE_PATH -> " + this.SAVE_FILE);
   }
 
-  public ConfigMapStorage() {
-    new ConfigMapStorage(null);
+  public static ConfigMapStorage getInstance() {
+    return new ConfigMapStorage(null);
+  }
+
+  public static ConfigMapStorage getInstance(String savePath) {
+    return new ConfigMapStorage(savePath);
   }
 
   @SuppressWarnings("unchecked")
@@ -129,7 +133,7 @@ public class ConfigMapStorage {
   }
 
   public static void main(String[] args) throws Exception {
-    ConfigMapStorage configMapStorage = new ConfigMapStorage();
+    ConfigMapStorage configMapStorage = ConfigMapStorage.getInstance();
     String dummyToken1 = Base64.getEncoder().encodeToString(configMapStorage.generateKey().getEncoded());
     String dummyToken2 = "fake_token";
     logger.info("[RAW] token1 ===> " + dummyToken1);
