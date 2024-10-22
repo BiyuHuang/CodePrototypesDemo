@@ -337,7 +337,7 @@ object MySqlLexer {
           // Treat as symbols
           addToken()
           tokens += Symbol(currentChar.toString)
-        case ' ' | '\n' | '\t' if !inString =>
+        case ' ' | '\n' | '\t' | '=' if !inString =>
           // Treat as token delimiter when not in string
           addToken()
         case _ =>

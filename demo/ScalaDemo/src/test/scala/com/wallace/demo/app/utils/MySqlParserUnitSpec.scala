@@ -21,6 +21,7 @@ class MySqlParserUnitSpec extends UnitSpec {
           start_time TIME(3) COMMENT 'Event start time with milliseconds',
           end_datetime DATETIME(6) DEFAULT '2023-10-22 14:30:00.123456',
           user_name VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+          `job_name` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
           UNIQUE INDEX idx_product_name (name),
           INDEX idx_price (product_id,price)
       ) ENGINE=InnoDB AUTO_INCREMENT=1343 DEFAULT CHARSET=utf8mb4
