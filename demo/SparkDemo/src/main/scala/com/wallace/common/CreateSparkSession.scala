@@ -13,6 +13,7 @@ trait CreateSparkSession extends FuncRunDuration with LogSupport {
       .master(master)
       .appName(appName)
       .config("spark.sql.warehouse.dir", warehouseLocation)
+      .config("xgboost.spark.debug", "true")
       //.enableHiveSupport()
       .getOrCreate()
 
