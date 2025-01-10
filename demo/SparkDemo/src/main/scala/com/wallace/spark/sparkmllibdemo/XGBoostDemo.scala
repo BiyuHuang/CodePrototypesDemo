@@ -1,9 +1,10 @@
 package com.wallace.spark.sparkmllibdemo
 
 import com.wallace.common.{CreateSparkSession, Using}
-import ml.dmlc.xgboost4j.scala.spark.{TrackerConf, XGBoostClassificationModel, XGBoostClassifier}
+import ml.dmlc.xgboost4j.scala.spark.XGBoostClassifier
+import ml.dmlc.xgboost4j.scala.spark.TaskConf
+import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, MulticlassClassificationEvaluator}
 import org.apache.spark.ml.feature.VectorAssembler
-import org.apache.spark.sql.functions._
 
 import scala.util.Random
 
@@ -63,6 +64,34 @@ object XGBoostDemo extends CreateSparkSession with Using {
 
         // 打印预测结果
         predictions.select("label", "features", "prediction").show()
+
+        // 二分类 AUC
+        val binaryEvaluator = new BinaryClassificationEvaluator().setLabelCol("label").setRawPredictionCol("rawPrediction").setMetricName("areaUnderROC")
+
+        val auc = binaryEvaluator.evaluate(predictions)
+        println(s"AUC-ROC: $auc")
+
+        val evaluator = new MulticlassClassificationEvaluator().setLabelCol("label").setPredictionCol("prediction")
+
+        // Accuracy
+        val accuracy = evaluator.setMetricName("accuracy").evaluate(predictions)
+        println(s"Accuracy: $accuracy")
+
+        // Precision
+        val precision = evaluator.setMetricName("precisionByLabel").evaluate(predictions)
+        println(s"Precision: $precision")
+
+        // Recall
+        val recall = evaluator.setMetricName("recallByLabel").evaluate(predictions)
+        println(s"Recall: $recall")
+
+        // 多分类的 F1 分数
+        val f1Score = evaluator.setMetricName("f1").evaluate(predictions)
+        println(s"F1 Score: $f1Score")
+
+        // 创建混淆矩阵
+        val confusionMatrix = predictions.groupBy("label", "prediction").count().orderBy("label", "prediction")
+        confusionMatrix.show()
     }
   }
 }
