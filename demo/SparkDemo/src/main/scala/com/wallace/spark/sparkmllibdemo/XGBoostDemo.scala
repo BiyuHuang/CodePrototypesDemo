@@ -1,13 +1,14 @@
 package com.wallace.spark.sparkmllibdemo
 
 import com.wallace.common.{CreateSparkSession, Using}
+import ml.dmlc.xgboost4j.scala.Booster
 import ml.dmlc.xgboost4j.scala.spark.{XGBoostClassificationModel, XGBoostClassifier}
 import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, MulticlassClassificationEvaluator}
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 import org.apache.spark.sql.functions._
 
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
 import scala.util.Random
 
 /**
@@ -22,11 +23,23 @@ object XGBoostDemo extends CreateSparkSession with Using {
         // Randomly generate 20,000 samples
         val random = new Random()
         val data = (1 to 20000).map { _ =>
-          val label = random.nextInt(2).toDouble // 随机生成 0 或 1
+          val randomLabel = random.nextInt(2).toDouble // 随机生成 0 或 1
           val feature1 = random.nextDouble() * 10 + 1.0 // 特征 1，范围 [0, 10)
           val feature2 = random.nextDouble() * 20 + 1.0 // 特征 2，范围 [0, 20)
           val feature3 = random.nextDouble() * 30 + 1.0 // 特征 3，范围 [0, 30)
-          (label, feature1, feature2, feature3)
+
+          val label = if (feature1 <= 5.0) {
+            1.0
+          } else if (feature2 >= 10.0) {
+            1.0
+          } else if (feature1 > 5.0 & feature2 < 10.0 & feature3 >= 20.0) {
+            1.0
+          } else {
+            0.0
+          }
+
+          val finalLabel: Double = if (label == randomLabel) label else 0.0
+          (finalLabel, feature1, feature2, feature3)
         }.zipWithIndex.map {
           case ((label, feature1, feature2, feature3), id) =>
             (label, feature1, feature2, feature3, id)
@@ -57,7 +70,7 @@ object XGBoostDemo extends CreateSparkSession with Using {
           "objective" -> "binary:logistic", // 二分类 multi:softprob
           "num_round" -> 200, // 迭代次数
           "num_workers" -> 2, // 并行任务数
-          "verbosity" -> 2, // 输出详细日志
+          // "verbosity" -> 2, // 输出详细日志
           "handle_invalid" -> "keep",
           "use_external_memory" -> "false" // 避免使用 Rabit Tracker
         )
@@ -76,6 +89,7 @@ object XGBoostDemo extends CreateSparkSession with Using {
             // Model training
             val model = xgbClassifier.fit(trainData)
             log.info(s"Model summary: ${model.summary.toString()}")
+            featureImportance(model, Array("feature1", "feature2", "feature3"))
             // Model transform
             val predictions = model.transform(testData)
             // Calculate log-loss
@@ -121,7 +135,7 @@ object XGBoostDemo extends CreateSparkSession with Using {
         predictions.select("id", "label", "features", "rawPrediction", "prediction").show()
 
         // AUC
-        val aucArray =  results.map(_._3.apply("auc-roc"))
+        val aucArray = results.map(_._3.apply("auc-roc"))
         val auc = aucArray.sum / aucArray.size
         val metrics = modelEvaluation(predictions)
         log.info(s"AUC-ROC: $auc, " +
@@ -166,5 +180,16 @@ object XGBoostDemo extends CreateSparkSession with Using {
       "recall" -> recall,
       "f1_score" -> f1Score
     )
+  }
+
+  private def featureImportance(model: XGBoostClassificationModel,
+    featureNames: Array[String]): Unit = {
+    val featureImportance: Map[String, Double] = model.nativeBooster
+      .getScore(featureNames, importanceType = "total_cover")
+    val totalScore = featureImportance.values.sum
+    featureImportance.toSeq.sortBy(-_._2).foreach {
+      case (feature, importance) =>
+        log.info(s"Feature: $feature, Importance: ${importance * 1.0 / totalScore}")
+    }
   }
 }
