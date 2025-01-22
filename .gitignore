@@ -29,3 +29,4 @@ resources/test/
 demo/ScalaDemo/.DS_Store
 dependency-reduced-pom.xml
 test/
+.vscode/
