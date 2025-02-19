@@ -30,3 +30,5 @@ demo/ScalaDemo/.DS_Store
 dependency-reduced-pom.xml
 test/
 .vscode/
+.metals/
+.bloop/

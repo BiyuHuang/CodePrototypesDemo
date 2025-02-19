@@ -33,7 +33,7 @@ class MasterActor extends Actor with ActorLogging with EventHandler with Using {
     context
       .system
       .scheduler
-      .scheduleWithFixedDelay(initialTimeout, heartbeatTimeout, self, CheckHeartbeat)
+      .schedule(initialTimeout, heartbeatTimeout, self, CheckHeartbeat)
   }
 
   override def handleHeartbeatEvent(): Unit = {

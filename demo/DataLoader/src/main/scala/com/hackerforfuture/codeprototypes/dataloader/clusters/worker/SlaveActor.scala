@@ -22,7 +22,7 @@ class SlaveActor(master: akka.actor.ActorRef) extends Actor with ActorLogging wi
     context
       .system
       .scheduler
-      .scheduleWithFixedDelay(5.seconds, 10.seconds, self, Heartbeat)
+      .schedule(5.seconds, 10.seconds, self, Heartbeat)
     self ! Register
   }
 

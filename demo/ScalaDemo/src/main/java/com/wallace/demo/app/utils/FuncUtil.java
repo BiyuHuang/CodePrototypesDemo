@@ -14,26 +14,52 @@ public class FuncUtil {
     }
 
     public static String[] split(String str, char split, char other) {
-        //        if (!str.contains(other + "")) {
-        //        return str.split(split + "", -1);
-        //    } else {
         ArrayList<String> strList = new ArrayList<>();
-        int num = 0;// other干扰符个数
-        int off = 0;// 字串的起始位置
-        int subStrSize = 0;// 字串的长度
+        int startIndex = 0; // 字串的起始位置
+        int subStrSize = 0; // 字串的长度
+        int num = 0; // Initialize num
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
             // 最后一个字符
             if (c != split && i == str.length() - 1) {
-                strList.add(str.substring(off, off + subStrSize + 1));
+                strList.add(str.substring(startIndex, startIndex + subStrSize + 1));
             }
             if (c == other) {
                 num++;
                 subStrSize++;
             } else if (num % 2 == 0 && c == split) {
-                strList.add(str.substring(off, off + subStrSize));
-                off += subStrSize + 1;
+                strList.add(str.substring(startIndex, startIndex + subStrSize));
+                startIndex += subStrSize + 1;
                 subStrSize = 0;
+            } else {
+                subStrSize++;
+            }
+        }
+        String fields[] = new String[strList.size()];
+        return strList.toArray(fields);
+    }
+
+    public static String[] splitWithLimit(String str, char split, char other, int limit) {
+        ArrayList<String> strList = new ArrayList<>(); // Initialize strList
+        int startIndex = 0; // 字串的起始位置
+        int subStrSize = 0; // 字串的长度
+        int splitCount = 0; // 分割次数
+        int num = 0; // Initialize num
+
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            // 最后一个字符
+            if (c != split && i == str.length() - 1) {
+                strList.add(str.substring(startIndex, startIndex + subStrSize + 1));
+            }
+            if (c == other) {
+                num++;
+                subStrSize++;
+            } else if (num % 2 == 0 && c == split && splitCount < limit - 1) {
+                strList.add(str.substring(startIndex, startIndex + subStrSize));
+                startIndex += subStrSize + 1;
+                subStrSize = 0;
+                splitCount++;
             } else {
                 subStrSize++;
             }
