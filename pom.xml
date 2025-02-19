@@ -38,6 +38,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.path>${project.basedir}</project.path>
         <log4j2.version>2.24.3</log4j2.version>
+        <slf4j.version>2.0.7</slf4j.version>
     </properties>
 
     <repositories>
@@ -97,10 +98,35 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
                 <version>${log4j2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- log4j2 framework -->
+
+            <!-- slf4j framework -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-reload4j</artifactId>
+                <version>${slf4j.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- slf4j framework -->
 
             <!-- https://mvnrepository.com/artifact/com.jcraft/jsch -->
             <dependency>
@@ -128,24 +154,6 @@
                 <groupId>com.github.pathikrit</groupId>
                 <artifactId>better-files_${scala.binary.version}</artifactId>
                 <version>3.4.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.7</version>
-            </dependency>
-
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
-                <version>1.2.13</version>
-            </dependency>
-
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>1.2.13</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor -->
@@ -214,14 +222,6 @@
                 <groupId>ch.ethz.ganymed</groupId>
                 <artifactId>ganymed-ssh2</artifactId>
                 <version>build210</version>
-            </dependency>
-
-            <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.36</version>
-                <!-- <scope>test</scope> -->
             </dependency>
 
             <dependency>

@@ -41,6 +41,7 @@ object DataLoader extends LogSupport {
         override def run(): Unit = DataLoaderServer.shutdown()
       })
 
+      logger.info("Starting DataLoaderServer...")
       DataLoaderServer.startup()
       DataLoaderServer.awaitShutdown()
     } catch {
