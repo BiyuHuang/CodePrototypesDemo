@@ -13,7 +13,6 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 
@@ -23,7 +22,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
  */
 object RddDemo extends CreateSparkSession with Using {
   private val _spark: SparkSession = createSparkSession("RddDemo")
-  val minPartitions: Int = Math.min(Runtime.getRuntime.availableProcessors(), 10)
+  private val minPartitions: Int = Math.min(Runtime.getRuntime.availableProcessors(), 10)
 
   def readTextFile(filePath: String): Unit = {
     val sc: SparkContext = _spark.sparkContext
