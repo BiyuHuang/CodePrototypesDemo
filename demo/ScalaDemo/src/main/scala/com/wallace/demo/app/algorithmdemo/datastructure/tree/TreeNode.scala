@@ -30,7 +30,7 @@ abstract class TreeNode[T, BaseType <: TreeNode[T, BaseType]] {
 
   def getEnd: Boolean = this.isEnd
 
-  def setDeep(deep: Int): Unit = {
+  private def setDeep(deep: Int): Unit = {
     this.deep = deep
   }
 
@@ -64,7 +64,7 @@ abstract class TreeNode[T, BaseType <: TreeNode[T, BaseType]] {
 
   def getChildren: ArrayBuffer[BaseType] = this.children
 
-  def setParentNode(parent: BaseType): Unit = {
+  private def setParentNode(parent: BaseType): Unit = {
     this.parentNode = Option(parent)
   }
 
@@ -107,9 +107,10 @@ class TrieTree {
     var curNode = root
     word.toCharArray.foreach {
       ch =>
-        val node = new TrieTreeNode(Option(ch))
-        if (curNode.findNode(node).isDefined) {
-          curNode = curNode.findNode(node).get
+        val node: TrieTreeNode = new TrieTreeNode(Option(ch))
+        val foundNode: Option[TrieTreeNode] = curNode.findNode(node)
+        if (foundNode.isDefined) {
+          curNode = foundNode.get
         } else {
           curNode.addChild(node)
           curNode = node
@@ -165,7 +166,7 @@ class TrieTree {
 
   def getCommonPrefix: String = ???
 
-  class TrieTreeNode(content: Option[Char]) extends TreeNode[Char, TrieTreeNode] {
+  private class TrieTreeNode(content: Option[Char]) extends TreeNode[Char, TrieTreeNode] {
     override def hashCode(): Int = {
       MurmurHash3.arrayHash(Array(content.getOrElse(""), this.getDeep))
     }

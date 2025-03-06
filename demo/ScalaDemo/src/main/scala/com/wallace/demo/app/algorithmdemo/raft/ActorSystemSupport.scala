@@ -16,22 +16,22 @@ trait ActorSystemSupport {
   class ActorSystemBuilder() {
     private final val actorConfMap = new ConcurrentHashMap[String, String]()
 
-    private var HOST: Option[String] = None
-    private var PORT: Option[Int] = None
-    private var ACTOR_SYSTEM_NAME: Option[String] = None
+    private var host: Option[String] = None
+    private var port: Option[Int] = None
+    private var name: Option[String] = None
 
     def setHost(host: String): ActorSystemBuilder = {
-      this.HOST = Option(host)
+      this.host = Option(host)
       this
     }
 
     def setPort(port: Int): ActorSystemBuilder = {
-      this.PORT = Option(port)
+      this.port = Option(port)
       this
     }
 
     def setName(name: String): ActorSystemBuilder = {
-      this.ACTOR_SYSTEM_NAME = Option(name)
+      this.name = Option(name)
       this
     }
 
@@ -41,15 +41,14 @@ trait ActorSystemSupport {
     }
 
     def build(): ActorSystem = {
-      require(this.HOST.isDefined, "please set hostname for ActorSystem")
-      require(this.PORT.isDefined, "please set port for ActorSystem")
-      require(this.ACTOR_SYSTEM_NAME.isDefined, "please set name for ActorSystem")
+      require(this.host.isDefined, "please set hostname for ActorSystem")
+      require(this.port.isDefined, "please set port for ActorSystem")
+      require(this.name.isDefined, "please set name for ActorSystem")
       this.actorConfMap.put("akka.actor.provider", "akka.remote.RemoteActorRefProvider")
-      this.actorConfMap.put("akka.remote.netty.tcp.hostname", this.HOST.get)
-      this.actorConfMap.put("akka.remote.netty.tcp.port", s"${this.PORT.get}")
+      this.actorConfMap.put("akka.remote.netty.tcp.hostname", this.host.get)
+      this.actorConfMap.put("akka.remote.netty.tcp.port", s"${this.port.get}")
       this.actorConfMap.put("akka.actor.warn-about-java-serializer-usage", "false")
-      ActorSystem.create(this.ACTOR_SYSTEM_NAME.get, ConfigFactory.parseMap(this.actorConfMap))
+      ActorSystem.create(this.name.get, ConfigFactory.parseMap(this.actorConfMap))
     }
   }
 }
-

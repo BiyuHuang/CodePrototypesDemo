@@ -5,7 +5,6 @@ import com.notalk.flink.demo.event.LoginEvent
 import org.apache.flink.cep.nfa.aftermatch.AfterMatchSkipStrategy
 import org.apache.flink.cep.scala.pattern.Pattern
 import org.apache.flink.cep.scala.{CEP, PatternStream}
-import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.{KeyedStream, StreamExecutionEnvironment, createTypeInformation}
 import org.apache.flink.streaming.api.windowing.time.Time
 
@@ -20,8 +19,7 @@ object FlinkCEPDemo extends LogSupport {
 
     // Set up the Flink execution environment
     val scalaEnv: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
-    scalaEnv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-    scalaEnv.setParallelism(1)
+    scalaEnv.setParallelism(2)
 
     // Define the stream of login events
     val stream: KeyedStream[LoginEvent, String] = scalaEnv
@@ -40,6 +38,8 @@ object FlinkCEPDemo extends LogSupport {
         LoginEvent("user_5", "192.168.23.13", "fail", 52000L),
         LoginEvent("user_5", "192.168.34.12", "fail", 53000L),
         LoginEvent("user_5", "192.168.44.11", "fail", 54000L),
+        LoginEvent("user_6", "192.168.34.13", "fail", 55000L),
+        LoginEvent("user_6", "192.168.44.14", "success", 56000L)
       )
       .assignAscendingTimestamps(_.eventTime)
       .keyBy(_.userId)
@@ -81,12 +81,12 @@ object FlinkCEPDemo extends LogSupport {
     // Apply the pattern to the stream and select the matching events
     val successStream = CEP.pattern(stream, successPattern)
     successStream.select((pattern: scala.collection.Map[String, Iterable[LoginEvent]]) => {
-      val iterator: Iterator[LoginEvent] = pattern.getOrElse("fail", Iterable.empty).iterator
-      val fail: LoginEvent = if (iterator.hasNext) iterator.next() else LoginEvent("", "", "", 0L)
-      val success: LoginEvent = pattern("success").iterator.next()
+        val iterator: Iterator[LoginEvent] = pattern.getOrElse("fail", Iterable.empty).iterator
+        val fail: LoginEvent = if (iterator.hasNext) iterator.next() else LoginEvent("", "", "", 0L)
+        val success: LoginEvent = pattern("success").iterator.next()
 
-      (success.userId, fail.ip, success.ip)
-    })
+        (success.userId, fail.ip, success.ip)
+      })
       .printToErr("success_result")
 
     // Execute the Flink job

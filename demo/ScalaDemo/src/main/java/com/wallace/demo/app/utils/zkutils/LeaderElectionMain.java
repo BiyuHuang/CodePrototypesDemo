@@ -1,4 +1,4 @@
-package com.wallace.demo.app.utils.zkUtils;
+package com.wallace.demo.app.utils.zkutils;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.Participant;

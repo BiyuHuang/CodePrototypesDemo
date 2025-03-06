@@ -6,10 +6,10 @@ import com.wallace.demo.app.common.LoopService
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicLong, AtomicReference}
 import java.util.{Properties, UUID}
+import java.security.SecureRandom
 import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
-import scala.util.Random
 
 /**
  * Author: biyu.huang
@@ -63,15 +63,17 @@ class NodeCoordinator(sleepMills: Long, name: String, host: String, nodeProps: P
     }
   }
 
-  def doElection(): Unit = {
+  private def doElection(): Unit = {
     if (!isCandidate.get()) isCandidate.set(true)
 
   }
 
   private class InternalActor() extends Actor {
-    val nodeActors: mutable.HashMap[String, ActorSelection] = new mutable.HashMap()
+    private val nodeActors: mutable.HashMap[String, ActorSelection] = new mutable.HashMap()
 
-    def getMessage: Any = {
+    private val secureRandom: SecureRandom = new SecureRandom()
+
+    private def getMessage: Any = {
       atomicBlock[Any](semaphore) {
         if (isLeader.get()) {
           HeartbeatMessage(HeartbeatType.LEADER, currentTerm.get(),
@@ -96,7 +98,7 @@ class NodeCoordinator(sleepMills: Long, name: String, host: String, nodeProps: P
         case (host, actorPath) =>
           val nodeActor: ActorSelection = context.actorSelection(actorPath)
           nodeActors.put(host, nodeActor)
-          nodeActor ! ElectionMessage(currentTerm.get(), currentNodeID, 150 + Random.nextInt(150))
+          nodeActor ! ElectionMessage(currentTerm.get(), currentNodeID, 150 + secureRandom.nextInt(150))
       }
       import context.dispatcher
       context.system.scheduler.schedule(0 millis, 100 millis, new Runnable {
