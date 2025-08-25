@@ -215,6 +215,12 @@ object EventDrivenDataLoaderApp extends LogSupport {
                 val stats = inMemoryStore.getStatistics
                 logger.info(s"📊 Event Store Stats: ${stats.totalEvents} events, " +
                   s"${stats.aggregateCount} aggregates, ${stats.eventTypeCount} event types")
+              case optimizedStore: OptimizedInMemoryEventStore =>
+                val stats = optimizedStore.getDetailedStatistics
+                logger.info(f"📊 Optimized Event Store Stats: ${stats.totalEvents} events, " +
+                  f"${stats.aggregateCount} aggregates, ${stats.eventTypeCount} event types, " +
+                  f"Memory: ${stats.memoryUsageMB}MB, Hot/Warm: ${stats.hotEvents}/${stats.warmEvents}, " +
+                  f"Efficiency: ${stats.memoryEfficiency}%.2f events/MB")
               case _ =>
                 logger.info("📊 Event Store: Non-memory store active")
             }

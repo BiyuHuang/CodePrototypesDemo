@@ -24,7 +24,7 @@ import scala.util.control.NonFatal
 
 /**
  * 事件驱动的DataLoader服务器
- * 
+ *
  * 功能增强：
  * - 集成事件总线和事件存储
  * - 启动事件驱动的Actor系统
@@ -32,26 +32,26 @@ import scala.util.control.NonFatal
  * - 支持分布式集群管理
  */
 object EventDrivenDataLoaderServer extends LogSupport {
-  
+
   private implicit val executionContext: ExecutionContext = ExecutionContext.global
-  
+
   // 服务状态
   private val startupComplete: AtomicBoolean = new AtomicBoolean(false)
   private val isShuttingDown: AtomicBoolean = new AtomicBoolean(false)
   private val isStartingUp: AtomicBoolean = new AtomicBoolean(false)
-  
+
   private var shutdownLatch: CountDownLatch = new CountDownLatch(1)
-  
+
   // 核心组件
   private var actorSystem: Option[ActorSystem] = None
   private var eventBus: Option[DataLoaderEventBus] = None
   private var eventStore: Option[EventStore] = None
   private var masterActor: Option[ActorRef] = None
   private var workerActors: List[ActorRef] = List.empty
-  
+
   // 服务线程池
   private val threadPool: ExecutorService = Executors.newFixedThreadPool(3)
-  
+
   /**
    * 启动事件驱动服务器
    */
@@ -63,33 +63,33 @@ object EventDrivenDataLoaderServer extends LogSupport {
 
       val canStartup = isStartingUp.compareAndSet(false, true)
       if (canStartup && !startupComplete.get) {
-        
+
         logger.info("Starting EventDrivenDataLoaderServer...")
-        
+
         // 1. 初始化Actor系统
         initializeActorSystem()
-        
+
         // 2. 初始化事件基础设施
         initializeEventInfrastructure()
-        
+
         // 3. 启动Master Actor
         startMasterActor()
-        
+
         // 4. 启动Worker Actors
         startWorkerActors()
-        
+
         // 5. 启动数据处理服务
         startDataProcessingServices()
-        
+
         // 6. 设置系统事件监听
         setupSystemEventListeners()
-        
+
         shutdownLatch = new CountDownLatch(1)
         startupComplete.set(true)
         isStartingUp.set(false)
-        
+
         logger.info("EventDrivenDataLoaderServer started successfully")
-        
+
         // 发布系统启动事件
         publishSystemStartedEvent()
       }
@@ -113,29 +113,29 @@ object EventDrivenDataLoaderServer extends LogSupport {
 
       if (shutdownLatch.getCount > 0 && isShuttingDown.compareAndSet(false, true)) {
         logger.info("Shutting down EventDrivenDataLoaderServer...")
-        
+
         // 发布系统关闭事件
         publishSystemShutdownEvent()
-        
+
         // 1. 停止Worker Actors
         stopWorkerActors()
-        
+
         // 2. 停止Master Actor
         stopMasterActor()
-        
+
         // 3. 关闭数据处理服务
         stopDataProcessingServices()
-        
+
         // 4. 关闭事件基础设施
         shutdownEventInfrastructure()
-        
+
         // 5. 关闭Actor系统
         shutdownActorSystem()
-        
+
         startupComplete.set(false)
         isShuttingDown.set(false)
         shutdownLatch.countDown()
-        
+
         logger.info("EventDrivenDataLoaderServer shutdown completed")
       }
     } catch {
@@ -163,16 +163,21 @@ object EventDrivenDataLoaderServer extends LogSupport {
    * 初始化事件基础设施
    */
   private def initializeEventInfrastructure(): Unit = {
-    actorSystem.foreach { system =>
-      // 创建事件存储
-      eventStore = Some(EventStore.inMemory(maxEvents = 50000))
-      logger.info("Event store initialized")
-      
-      // 创建事件总线
-      val bus = EventBus.initialize(system)
-      eventStore.foreach(bus.withEventStore)
-      eventBus = Some(bus)
-      logger.info("Event bus initialized")
+    actorSystem.foreach {
+      system =>
+        // 创建优化的事件存储
+        eventStore = Some(EventStore.optimizedInMemory(
+          maxEvents = 50000,
+          maxMemoryMB = 200,  // 增加内存限制以适应生产环境
+          maxEventSizeKB = 50  // 允许更大的事件
+        ))
+        logger.info("Event store initialized")
+
+        // 创建事件总线
+        val bus = EventBus.initialize(system)
+        eventStore.foreach(bus.withEventStore)
+        eventBus = Some(bus)
+        logger.info("Event bus initialized")
     }
   }
 
@@ -231,7 +236,7 @@ object EventDrivenDataLoaderServer extends LogSupport {
         }
       }
       bus.subscribe(clusterEventListener)
-      
+
       // 监听任务事件
       val taskEventListener = new SimpleEventListener[TaskCompleted] {
         override def handleEvent(event: TaskCompleted): Unit = {
@@ -239,7 +244,7 @@ object EventDrivenDataLoaderServer extends LogSupport {
         }
       }
       bus.subscribe(taskEventListener)
-      
+
       logger.info("System event listeners setup completed")
     }
   }
@@ -327,6 +332,16 @@ object EventDrivenDataLoaderServer extends LogSupport {
       workerCount = workerActors.size,
       eventStoreStats = eventStore.map {
         case inMemory: InMemoryEventStore => Some(inMemory.getStatistics)
+        case optimized: OptimizedInMemoryEventStore => 
+          // 将优化版统计转换为标准统计格式
+          val optimizedStats = optimized.getDetailedStatistics
+          Some(EventStoreStatistics(
+            totalEvents = optimizedStats.totalEvents,
+            aggregateCount = optimizedStats.aggregateCount,
+            eventTypeCount = optimizedStats.eventTypeCount,
+            oldestEvent = optimizedStats.oldestEvent,
+            newestEvent = optimizedStats.newestEvent
+          ))
         case _ => None
       }.flatten
     )
