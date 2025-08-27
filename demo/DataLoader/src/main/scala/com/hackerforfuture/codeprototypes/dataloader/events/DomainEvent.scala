@@ -85,8 +85,147 @@ case class WorkerTimedOut(
 ) extends AbstractDomainEvent(aggregateId = workerId)
 
 /**
- * Master选举事件
+ * 工作节点断连事件
  */
+case class WorkerDisconnected(
+  workerId: String,
+  reason: String,
+  disconnectedAt: Instant = Instant.now(),
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = workerId)
+
+/**
+ * 工作节点重连事件
+ */
+case class WorkerReconnected(
+  workerId: String,
+  reconnectedAt: Instant = Instant.now(),
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = workerId)
+
+/**
+ * 集群节点状态事件
+ */
+case class ClusterNodeUp(
+  nodeId: String,
+  nodeAddress: String,
+  nodeRoles: Set[String],
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = nodeId)
+
+case class ClusterNodeDown(
+  nodeId: String,
+  nodeAddress: String,
+  reason: String,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = nodeId)
+
+case class ClusterNodeUnreachable(
+  nodeId: String,
+  nodeAddress: String,
+  observedBy: String,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = nodeId)
+
+case class ClusterNodeReachable(
+  nodeId: String,
+  nodeAddress: String,
+  observedBy: String,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = nodeId)
+
+/**
+ * Leader选举相关事件
+ */
+case class LeaderElectionStarted(
+  term: Long,
+  candidateId: String,
+  clusterSize: Int,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = candidateId)
+
+case class VoteCasted(
+  term: Long,
+  voterId: String,
+  candidateId: String,
+  voteGranted: Boolean,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = candidateId)
+
+case class LeaderElected(
+  term: Long,
+  leaderId: String,
+  followerIds: List[String],
+  electionDuration: Long,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = leaderId)
+
+case class LeaderHeartbeat(
+  term: Long,
+  leaderId: String,
+  followerCount: Int,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = leaderId)
+
+case class LeaderStepDown(
+  term: Long,
+  leaderId: String,
+  reason: String,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = leaderId)
+
+/**
+ * 集群角色变更事件
+ */
+case class NodeBecameLeader(
+  nodeId: String,
+  term: Long,
+  previousLeader: Option[String],
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = nodeId)
+
+case class NodeBecameFollower(
+  nodeId: String,
+  term: Long,
+  newLeader: String,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = nodeId)
+
+case class NodeBecameCandidate(
+  nodeId: String,
+  term: Long,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = nodeId)
+
+/**
+ * 集群状态迁移事件
+ */
+case class MasterStateMigrationStarted(
+  fromNode: String,
+  toNode: String,
+  stateSize: Long,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = toNode)
+
+case class MasterStateMigrationCompleted(
+  fromNode: String,
+  toNode: String,
+  migratedItems: Int,
+  duration: Long,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = toNode)
+
+case class MasterStateMigrationFailed(
+  fromNode: String,
+  toNode: String,
+  error: String,
+  override val correlationId: Option[String] = None
+) extends AbstractDomainEvent(aggregateId = toNode)
+
+/**
+ * 保持向后兼容的Master选举事件
+ */
+@deprecated("Use LeaderElected instead", "1.1.0")
 case class MasterElected(
   masterId: String,
   masterPath: ActorPath,

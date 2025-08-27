@@ -43,7 +43,11 @@ class SlaveActor(master: akka.actor.ActorRef) extends Actor with ActorLogging wi
       self ! StopActor
     case message =>
       // 发送带有唯一标识ID的自定义消息给Master
-      val customMessage = CustomMessage(uniqueID, message)
+      val customMessage = CustomMessage(
+        messageType = "worker_message",
+        data = Map("content" -> message.toString),
+        id = Some(uniqueID)
+      )
       master ! customMessage
   }
 

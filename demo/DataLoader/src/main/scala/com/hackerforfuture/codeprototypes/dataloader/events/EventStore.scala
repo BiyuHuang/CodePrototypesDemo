@@ -145,7 +145,7 @@ class InMemoryEventStore(maxEvents: Int = 10000)(implicit ec: ExecutionContext)
    * 根据事件类型获取事件
    */
   override def getEventsByType(eventType: String): Seq[DomainEvent] = lock.synchronized {
-    eventsByType.getOrElse(eventType, mutable.ListBuffer.empty).toSeq.sortBy(_.timestamp)
+    eventsByType.getOrElse(eventType, mutable.ListBuffer.empty).sortBy(_.timestamp)
   }
 
   /**
@@ -154,14 +154,14 @@ class InMemoryEventStore(maxEvents: Int = 10000)(implicit ec: ExecutionContext)
   override def getEventsByTimeRange(start: Instant, end: Instant): Seq[DomainEvent] = lock.synchronized {
     events.filter { event =>
       event.timestamp.isAfter(start) && event.timestamp.isBefore(end)
-    }.toSeq.sortBy(_.timestamp)
+    }.sortBy(_.timestamp)
   }
 
   /**
    * 获取最新的N个事件
    */
   override def getLatestEvents(limit: Int): Seq[DomainEvent] = lock.synchronized {
-    events.takeRight(limit).toSeq.sortBy(_.timestamp).reverse
+    events.takeRight(limit).sortBy(_.timestamp).reverse
   }
 
   /**
@@ -222,10 +222,10 @@ class InMemoryEventStore(maxEvents: Int = 10000)(implicit ec: ExecutionContext)
 
 /**
  * 内存优化的事件存储实现 - 适用于生产环境的内存存储
- * 
+ *
  * 优化策略：
  * 1. 内存使用监控
- * 2. 智能清理策略  
+ * 2. 智能清理策略
  * 3. 事件大小限制
  * 4. 字符串池化
  * 5. 分层存储
@@ -239,19 +239,19 @@ class OptimizedInMemoryEventStore(
   // 内存使用统计
   private val memoryUsage = new AtomicLong(0L)
   private val eventCount = new AtomicLong(0L)
-  
+
   // 字符串池化 - 减少重复字符串内存占用
   private val stringPool = TrieMap[String, String]()
-  
+
   // 分层存储：热数据 + 温数据
-  private val hotEvents = mutable.ListBuffer[DomainEvent]()      // 最近1000个事件
-  private val warmEvents = mutable.ListBuffer[DomainEvent]()     // 其余事件
-  
+  private val hotEvents = mutable.ListBuffer[DomainEvent]() // 最近1000个事件
+  private val warmEvents = mutable.ListBuffer[DomainEvent]() // 其余事件
+
   // 优化的索引结构
-  private val eventsByAggregate = TrieMap[String, mutable.ArrayBuffer[Int]]()  // 存储索引而非对象
-  private val eventsByType = TrieMap[String, mutable.ArrayBuffer[Int]]()       // 存储索引而非对象  
-  private val eventsById = TrieMap[String, Int]()                              // 存储索引而非对象
-  
+  private val eventsByAggregate = TrieMap[String, mutable.ArrayBuffer[Int]]() // 存储索引而非对象
+  private val eventsByType = TrieMap[String, mutable.ArrayBuffer[Int]]() // 存储索引而非对象
+  private val eventsById = TrieMap[String, Int]() // 存储索引而非对象
+
   // 同步锁
   private val lock = new Object
 
@@ -261,25 +261,25 @@ class OptimizedInMemoryEventStore(
   private def intern(str: String): String = {
     stringPool.getOrElseUpdate(str, str)
   }
-  
+
   /**
    * 估算事件大小（KB）
    */
   private def estimateEventSize(event: DomainEvent): Int = {
     val baseSize = 200 // 基础对象大小
-    val stringSize = Option(event.aggregateId).map(_.length * 2).getOrElse(0) + 
-                    Option(event.eventType).map(_.length * 2).getOrElse(0) +
-                    Option(event.eventId).map(_.length * 2).getOrElse(0)
+    val stringSize = Option(event.aggregateId).map(_.length * 2).getOrElse(0) +
+      Option(event.eventType).map(_.length * 2).getOrElse(0) +
+      Option(event.eventId).map(_.length * 2).getOrElse(0)
     (baseSize + stringSize) / 1024 // 转换为KB
   }
-  
+
   /**
    * 获取总事件列表（热+温）
    */
   private def getAllEvents: IndexedSeq[DomainEvent] = lock.synchronized {
     (hotEvents ++ warmEvents).toIndexedSeq
   }
-  
+
   /**
    * 根据索引获取事件
    */
@@ -296,78 +296,78 @@ class OptimizedInMemoryEventStore(
         logger.warn(s"Event ${event.eventId} size ${eventSize}KB exceeds limit ${maxEventSizeKB}KB")
         return
       }
-      
+
       // 2. 去重检查
       val pooledEventId = intern(event.eventId)
       if (eventsById.contains(pooledEventId)) {
         logger.warn(s"Event with id $pooledEventId already exists, skipping")
         return
       }
-      
+
       // 3. 内存限制检查
       val currentMemoryMB = memoryUsage.get() / (1024 * 1024)
       if (currentMemoryMB > maxMemoryMB) {
         performIntelligentCleanup()
       }
-      
-      // 4. 数量限制检查  
+
+      // 4. 数量限制检查
       if (eventCount.get() >= maxEvents) {
         moveHotToWarm()
         if (eventCount.get() >= maxEvents) {
           removeOldestEvents(maxEvents / 10)
         }
       }
-      
+
       // 5. 字符串池化处理（直接使用原事件，但对字符串进行池化）
       val pooledAggregateId = intern(event.aggregateId)
       val pooledEventType = intern(event.eventType)
-      
+
       // 6. 存储到热数据区
       hotEvents += event
       val eventIndex = (hotEvents.size + warmEvents.size) - 1
-      
+
       // 7. 更新索引（存储索引而非对象引用，使用池化的字符串作为key）
-      eventsByAggregate.getOrElseUpdate(pooledAggregateId, 
+      eventsByAggregate.getOrElseUpdate(pooledAggregateId,
         mutable.ArrayBuffer[Int]()) += eventIndex
-      eventsByType.getOrElseUpdate(pooledEventType, 
-        mutable.ArrayBuffer[Int]()) += eventIndex  
+      eventsByType.getOrElseUpdate(pooledEventType,
+        mutable.ArrayBuffer[Int]()) += eventIndex
       eventsById += (pooledEventId -> eventIndex)
-      
+
       // 8. 更新统计
       memoryUsage.addAndGet(eventSize * 1024L)
       eventCount.incrementAndGet()
-      
+
       logger.debug(s"Stored optimized event: ${event.eventType} with id: $pooledEventId")
-      
+
     } catch {
       case ex: Exception =>
         logger.error(s"Failed to store optimized event ${event.eventId}", ex)
         throw ex
     }
   }
-  
+
   /**
    * 智能清理策略：基于内存使用量和访问频率
    */
   private def performIntelligentCleanup(): Unit = {
     val startMemory = memoryUsage.get()
-    
+
     // 1. 清理字符串池中未使用的字符串
     cleanStringPool()
-    
+
     // 2. 将热数据移到温数据区
     moveHotToWarm()
-    
+
     // 3. 如果内存仍然紧张，删除最老的温数据
     val currentMemoryMB = memoryUsage.get() / (1024 * 1024)
     if (currentMemoryMB > maxMemoryMB * 0.8) {
       removeOldestEvents(maxEvents / 20) // 删除5%
     }
-    
+
     val savedMemory = (startMemory - memoryUsage.get()) / (1024 * 1024)
     logger.info(s"Intelligent cleanup saved ${savedMemory}MB memory")
   }
-  
+
   /**
    * 将热数据移动到温数据区
    */
@@ -379,7 +379,7 @@ class OptimizedInMemoryEventStore(
       logger.debug(s"Moved ${toMove.size} events from hot to warm storage")
     }
   }
-  
+
   /**
    * 清理未使用的字符串池
    */
@@ -387,54 +387,54 @@ class OptimizedInMemoryEventStore(
     val usedStrings = mutable.Set[String]()
     getAllEvents.foreach { event =>
       usedStrings += event.aggregateId
-      usedStrings += event.eventType  
+      usedStrings += event.eventType
       usedStrings += event.eventId
     }
-    
+
     val before = stringPool.size
     stringPool.retain((k, _) => usedStrings.contains(k))
     val after = stringPool.size
-    
+
     if (before > after) {
       logger.debug(s"Cleaned string pool: ${before - after} unused strings removed")
     }
   }
-  
+
   private def removeOldestEvents(count: Int): Unit = {
     // 从温数据区开始删除
     val toRemoveFromWarm = math.min(count, warmEvents.size)
     if (toRemoveFromWarm > 0) {
       val removed = warmEvents.take(toRemoveFromWarm)
       warmEvents.remove(0, toRemoveFromWarm)
-      
+
       // 更新统计
       removed.foreach { event =>
         memoryUsage.addAndGet(-estimateEventSize(event) * 1024L)
         eventCount.decrementAndGet()
       }
-      
+
       logger.info(s"Removed $toRemoveFromWarm oldest events from warm storage")
     }
-    
+
     // 如果还需要删除更多，从热数据区删除
     val remaining = count - toRemoveFromWarm
     if (remaining > 0 && hotEvents.nonEmpty) {
       val toRemoveFromHot = math.min(remaining, hotEvents.size)
       val removed = hotEvents.take(toRemoveFromHot)
       hotEvents.remove(0, toRemoveFromHot)
-      
+
       removed.foreach { event =>
         memoryUsage.addAndGet(-estimateEventSize(event) * 1024L)
         eventCount.decrementAndGet()
       }
-      
+
       logger.info(s"Removed $toRemoveFromHot oldest events from hot storage")
     }
-    
+
     // 重建索引（因为索引位置改变了）
     rebuildIndexes()
   }
-  
+
   /**
    * 重建所有索引
    */
@@ -442,21 +442,21 @@ class OptimizedInMemoryEventStore(
     eventsByAggregate.clear()
     eventsByType.clear()
     eventsById.clear()
-    
+
     val allEvents = getAllEvents
     allEvents.zipWithIndex.foreach { case (event, index) =>
       // 使用池化的字符串作为key
       val pooledAggregateId = intern(event.aggregateId)
       val pooledEventType = intern(event.eventType)
       val pooledEventId = intern(event.eventId)
-      
-      eventsByAggregate.getOrElseUpdate(pooledAggregateId, 
+
+      eventsByAggregate.getOrElseUpdate(pooledAggregateId,
         mutable.ArrayBuffer[Int]()) += index
-      eventsByType.getOrElseUpdate(pooledEventType, 
+      eventsByType.getOrElseUpdate(pooledEventType,
         mutable.ArrayBuffer[Int]()) += index
       eventsById += (pooledEventId -> index)
     }
-    
+
     logger.debug("Rebuilt all indexes after cleanup")
   }
 
@@ -469,16 +469,14 @@ class OptimizedInMemoryEventStore(
     val pooledId = stringPool.getOrElse(aggregateId, aggregateId)
     val indexes = eventsByAggregate.getOrElse(pooledId, mutable.ArrayBuffer.empty)
     val allEvents = getAllEvents
-    indexes.flatMap(i => if (i < allEvents.length) Some(allEvents(i)) else None)
-      .toSeq.sortBy(_.timestamp)
+    indexes.flatMap(i => allEvents.lift(i)).sortBy(_.timestamp)
   }
 
   override def getEventsByType(eventType: String): Seq[DomainEvent] = lock.synchronized {
     val pooledType = stringPool.getOrElse(eventType, eventType)
     val indexes = eventsByType.getOrElse(pooledType, mutable.ArrayBuffer.empty)
     val allEvents = getAllEvents
-    indexes.flatMap(i => if (i < allEvents.length) Some(allEvents(i)) else None)
-      .toSeq.sortBy(_.timestamp)
+    indexes.flatMap(i => allEvents.lift(i)).sortBy(_.timestamp)
   }
 
   override def getEventsByTimeRange(start: Instant, end: Instant): Seq[DomainEvent] = lock.synchronized {
@@ -510,7 +508,7 @@ class OptimizedInMemoryEventStore(
   }
 
   override def count(): Long = eventCount.get()
-  
+
   /**
    * 获取详细的内存统计
    */
@@ -526,8 +524,12 @@ class OptimizedInMemoryEventStore(
       eventTypeCount = eventsByType.size,
       oldestEvent = allEvents.headOption.map(_.timestamp),
       newestEvent = allEvents.lastOption.map(_.timestamp),
-      averageEventSizeKB = if (eventCount.get() > 0) 
-        (memoryUsage.get() / eventCount.get() / 1024).toInt else 0
+      averageEventSizeKB =
+        if (eventCount.get() > 0) {
+          (memoryUsage.get() / eventCount.get() / 1024).toInt
+        } else {
+          0
+        }
     )
   }
 }

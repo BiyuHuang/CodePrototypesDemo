@@ -81,10 +81,12 @@ class MasterActor extends Actor with ActorLogging with EventHandler with Using {
 
   def receive: Receive = {
     case Heartbeat => handleHeartbeatEvent()
-    case Register => handleRegisterEvent()
+    case register: Register => handleRegisterEvent()
     case CheckHeartbeat => handelCheckHeartbeatEvent()
     case StopActor => handleStopEvent()
-    case CustomMessage(id, content) =>
+    case msg: CustomMessage =>
+      val id = msg.id.getOrElse(sender().path)
+      val content = msg.content.getOrElse("empty")
       if (registeredSlaves.contains(id)) {
         log.info(s"Processing message from slave $id: $content")
         // 处理消息逻辑

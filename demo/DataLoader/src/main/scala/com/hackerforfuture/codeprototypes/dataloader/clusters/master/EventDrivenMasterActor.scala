@@ -90,10 +90,10 @@ class EventDrivenMasterActor(override val eventBus: DataLoaderEventBus)
         workerPath = senderId
       )
 
-    case Register =>
+    case register: Register =>
       val senderId = sender().path
       WorkerRegistered(
-        workerId = senderId.name,
+        workerId = register.workerId,
         workerPath = senderId
       )
 
@@ -111,10 +111,10 @@ class EventDrivenMasterActor(override val eventBus: DataLoaderEventBus)
   override protected def handleMessage(message: Message): Unit = {
     message match {
       case Heartbeat => handleHeartbeatEvent()
-      case Register => handleRegisterEvent()
+      case register: Register => handleRegisterEvent()
       case CheckHeartbeat => handelCheckHeartbeatEvent()
       case StopActor => handleStopEvent()
-      case CustomMessage(id, content) => handleCustomMessage(id, content)
+      case msg: CustomMessage => handleCustomMessage(msg.id.getOrElse(sender().path), msg.content)
       case SlaveActorTerminated(id, reason) => handleSlaveTerminated(id, reason)
       case _ => log.warning(s"Unknown message: $message")
     }

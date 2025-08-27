@@ -103,7 +103,7 @@ class EventDrivenSlaveActor(master: ActorRef, override val eventBus: DataLoaderE
    * 消息到事件的转换
    */
   override protected def messageToEvent: PartialFunction[Message, DomainEvent] = {
-    case Register =>
+    case register: Register =>
       WorkerRegistered(
         workerId = actorId,
         workerPath = self.path,
@@ -123,7 +123,7 @@ class EventDrivenSlaveActor(master: ActorRef, override val eventBus: DataLoaderE
   override protected def handleMessage(message: Message): Unit = {
     message match {
       case Heartbeat => handleHeartbeatEvent()
-      case Register => handleRegisterEvent()
+      case register: Register => handleRegisterEvent()
       case RegisterTimeout => handleRegisterEvent()
       case StopActor => handleStopEvent()
       case _ => log.warning(s"Unknown message: $message")
@@ -272,7 +272,7 @@ class EventDrivenSlaveActor(master: ActorRef, override val eventBus: DataLoaderE
   /**
    * 处理任务成功
    */
-  private def handleTaskSuccess(taskId: String, result: TaskResult): Unit = {
+  private def handleTaskSuccess(taskId: String, result: com.hackerforfuture.codeprototypes.dataloader.events.TaskResult): Unit = {
     activeTasks.get(taskId).foreach { taskExecution =>
       activeTasks.put(taskId, taskExecution.copy(status = Completed))
       
